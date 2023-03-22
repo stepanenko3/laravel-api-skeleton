@@ -97,12 +97,10 @@ trait RegisterConversions
 
     protected function loadConversions(): void
     {
-        $finallyConversions = array_merge(
+        $this->conversions = array_merge(
             $this->modelMediaConversions ?? [],
             $this->getMediaConversions(),
         );
-
-        $this->conversions = $finallyConversions;
 
         $conversions = array_keys($this->conversions);
 

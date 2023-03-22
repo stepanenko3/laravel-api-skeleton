@@ -76,7 +76,7 @@ class TelegramBot
             ];
         }
 
-        $res = Http::post('https://api.telegram.org/bot' . config('services.telegram.client_secret') . '/sendMessage', $data);
+        Http::post('https://api.telegram.org/bot' . config('services.telegram.client_secret') . '/sendMessage', $data);
 
         return true;
     }
