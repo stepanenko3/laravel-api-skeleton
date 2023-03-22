@@ -1,8 +1,8 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Traits\Draftable;
+namespace Stepanenko3\LaravelApiSkeleton\Traits\Draftable;
 
-use Stepanenko3\LaravelLogicContainers\Scopes\DraftableScope;
+use Stepanenko3\LaravelApiSkeleton\Scopes\DraftableScope;
 
 trait Draftable
 {

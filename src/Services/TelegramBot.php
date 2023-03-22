@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Services;
+namespace Stepanenko3\LaravelApiSkeleton\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;

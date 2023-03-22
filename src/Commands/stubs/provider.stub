@@ -1,15 +1,15 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers;
+namespace Stepanenko3\LaravelApiSkeleton;
 
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Stepanenko3\LaravelLogicContainers\Commands\ContainerActionMakeCommand;
-use Stepanenko3\LaravelLogicContainers\Commands\ContainerControllerMakeCommand;
-use Stepanenko3\LaravelLogicContainers\Commands\ContainerDtoMakeCommand;
-use Stepanenko3\LaravelLogicContainers\Commands\ContainerModelMakeCommand;
-use Stepanenko3\LaravelLogicContainers\Commands\ContainerResourceMakeCommand;
+use Stepanenko3\LaravelApiSkeleton\Commands\ContainerActionMakeCommand;
+use Stepanenko3\LaravelApiSkeleton\Commands\ContainerControllerMakeCommand;
+use Stepanenko3\LaravelApiSkeleton\Commands\ContainerDtoMakeCommand;
+use Stepanenko3\LaravelApiSkeleton\Commands\ContainerModelMakeCommand;
+use Stepanenko3\LaravelApiSkeleton\Commands\ContainerResourceMakeCommand;
 
 class {{ container }}Provider extends PackageServiceProvider
 {
@@ -21,7 +21,7 @@ class {{ container }}Provider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package
-            ->name('logic-containers')
+            ->name('laravel-api-skeleton')
             ->hasConfigFile()
             ->hasCommand(ContainerModelMakeCommand::class)
             ->hasCommand(ContainerResourceMakeCommand::class)
@@ -35,7 +35,7 @@ class {{ container }}Provider extends PackageServiceProvider
                     })
                     ->publishConfigFile()
                     ->copyAndRegisterServiceProviderInApp()
-                    ->askToStarRepoOnGitHub('stepanenko3/laravel-logic-containers')
+                    ->askToStarRepoOnGitHub('stepanenko3/laravel-api-skeleton')
                     ->endWith(function (InstallCommand $command) {
                         $command->info('Have a great day!');
                     });

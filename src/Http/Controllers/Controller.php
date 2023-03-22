@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Http\Controllers;
+namespace Stepanenko3\LaravelApiSkeleton\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
 

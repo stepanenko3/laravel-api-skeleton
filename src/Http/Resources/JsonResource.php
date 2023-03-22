@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Http\Resources;
+namespace Stepanenko3\LaravelApiSkeleton\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource as BaseJsonResource;

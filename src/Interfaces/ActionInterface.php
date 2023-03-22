@@ -1,8 +1,8 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Interfaces;
+namespace Stepanenko3\LaravelApiSkeleton\Interfaces;
 
-use Stepanenko3\LaravelLogicContainers\DTO\DTO;
+use Stepanenko3\LaravelApiSkeleton\DTO\DTO;
 
 interface ActionInterface
 {

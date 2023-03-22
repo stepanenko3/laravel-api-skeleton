@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Commands;
+namespace Stepanenko3\LaravelApiSkeleton\Commands;
 
 use Illuminate\Console\GeneratorCommand as BaseGeneratorCommand;
 use Symfony\Component\Console\Input\InputArgument;

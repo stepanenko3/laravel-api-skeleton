@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Database\Schema;
+namespace Stepanenko3\LaravelApiSkeleton\Database\Schema;
 
 use Illuminate\Database\Schema\Blueprint as IlluminateBlueprint;
 use Illuminate\Database\Schema\ForeignKeyDefinition;

@@ -1,8 +1,8 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Channels;
+namespace Stepanenko3\LaravelApiSkeleton\Channels;
 
-use Stepanenko3\LaravelLogicContainers\Services\SMS;
+use Stepanenko3\LaravelApiSkeleton\Services\SMS;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 

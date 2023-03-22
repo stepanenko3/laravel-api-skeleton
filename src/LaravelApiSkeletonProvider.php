@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Providers;
+namespace Stepanenko3\LaravelApiSkeleton;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,15 +10,15 @@ use Illuminate\Support\Facades\Schema;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Stepanenko3\LaravelLogicContainers\Commands\ContainerActionMakeCommand;
-use Stepanenko3\LaravelLogicContainers\Commands\ContainerControllerMakeCommand;
-use Stepanenko3\LaravelLogicContainers\Commands\ContainerDtoMakeCommand;
-use Stepanenko3\LaravelLogicContainers\Commands\ContainerModelMakeCommand;
-use Stepanenko3\LaravelLogicContainers\Commands\ContainerResourceMakeCommand;
-use Stepanenko3\LaravelLogicContainers\DTO\DTO;
-use Stepanenko3\LaravelLogicContainers\Http\Schemas\HttpSchema;
+use Stepanenko3\LaravelApiSkeleton\Commands\ContainerActionMakeCommand;
+use Stepanenko3\LaravelApiSkeleton\Commands\ContainerControllerMakeCommand;
+use Stepanenko3\LaravelApiSkeleton\Commands\ContainerDtoMakeCommand;
+use Stepanenko3\LaravelApiSkeleton\Commands\ContainerModelMakeCommand;
+use Stepanenko3\LaravelApiSkeleton\Commands\ContainerResourceMakeCommand;
+use Stepanenko3\LaravelApiSkeleton\DTO\DTO;
+use Stepanenko3\LaravelApiSkeleton\Http\Schemas\HttpSchema;
 
-class LaravelLogicContainersProvider extends PackageServiceProvider
+class LaravelApiSkeletonProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
@@ -28,13 +28,15 @@ class LaravelLogicContainersProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package
-            ->name('logic-containers')
+            ->name('laravel-api-skeleton')
             ->hasConfigFile()
-            ->hasCommand(ContainerModelMakeCommand::class)
-            ->hasCommand(ContainerResourceMakeCommand::class)
-            ->hasCommand(ContainerActionMakeCommand::class)
-            ->hasCommand(ContainerDtoMakeCommand::class)
-            ->hasCommand(ContainerControllerMakeCommand::class)
+            ->hasCommands([
+                ContainerModelMakeCommand::class,
+                ContainerResourceMakeCommand::class,
+                ContainerActionMakeCommand::class,
+                ContainerDtoMakeCommand::class,
+                ContainerControllerMakeCommand::class,
+            ])
             ->hasInstallCommand(function (InstallCommand $command): void {
                 $command
                     ->startWith(function (InstallCommand $command): void {
@@ -42,7 +44,7 @@ class LaravelLogicContainersProvider extends PackageServiceProvider
                     })
                     ->publishConfigFile()
                     ->copyAndRegisterServiceProviderInApp()
-                    ->askToStarRepoOnGitHub('stepanenko3/laravel-logic-containers')
+                    ->askToStarRepoOnGitHub('stepanenko3/laravel-api-skeleton')
                     ->endWith(function (InstallCommand $command): void {
                         $command->info('Have a great day!');
                     });

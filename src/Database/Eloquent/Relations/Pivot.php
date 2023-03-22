@@ -1,9 +1,9 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Database\Eloquent\Relations;
+namespace Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Relations\Pivot as BasePivot;
-use Stepanenko3\LaravelLogicContainers\Database\Eloquent\Builder;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
 
 abstract class Pivot extends BasePivot
 {

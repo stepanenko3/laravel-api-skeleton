@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\{Http, Storage};
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Stepanenko3\LaravelLogicContainers\Helpers\ExtendedCollection;
+use Stepanenko3\LaravelApiSkeleton\Helpers\ExtendedCollection;
 
 if (!function_exists('get_media_url')) {
     /**
@@ -225,7 +225,7 @@ if (!function_exists('get_location')) {
             $ip = get_ip();
         }
 
-        $cache = Stepanenko3\LaravelLogicContainers\Models\Track\TrackerGeoipCache::firstWhere('client_ip', $ip);
+        $cache = Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerGeoipCache::firstWhere('client_ip', $ip);
 
         if ($cache && $cache->payload) {
             return $cache->payload;
@@ -257,7 +257,7 @@ if (!function_exists('get_location')) {
                 'zip' => $res['postal'] ?? '',
             ];
 
-            Stepanenko3\LaravelLogicContainers\Models\Track\TrackerGeoipCache::create([
+            Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerGeoipCache::create([
                 'client_ip' => $ip,
                 'payload' => $data,
             ]);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Services;
+namespace Stepanenko3\LaravelApiSkeleton\Services;
 
 use Exception;
 use Illuminate\Support\Facades\{Http, Log};

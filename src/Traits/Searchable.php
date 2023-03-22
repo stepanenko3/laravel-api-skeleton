@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Traits;
+namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
 use Illuminate\Database\Query\Builder as DatabaseBuilder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;

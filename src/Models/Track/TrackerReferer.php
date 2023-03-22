@@ -1,9 +1,9 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Models\Track;
+namespace Stepanenko3\LaravelApiSkeleton\Models\Track;
 
-use Stepanenko3\LaravelLogicContainers\Database\Eloquent\Model;
-use Stepanenko3\LaravelLogicContainers\Traits\Trackable;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Model;
+use Stepanenko3\LaravelApiSkeleton\Traits\Trackable;
 
 class TrackerReferer extends Model
 {

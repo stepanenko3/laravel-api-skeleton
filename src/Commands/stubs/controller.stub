@@ -2,10 +2,10 @@
 
 namespace {{ namespace }};
 
-use Stepanenko3\LaravelLogicContainers\Helpers\ApiPagination;
-use Stepanenko3\LaravelLogicContainers\Helpers\Response;
-use Stepanenko3\LaravelLogicContainers\Http\Controllers\Controller;
-use Stepanenko3\LaravelLogicContainers\Http\Responses\SuccessResponse;
+use Stepanenko3\LaravelApiSkeleton\Helpers\ApiPagination;
+use Stepanenko3\LaravelApiSkeleton\Helpers\Response;
+use Stepanenko3\LaravelApiSkeleton\Http\Controllers\Controller;
+use Stepanenko3\LaravelApiSkeleton\Http\Responses\SuccessResponse;
 use Illuminate\Contracts\Support\Responsable;
 use App\Services\{{ container }}\DTO\{{ pluralName }}FetchDTO;
 use App\Services\{{ container }}\DTO\{{ singularName }}ShowDTO;

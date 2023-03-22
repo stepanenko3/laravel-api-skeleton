@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Traits;
+namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 

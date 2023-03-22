@@ -1,11 +1,11 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Database\Eloquent;
+namespace Stepanenko3\LaravelApiSkeleton\Database\Eloquent;
 
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
-use Stepanenko3\LaravelLogicContainers\Http\Schemas\HttpSchema;
+use Stepanenko3\LaravelApiSkeleton\Http\Schemas\HttpSchema;
 
 abstract class Model extends BaseModel
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Helpers;
+namespace Stepanenko3\LaravelApiSkeleton\Helpers;
 
 use Exception;
 

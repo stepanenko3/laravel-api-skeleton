@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Traits\Draftable;
+namespace Stepanenko3\LaravelApiSkeleton\Traits\Draftable;
 
 class DraftStatus
 {

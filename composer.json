@@ -1,5 +1,5 @@
 {
-    "name": "stepanenko3/laravel-logic-containers",
+    "name": "stepanenko3/laravel-api-skeleton",
     "description": "Laravel services architecture",
     "keywords": [
         "laravel",
@@ -10,7 +10,7 @@
         "logic",
         "business logics"
     ],
-    "homepage": "https://github.com/stepanenko3/laravel-logic-containers",
+    "homepage": "https://github.com/stepanenko3/laravel-api-skeleton",
     "license": "MIT",
     "authors": [
         {
@@ -38,7 +38,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Stepanenko3\\LaravelLogicContainers\\": "src"
+            "Stepanenko3\\LaravelApiSkeleton\\": "src"
         },
         "files": [
             "src/helpers.php"
@@ -50,7 +50,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Stepanenko3\\LaravelLogicContainers\\LaravelLogicContainersProvider"
+                "Stepanenko3\\LaravelApiSkeleton\\LaravelApiSkeletonProvider"
             ]
         }
     },

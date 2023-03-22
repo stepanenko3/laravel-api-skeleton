@@ -1,8 +1,8 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Scopes;
+namespace Stepanenko3\LaravelApiSkeleton\Scopes;
 
-use Stepanenko3\LaravelLogicContainers\Traits\Draftable\DraftStatus;
+use Stepanenko3\LaravelApiSkeleton\Traits\Draftable\DraftStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;

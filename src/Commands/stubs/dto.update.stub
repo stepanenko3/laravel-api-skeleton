@@ -2,9 +2,9 @@
 
 namespace {{ namespace }};
 
-use Stepanenko3\LaravelLogicContainers\DTO\BaseDTO;
-use Stepanenko3\LaravelLogicContainers\DTO\Casts\IntegerCast;
-use Stepanenko3\LaravelLogicContainers\DTO\Casts\StringCast;
+use Stepanenko3\LaravelApiSkeleton\DTO\BaseDTO;
+use Stepanenko3\LaravelApiSkeleton\DTO\Casts\IntegerCast;
+use Stepanenko3\LaravelApiSkeleton\DTO\Casts\StringCast;
 
 class {{ class }} extends BaseDTO
 {

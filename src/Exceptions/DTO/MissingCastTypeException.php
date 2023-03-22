@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Exceptions\DTO;
+namespace Stepanenko3\LaravelApiSkeleton\Exceptions\DTO;
 
 use Exception;
 use Symfony\Component\HttpFoundation\Response;

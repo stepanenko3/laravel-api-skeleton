@@ -1,9 +1,9 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Channels;
+namespace Stepanenko3\LaravelApiSkeleton\Channels;
 
 use Illuminate\Notifications\Notification;
-use Stepanenko3\LaravelLogicContainers\Services\TelegramBot;
+use Stepanenko3\LaravelApiSkeleton\Services\TelegramBot;
 
 class TelegramChannel
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\DTO\Casts;
+namespace Stepanenko3\LaravelApiSkeleton\DTO\Casts;
 
-use Stepanenko3\LaravelLogicContainers\Exceptions\DTO\CastException;
-use Stepanenko3\LaravelLogicContainers\Interfaces\DtoCastInterface;
+use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastException;
+use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoCastInterface;
 
 class FloatCast implements DtoCastInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Rules;
+namespace Stepanenko3\LaravelApiSkeleton\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\InvokableRule;

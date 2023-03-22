@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Database\Eloquent\Relations;
+namespace Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Relations;
 
 abstract class MorphPivot extends Pivot
 {

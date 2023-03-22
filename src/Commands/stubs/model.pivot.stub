@@ -2,7 +2,7 @@
 
 namespace {{ namespace }};
 
-use Stepanenko3\LaravelLogicContainers\Database\Eloquent\Pivot;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Pivot;
 
 class {{ class }} extends Pivot
 {

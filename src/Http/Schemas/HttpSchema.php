@@ -1,18 +1,18 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Http\Schemas;
+namespace Stepanenko3\LaravelApiSkeleton\Http\Schemas;
 
 use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Contracts\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Stepanenko3\LaravelLogicContainers\Exceptions\DTO\CastTargetException;
-use Stepanenko3\LaravelLogicContainers\Exceptions\DTO\InvalidJsonException;
-use Stepanenko3\LaravelLogicContainers\Exceptions\DTO\MissingCastTypeException;
+use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastTargetException;
+use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\InvalidJsonException;
+use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\MissingCastTypeException;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
-use Stepanenko3\LaravelLogicContainers\Rules\KeysIn;
+use Stepanenko3\LaravelApiSkeleton\Rules\KeysIn;
 
 abstract class HttpSchema
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Interfaces;
+namespace Stepanenko3\LaravelApiSkeleton\Interfaces;
 
 interface DtoInterface
 {

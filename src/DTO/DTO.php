@@ -1,18 +1,18 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\DTO;
+namespace Stepanenko3\LaravelApiSkeleton\DTO;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Stepanenko3\LaravelLogicContainers\Exceptions\DTO\CastTargetException;
-use Stepanenko3\LaravelLogicContainers\Exceptions\DTO\InvalidJsonException;
-use Stepanenko3\LaravelLogicContainers\Exceptions\DTO\MissingCastTypeException;
+use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastTargetException;
+use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\InvalidJsonException;
+use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\MissingCastTypeException;
 use Illuminate\Support\Arr;
-use Stepanenko3\LaravelLogicContainers\Interfaces\DtoCastInterface;
-use Stepanenko3\LaravelLogicContainers\Interfaces\DtoInterface;
+use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoCastInterface;
+use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoInterface;
 
 abstract class DTO implements DtoInterface
 {
@@ -224,7 +224,7 @@ abstract class DTO implements DtoInterface
                 || empty($result[$key])
             ) {
                 if (!array_key_exists($key, $casts)) {
-                    if (config('logic-containers.dto_require_casting', false)) {
+                    if (config('laravel-api-skeleton.dto_require_casting', false)) {
                         throw new MissingCastTypeException($key);
                     }
 

@@ -3,7 +3,7 @@
 namespace {{ namespace }};
 
 use Illuminate\Http\Request;
-use Stepanenko3\LaravelLogicContainers\Http\Resources\JsonResource;
+use Stepanenko3\LaravelApiSkeleton\Http\Resources\JsonResource;
 
 class {{ class }} extends JsonResource
 {

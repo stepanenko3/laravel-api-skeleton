@@ -3,7 +3,7 @@
 namespace {{ namespace }};
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Stepanenko3\LaravelLogicContainers\Database\Eloquent\Model;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Model;
 
 class {{ class }} extends Model
 {

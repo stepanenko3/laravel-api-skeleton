@@ -1,11 +1,11 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Http\Responses;
+namespace Stepanenko3\LaravelApiSkeleton\Http\Responses;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Stepanenko3\LaravelLogicContainers\Helpers\ApiPagination;
+use Stepanenko3\LaravelApiSkeleton\Helpers\ApiPagination;
 
 class SuccessResponse implements Responsable
 {

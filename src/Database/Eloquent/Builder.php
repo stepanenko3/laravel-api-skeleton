@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Database\Eloquent;
+namespace Stepanenko3\LaravelApiSkeleton\Database\Eloquent;
 
 use Illuminate\Database\Eloquent\Builder as BaseBuilder;
 use Stepanenko3\LaravelPagination\Pagination;

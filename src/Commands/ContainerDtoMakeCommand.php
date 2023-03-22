@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Commands;
+namespace Stepanenko3\LaravelApiSkeleton\Commands;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 

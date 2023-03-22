@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Helpers\Track;
+namespace Stepanenko3\LaravelApiSkeleton\Helpers\Track;
 
 use Snowplow\RefererParser\Parser;
 

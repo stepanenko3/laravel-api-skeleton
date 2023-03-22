@@ -1,11 +1,11 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Database\Migrations;
+namespace Stepanenko3\LaravelApiSkeleton\Database\Migrations;
 
 use Illuminate\Database\Migrations\Migration as MigrationsMigration;
 use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Support\Facades\DB;
-use Stepanenko3\LaravelLogicContainers\Database\Schema\Blueprint;
+use Stepanenko3\LaravelApiSkeleton\Database\Schema\Blueprint;
 
 class Migration extends MigrationsMigration
 {

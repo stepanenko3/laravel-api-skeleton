@@ -1,9 +1,9 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\Helpers\Track;
+namespace Stepanenko3\LaravelApiSkeleton\Helpers\Track;
 
-use Stepanenko3\LaravelLogicContainers\Models\Track;
-use Stepanenko3\LaravelLogicContainers\Models\Track\TrackerSession;
+use Stepanenko3\LaravelApiSkeleton\Models\Track;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerSession;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cookie;
 
@@ -17,22 +17,22 @@ class Tracker
     /**
      * User agent parser instance.
      */
-    private ?\Stepanenko3\LaravelLogicContainers\Helpers\Track\UserAgentParser $userAgent = null;
+    private ?\Stepanenko3\LaravelApiSkeleton\Helpers\Track\UserAgentParser $userAgent = null;
 
     /**
      * Mobile detector instance.
      */
-    private ?\Stepanenko3\LaravelLogicContainers\Helpers\Track\MobileDetect $mobileDetect = null;
+    private ?\Stepanenko3\LaravelApiSkeleton\Helpers\Track\MobileDetect $mobileDetect = null;
 
     /**
      * Crawler detector instance.
      */
-    private ?\Stepanenko3\LaravelLogicContainers\Helpers\Track\CrawlerDetect $crawlerDetect = null;
+    private ?\Stepanenko3\LaravelApiSkeleton\Helpers\Track\CrawlerDetect $crawlerDetect = null;
 
     /**
      * Language detector instance.
      */
-    private ?\Stepanenko3\LaravelLogicContainers\Helpers\Track\LanguageDetect $langDetect = null;
+    private ?\Stepanenko3\LaravelApiSkeleton\Helpers\Track\LanguageDetect $langDetect = null;
 
     private $sessionId;
 

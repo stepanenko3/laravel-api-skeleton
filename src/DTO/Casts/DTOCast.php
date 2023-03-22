@@ -1,12 +1,12 @@
 <?php
 
-namespace Stepanenko3\LaravelLogicContainers\DTO\Casts;
+namespace Stepanenko3\LaravelApiSkeleton\DTO\Casts;
 
-use Stepanenko3\LaravelLogicContainers\Interfaces\DtoCastInterface;
+use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoCastInterface;
 use Illuminate\Validation\ValidationException;
 use Throwable;
-use Stepanenko3\LaravelLogicContainers\Exceptions\DTO\CastException;
-use Stepanenko3\LaravelLogicContainers\Exceptions\DTO\CastTargetException;
+use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastException;
+use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastTargetException;
 
 class DTOCast implements DtoCastInterface
 {
