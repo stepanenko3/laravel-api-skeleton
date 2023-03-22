@@ -1,0 +1,31 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Http\Request;
+use Stepanenko3\LaravelLogicContainers\Http\Resources\JsonResource;
+
+class {{ class }} extends JsonResource
+{
+    public array $attributes = [
+        // 'title',
+        // 'slug',
+        // 'created_at',
+        // 'updated_at',
+    ];
+
+    public function toMeta(Request $request): array
+    {
+        return [
+            // 'price' => $this->whenNotNull($this->getPrice()),
+        ];
+    }
+
+    public function toRelations(Request $request): array
+    {
+        return [
+            // 'parent' => new self($this->whenLoaded('parent')),
+            // 'categories' => CategoryResource::collection($this->whenLoaded('categories')),
+        ];
+    }
+}

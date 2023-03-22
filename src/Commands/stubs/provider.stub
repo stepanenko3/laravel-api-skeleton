@@ -1,0 +1,49 @@
+<?php
+
+namespace Stepanenko3\LaravelLogicContainers;
+
+use Spatie\LaravelPackageTools\Commands\InstallCommand;
+use Spatie\LaravelPackageTools\Package;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Stepanenko3\LaravelLogicContainers\Commands\ContainerActionMakeCommand;
+use Stepanenko3\LaravelLogicContainers\Commands\ContainerControllerMakeCommand;
+use Stepanenko3\LaravelLogicContainers\Commands\ContainerDtoMakeCommand;
+use Stepanenko3\LaravelLogicContainers\Commands\ContainerModelMakeCommand;
+use Stepanenko3\LaravelLogicContainers\Commands\ContainerResourceMakeCommand;
+
+class {{ container }}Provider extends PackageServiceProvider
+{
+    public function configurePackage(Package $package): void
+    {
+        /*
+         * This class is a Package Service Provider
+         *
+         * More info: https://github.com/spatie/laravel-package-tools
+         */
+        $package
+            ->name('logic-containers')
+            ->hasConfigFile()
+            ->hasCommand(ContainerModelMakeCommand::class)
+            ->hasCommand(ContainerResourceMakeCommand::class)
+            ->hasCommand(ContainerActionMakeCommand::class)
+            ->hasCommand(ContainerDtoMakeCommand::class)
+            ->hasCommand(ContainerControllerMakeCommand::class)
+            ->hasInstallCommand(function (InstallCommand $command) {
+                $command
+                    ->startWith(function(InstallCommand $command) {
+                        $command->info('Hello, and welcome to my great new package!');
+                    })
+                    ->publishConfigFile()
+                    ->copyAndRegisterServiceProviderInApp()
+                    ->askToStarRepoOnGitHub('stepanenko3/laravel-logic-containers')
+                    ->endWith(function (InstallCommand $command) {
+                        $command->info('Have a great day!');
+                    });
+            });
+    }
+
+    public function boot()
+    {
+        parent::boot();
+    }
+}

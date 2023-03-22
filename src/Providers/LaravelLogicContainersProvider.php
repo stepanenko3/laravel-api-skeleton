@@ -1,0 +1,119 @@
+<?php
+
+namespace Stepanenko3\LaravelLogicContainers\Providers;
+
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Spatie\LaravelPackageTools\Commands\InstallCommand;
+use Spatie\LaravelPackageTools\Package;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Stepanenko3\LaravelLogicContainers\Commands\ContainerActionMakeCommand;
+use Stepanenko3\LaravelLogicContainers\Commands\ContainerControllerMakeCommand;
+use Stepanenko3\LaravelLogicContainers\Commands\ContainerDtoMakeCommand;
+use Stepanenko3\LaravelLogicContainers\Commands\ContainerModelMakeCommand;
+use Stepanenko3\LaravelLogicContainers\Commands\ContainerResourceMakeCommand;
+use Stepanenko3\LaravelLogicContainers\DTO\DTO;
+use Stepanenko3\LaravelLogicContainers\Http\Schemas\HttpSchema;
+
+class LaravelLogicContainersProvider extends PackageServiceProvider
+{
+    public function configurePackage(Package $package): void
+    {
+        /*
+         * This class is a Package Service Provider
+         *
+         * More info: https://github.com/spatie/laravel-package-tools
+         */
+        $package
+            ->name('logic-containers')
+            ->hasConfigFile()
+            ->hasCommand(ContainerModelMakeCommand::class)
+            ->hasCommand(ContainerResourceMakeCommand::class)
+            ->hasCommand(ContainerActionMakeCommand::class)
+            ->hasCommand(ContainerDtoMakeCommand::class)
+            ->hasCommand(ContainerControllerMakeCommand::class)
+            ->hasInstallCommand(function (InstallCommand $command): void {
+                $command
+                    ->startWith(function (InstallCommand $command): void {
+                        $command->info('Hello, and welcome to my great new package!');
+                    })
+                    ->publishConfigFile()
+                    ->copyAndRegisterServiceProviderInApp()
+                    ->askToStarRepoOnGitHub('stepanenko3/laravel-logic-containers')
+                    ->endWith(function (InstallCommand $command): void {
+                        $command->info('Have a great day!');
+                    });
+            });
+    }
+
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        parent::register();
+
+        foreach ([
+            DTO::class,
+            HttpSchema::class,
+        ] as $abstract) {
+            $this->app->beforeResolving($abstract, function ($class, $parameters, $app): void {
+                if ($app->has($class)) {
+                    return;
+                }
+
+                $app->bind(
+                    $class,
+                    fn ($container) => $class::fromRequest($container['request']),
+                );
+            });
+        }
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        parent::boot();
+
+        Schema::defaultStringLength(191);
+
+        Carbon::setLocale(config('app.locale'));
+        setlocale(LC_TIME, config('app.locale'));
+
+        $this->preventLazyLoading();
+
+        Builder::macro('orderBy', function ($field, $order = 'asc', $locale = null) {
+            if (
+                in_array(HasTranslations::class, class_uses($this->model))
+                && $this->model->isTranslatableAttribute($field)
+            ) {
+                $locale ??= app()->getLocale();
+                $field .= '->' . $locale;
+                $this->query->orderBy($field, $order);
+            } else {
+                $this->query->orderBy($field, $order);
+            }
+
+            return $this;
+        });
+    }
+
+    private function preventLazyLoading(): void
+    {
+        Model::preventLazyLoading(!app()->environment('production'));
+
+        // But in production, log the violation instead of throwing an exception.
+        if (app()->environment('production')) {
+            Model::handleLazyLoadingViolationUsing(function ($model, $relation): void {
+                $class = $model::class;
+
+                Log::warning("Attempted to lazy load [{$relation}] on model [{$class}].");
+            });
+        }
+    }
+}

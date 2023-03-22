@@ -1,0 +1,106 @@
+<?php
+
+namespace {{ namespace }};
+
+use Stepanenko3\LaravelLogicContainers\Helpers\ApiPagination;
+use Stepanenko3\LaravelLogicContainers\Helpers\Response;
+use Stepanenko3\LaravelLogicContainers\Http\Controllers\Controller;
+use Stepanenko3\LaravelLogicContainers\Http\Responses\SuccessResponse;
+use Illuminate\Contracts\Support\Responsable;
+use App\Services\{{ container }}\DTO\{{ pluralName }}FetchDTO;
+use App\Services\{{ container }}\DTO\{{ singularName }}ShowDTO;
+use App\Services\{{ container }}\DTO\{{ singularName }}StoreDTO;
+use App\Services\{{ container }}\DTO\{{ singularName }}UpdateDTO;
+use App\Services\{{ container }}\DTO\{{ singularName }}DeleteDTO;
+use App\Services\{{ container }}\Actions\{{ pluralName }}Fetch;
+use App\Services\{{ container }}\Actions\{{ singularName }}Show;
+use App\Services\{{ container }}\Actions\{{ singularName }}Store;
+use App\Services\{{ container }}\Actions\{{ singularName }}Update;
+use App\Services\{{ container }}\Actions\{{ singularName }}Delete;
+use App\Services\{{ container }}\Http\Schemas\{{ singularName }}Schema;
+use App\Services\{{ container }}\Http\Resources\{{ singularName }}Resource;
+
+class {{ class }} extends Controller
+{
+    public function index(
+        {{ singularName }}Schema $schema,
+        {{ pluralName }}FetchDTO $dto,
+        {{ pluralName }}Fetch $action,
+    ): Responsable {
+        return Response::make(function () use ($dto, $action, $schema) {
+            $data = $action->handle($dto, $schema);
+
+            return new SuccessResponse(
+                data: {{ singularName }}Resource::collection($data),
+                metadata: [
+                    'pagination' => (new ApiPagination($data))->toArray(),
+                ],
+            );
+        });
+    }
+
+    public function show(
+        {{ singularName }}Schema $schema,
+        {{ singularName }}GetDTO $dto,
+        {{ singularName }}Get $action,
+    ): Responsable {
+        return Response::make(
+            fn () => new SuccessResponse(
+                data: new {{ singularName }}Resource(
+                    $action->handle($dto, $schema),
+                ),
+                metadata: [
+                    //
+                ],
+            ),
+        );
+    }
+
+    public function store(
+        {{ singularName }}StoreDTO $dto,
+        {{ singularName }}Store $action,
+    ): Responsable {
+        return Response::make(
+            fn () => new SuccessResponse(
+                data: new {{ singularName }}Resource(
+                    $action->handle($dto),
+                ),
+                metadata: [
+                    //
+                ],
+            ),
+        );
+    }
+
+    public function update(
+        {{ singularName }}UpdateDTO $dto,
+        {{ singularName }}Update $action,
+    ): Responsable {
+        return Response::make(
+            fn () => new SuccessResponse(
+                data: new {{ singularName }}Resource(
+                    $action->handle($dto),
+                ),
+                metadata: [
+                    //
+                ],
+            ),
+        );
+    }
+
+    public function destroy(
+        {{ singularName }}DeleteDTO $dto,
+        {{ singularName }}Delete $action,
+    ): Responsable {
+        return Response::make(
+            fn () => new SuccessResponse(
+                data: new {{ singularName }}Resource(
+                    $action->handle($dto),
+                ),
+                metadata: [
+                    //
+                ],
+            ),
+        );
+    }
+}

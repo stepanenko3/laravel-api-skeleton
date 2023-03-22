@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Http\Schemas\Api\v1\Blog;
+
+use App\Http\Schemas\AbstractSchema;
+
+class BlogCategorySchema extends AbstractSchema
+{
+    public function fields(): array
+    {
+        return [
+            'id',
+            'name',
+            'slug',
+            'created_at',
+            'updated_at',
+        ];
+    }
+
+    public function with(): array
+    {
+        return [
+            'blogPosts' => BlogPostSchema::class,
+            'blogPost' => BlogPostSchema::class,
+            'relationCategories' => self::class,
+        ];
+    }
+
+    public function withCount(): array
+    {
+        return [
+            'blogPosts',
+        ];
+    }
+}

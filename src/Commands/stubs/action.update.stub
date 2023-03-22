@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Services\{{ container }}\Models\{{ singularName }};
+use App\Services\{{ container }}\DTO\{{ singularName }}UpdateDTO;
+
+class {{ class }}
+{
+    public function handle(
+        {{ singularName }}UpdateDTO $dto,
+    ): int {
+        return {{ singularName }}::query()
+            ->where('id', $dto->id)
+            ->update($dto->toArray());
+    }
+}

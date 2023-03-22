@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Database\Eloquent\Model;
+use App\Services\{{ container }}\Models\{{ singularName }};
+use App\Services\{{ container }}\DTO\{{ singularName }}GetDTO;
+
+class {{ class }}
+{
+    public function handle(
+        {{ singularName }}GetDTO $dto,
+    ): Model {
+        return {{ singularName }}::query()
+            ->findOrFail($dto->id);
+    }
+}

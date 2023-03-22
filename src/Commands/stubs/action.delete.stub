@@ -1,0 +1,15 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Services\{{ container }}\Models\{{ singularName }};
+use App\Services\{{ container }}\DTO\{{ singularName }}DeleteDTO;
+
+class {{ class }}
+{
+    public function handle(
+        {{ singularName }}DeleteDTO $dto,
+    ): int {
+        return {{ singularName }}::destroy($dto->id);
+    }
+}

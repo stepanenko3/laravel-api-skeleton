@@ -1,0 +1,32 @@
+<?php
+
+namespace {{ namespace }};
+
+use Stepanenko3\LaravelLogicContainers\DTO\BaseDTO;
+use Stepanenko3\LaravelLogicContainers\DTO\Casts\IntegerCast;
+
+class {{ class }} extends BaseDTO
+{
+    protected int $id;
+
+    public function rules(): array
+    {
+        return [
+            'id' => 'required|integer|exists:{table},{field}',
+        ];
+    }
+
+    protected function defaults(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'id' => new IntegerCast(),
+        ];
+    }
+}

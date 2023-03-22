@@ -1,0 +1,20 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Services\{{ container }}\Models\{{ singularName }};
+use App\Services\{{ container }}\DTO\{{ pluralName }}FetchDTO;
+
+class {{ class }}
+{
+    public function handle(
+        {{ pluralName }}FetchDTO $dto,
+    ): LengthAwarePaginator {
+        return {{ singularName }}::query()
+            ->paginate(
+                page: $dto->page,
+                perPage: $dto->per_page,
+            );
+    }
+}

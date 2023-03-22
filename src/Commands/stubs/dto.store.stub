@@ -1,0 +1,32 @@
+<?php
+
+namespace {{ namespace }};
+
+use Stepanenko3\LaravelLogicContainers\DTO\BaseDTO;
+use Stepanenko3\LaravelLogicContainers\DTO\Casts\StringCast;
+
+class {{ class }} extends BaseDTO
+{
+    protected string $name;
+
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string|between:2,50',
+        ];
+    }
+
+    protected function defaults(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'name' => new StringCast(),
+        ];
+    }
+}

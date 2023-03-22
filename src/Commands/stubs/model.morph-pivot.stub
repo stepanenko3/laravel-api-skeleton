@@ -1,0 +1,10 @@
+<?php
+
+namespace {{ namespace }};
+
+use Stepanenko3\LaravelLogicContainers\Database\Eloquent\MorphPivot;
+
+class {{ class }} extends MorphPivot
+{
+    //
+}

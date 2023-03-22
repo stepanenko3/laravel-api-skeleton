@@ -1,0 +1,43 @@
+<?php
+
+namespace {{ namespace }};
+
+use Stepanenko3\LaravelLogicContainers\DTO\BaseDTO;
+use Stepanenko3\LaravelLogicContainers\DTO\Casts\IntegerCast;
+use Stepanenko3\LaravelLogicContainers\DTO\Casts\StringCast;
+
+class {{ class }} extends BaseDTO
+{
+    protected int $page;
+
+    protected int $per_page;
+
+    protected string $order_by;
+
+    public function rules(): array
+    {
+        return [
+            'page' => 'nullable|integer|min:1',
+            'per_page' => 'nullable|integer|between:1,100',
+            'order_by' => 'nullable|string|in:newest,oldest',
+        ];
+    }
+
+    protected function defaults(): array
+    {
+        return [
+            'page' => 1,
+            'per_page' => 15,
+            'order_by' => 'newest',
+        ];
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'page' => new IntegerCast(),
+            'per_page' => new IntegerCast(),
+            'order_by' => new StringCast(),
+        ];
+    }
+}

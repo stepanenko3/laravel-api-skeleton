@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Services\{{ container }}\Models\{{ singularName }};
+use App\Services\{{ container }}\DTO\{{ singularName }}StoreDTO;
+
+class {{ class }}
+{
+    public function handle(
+        {{ singularName }}StoreDTO $dto,
+    ): bool {
+        return $dto
+            ->toModel({{ singularName }}::class)
+            ->save();
+    }
+}
