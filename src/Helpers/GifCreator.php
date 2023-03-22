@@ -12,42 +12,39 @@ class GifCreator
     /**
      * @var string The gif string sourc
      */
-    private $gif;
+    private string $gif;
 
     /**
      * @var string Encoder version
      */
-    private $version;
+    private readonly string $version;
 
     /**
      * @var bool Check the image is build or not
      */
-    private $imgBuilt;
+    private bool $imgBuilt;
 
     /**
      * @var array Frames string sources
      */
-    private $frameSources;
+    private array $frameSources;
 
     /**
      * @var int Gif loop
      */
-    private $loop;
+    private int $loop;
 
     /**
      * @var int Gif dis
      */
-    private $dis;
+    private int $dis;
 
     /**
      * @var int Gif color
      */
-    private $colour;
+    private int $colour;
 
-    /**
-     * @var array
-     */
-    private $errors;
+    private readonly array $errors;
 
     // Methods
     // ===================================================================================
@@ -114,14 +111,14 @@ class GifCreator
                 $colour = imagecolortransparent($resourceImg);
             }
 
-            if (substr($this->frameSources[$i], 0, 6) != 'GIF87a' && substr($this->frameSources[$i], 0, 6) != 'GIF89a') {
+            if (!str_starts_with((string) $this->frameSources[$i], 'GIF87a') && !str_starts_with((string) $this->frameSources[$i], 'GIF89a')) {
                 throw new \Exception($this->version . ': ' . $i . ' ' . $this->errors['ERR01']);
             }
 
             for ($j = (13 + 3 * (2 << (ord($this->frameSources[$i][10]) & 0x07))), $k = true; $k; $j++) {
                 switch ($this->frameSources[$i][$j]) {
                     case '!':
-                        if (substr($this->frameSources[$i], $j + 3, 8) == 'NETSCAPE') {
+                        if (substr((string) $this->frameSources[$i], $j + 3, 8) == 'NETSCAPE') {
                             throw new \Exception($this->version . ': ' . $this->errors['ERR03'] . ' (' . ($i + 1) . ' source).');
                         }
 
@@ -174,8 +171,8 @@ class GifCreator
         if (ord($this->frameSources[0][10]) & 0x80) {
             $cmap = 3 * (2 << (ord($this->frameSources[0][10]) & 0x07));
 
-            $this->gif .= substr($this->frameSources[0], 6, 7);
-            $this->gif .= substr($this->frameSources[0], 13, $cmap);
+            $this->gif .= substr((string) $this->frameSources[0], 6, 7);
+            $this->gif .= substr((string) $this->frameSources[0], 13, $cmap);
             $this->gif .= "!\377\13NETSCAPE2.0\3\1" . $this->encodeAsciiToChar($this->loop) . "\0";
         }
     }
@@ -188,23 +185,24 @@ class GifCreator
      */
     public function addGifFrames($i, $d): void
     {
+        $Locals_img = [];
         $Locals_str = 13 + 3 * (2 << (ord($this->frameSources[$i][10]) & 0x07));
 
-        $Locals_end = strlen($this->frameSources[$i]) - $Locals_str - 1;
-        $Locals_tmp = substr($this->frameSources[$i], $Locals_str, $Locals_end);
+        $Locals_end = strlen((string) $this->frameSources[$i]) - $Locals_str - 1;
+        $Locals_tmp = substr((string) $this->frameSources[$i], $Locals_str, $Locals_end);
 
         $Global_len = 2 << (ord($this->frameSources[0][10]) & 0x07);
         $Locals_len = 2 << (ord($this->frameSources[$i][10]) & 0x07);
 
-        $Global_rgb = substr($this->frameSources[0], 13, 3 * (2 << (ord($this->frameSources[0][10]) & 0x07)));
-        $Locals_rgb = substr($this->frameSources[$i], 13, 3 * (2 << (ord($this->frameSources[$i][10]) & 0x07)));
+        $Global_rgb = substr((string) $this->frameSources[0], 13, 3 * (2 << (ord($this->frameSources[0][10]) & 0x07)));
+        $Locals_rgb = substr((string) $this->frameSources[$i], 13, 3 * (2 << (ord($this->frameSources[$i][10]) & 0x07)));
 
-        $Locals_ext = "!\xF9\x04" . chr(($this->dis << 2) + 0) . chr(($d >> 0) & 0xFF) . chr(($d >> 8) & 0xFF) . "\x0\x0";
+        $Locals_ext = "!\xF9\x04" . chr($this->dis << 2) . chr(($d >> 0) & 0xFF) . chr(($d >> 8) & 0xFF) . "\x0\x0";
 
         if ($this->colour > -1 && ord($this->frameSources[$i][10]) & 0x80) {
             for ($j = 0; $j < (2 << (ord($this->frameSources[$i][10]) & 0x07)); $j++) {
                 if (
-                    ord($Locals_rgb[3 * $j + 0]) == (($this->colour >> 16) & 0xFF)
+                    ord($Locals_rgb[3 * $j]) == (($this->colour >> 16) & 0xFF)
                     && ord($Locals_rgb[3 * $j + 1]) == (($this->colour >> 8) & 0xFF)
                     && ord($Locals_rgb[3 * $j + 2]) == (($this->colour >> 0) & 0xFF)
                 ) {
@@ -277,7 +275,7 @@ class GifCreator
     {
         for ($i = 0; $i < $length; $i++) {
             if (
-                $globalBlock[3 * $i + 0] != $localBlock[3 * $i + 0]
+                $globalBlock[3 * $i] != $localBlock[3 * $i]
                 || $globalBlock[3 * $i + 1] != $localBlock[3 * $i + 1]
                 || $globalBlock[3 * $i + 2] != $localBlock[3 * $i + 2]
             ) {
@@ -297,7 +295,7 @@ class GifCreator
      *
      * @return string
      */
-    public function encodeAsciiToChar($char)
+    public function encodeAsciiToChar(mixed $char)
     {
         return chr($char & 0xFF) . chr(($char >> 8) & 0xFF);
     }

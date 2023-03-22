@@ -10,11 +10,11 @@ use Throwable;
 class ErrorResponse implements Responsable
 {
     public function __construct(
-        private string $message = 'Something went wrong',
-        private array $data = [],
-        private ?Throwable $exception = null,
-        private int $code = Response::HTTP_INTERNAL_SERVER_ERROR,
-        private array $headers = [],
+        private readonly string $message = 'Something went wrong',
+        private readonly array $data = [],
+        private readonly ?Throwable $exception = null,
+        private readonly int $code = Response::HTTP_INTERNAL_SERVER_ERROR,
+        private readonly array $headers = [],
     ) {
         //
     }

@@ -10,11 +10,11 @@ use Stepanenko3\LaravelLogicContainers\Helpers\ApiPagination;
 class SuccessResponse implements Responsable
 {
     public function __construct(
-        private mixed $data,
+        private readonly mixed $data,
         private array $metadata = [],
-        private int $code = Response::HTTP_OK,
-        private array $headers = [],
-        private mixed $pagination = null,
+        private readonly int $code = Response::HTTP_OK,
+        private readonly array $headers = [],
+        private readonly mixed $pagination = null,
     ) {
         if ($this->pagination) {
             $this->metadata['pagination'] = (new ApiPagination($this->pagination))->toArray();

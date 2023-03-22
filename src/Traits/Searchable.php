@@ -32,7 +32,7 @@ trait Searchable
 
     private function bindToSearchQuery($query, $search, $fields, $words = null): void
     {
-        $search = str_ireplace(['\'', '"'], ['', ''], $search);
+        $search = str_ireplace(['\'', '"'], ['', ''], (string) $search);
         $words = $words ?: explode(' ', trim($search));
 
         $sql = [];
@@ -52,8 +52,8 @@ trait Searchable
 
             foreach ($words as $word) {
                 $whens = [
-                    'WHEN LOWER(' . $key . ') = \'' . $wrapWord . DB::raw(mb_strtolower($word)) . $wrapWord . '\' THEN ' . round($weight / count($words) * 2, 2),
-                    'WHEN LOWER(' . $key . ') LIKE \'%' . DB::raw(mb_strtolower($word)) . '%\' THEN ' . round($weight / count($words), 2),
+                    'WHEN LOWER(' . $key . ') = \'' . $wrapWord . DB::raw(mb_strtolower((string) $word)) . $wrapWord . '\' THEN ' . round($weight / count($words) * 2, 2),
+                    'WHEN LOWER(' . $key . ') LIKE \'%' . DB::raw(mb_strtolower((string) $word)) . '%\' THEN ' . round($weight / count($words), 2),
                 ];
 
                 $sql[] = '(CASE ' . DB::raw(implode(' ', $whens)) . ' ELSE 0 END)';

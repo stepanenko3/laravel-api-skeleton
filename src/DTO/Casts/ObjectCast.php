@@ -12,7 +12,7 @@ class ObjectCast implements DtoCastInterface
         mixed $value,
     ): object {
         if (is_string($value)) {
-            $value = json_decode($value, true);
+            $value = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
         }
 
         if (!is_array($value)) {

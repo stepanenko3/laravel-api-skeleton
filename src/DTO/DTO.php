@@ -16,17 +16,13 @@ use Stepanenko3\LaravelLogicContainers\Interfaces\DtoInterface;
 
 abstract class DTO implements DtoInterface
 {
-    protected array $data = [];
-
     protected array $validatedData = [];
 
     private \Illuminate\Contracts\Validation\Validator | \Illuminate\Validation\Validator $validator;
 
     public function __construct(
-        array $data)
+        protected array $data)
     {
-        $this->data = $data;
-
         $this->boot();
 
         $this->isValidData()
@@ -58,7 +54,7 @@ abstract class DTO implements DtoInterface
      */
     public static function fromJson(string $json): self
     {
-        $jsonDecoded = json_decode($json, true);
+        $jsonDecoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         if (!is_array($jsonDecoded)) {
             throw new InvalidJsonException();
         }
@@ -144,7 +140,7 @@ abstract class DTO implements DtoInterface
     {
         return $pretty
             ? json_encode($this->validatedData, JSON_PRETTY_PRINT)
-            : json_encode($this->validatedData);
+            : json_encode($this->validatedData, JSON_THROW_ON_ERROR);
     }
 
     /**

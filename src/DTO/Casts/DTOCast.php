@@ -11,7 +11,7 @@ use Stepanenko3\LaravelLogicContainers\Exceptions\DTO\CastTargetException;
 class DTOCast implements DtoCastInterface
 {
     public function __construct(
-        private string $dtoClass,
+        private readonly string $dtoClass,
     ) {
         //
     }
@@ -21,7 +21,7 @@ class DTOCast implements DtoCastInterface
         mixed $value,
     ): DtoCastInterface {
         if (is_string($value)) {
-            $value = json_decode($value, true);
+            $value = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
         }
 
         if (!is_array($value)) {

@@ -10,8 +10,8 @@ use Stepanenko3\LaravelLogicContainers\Exceptions\DTO\CastException;
 class CarbonCast implements DtoCastInterface
 {
     public function __construct(
-        private ?string $timezone = null,
-        private ?string $format = null,
+        private readonly ?string $timezone = null,
+        private readonly ?string $format = null,
     ) {
         //
     }

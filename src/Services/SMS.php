@@ -8,7 +8,7 @@ use Twilio\Rest\Client;
 
 class SMS
 {
-    private $via = 'smsclub';
+    private string $via = 'smsclub';
 
     public function send(string $phone, string $message): self
     {
@@ -49,7 +49,7 @@ class SMS
         try {
             $client = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
 
-            $res = $client->messages->create($phone, [
+            $client->messages->create($phone, [
                 'from' => env('TWILIO_NUMBER'),
                 'body' => $message,
             ]);

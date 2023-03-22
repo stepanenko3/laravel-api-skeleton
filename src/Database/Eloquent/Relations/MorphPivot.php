@@ -30,7 +30,7 @@ abstract class MorphPivot extends Pivot
     public function delete()
     {
         if (isset($this->attributes[$this->getKeyName()])) {
-            return (int) parent::delete();
+            return parent::delete();
         }
 
         if ($this->fireModelEvent('deleting') === false) {
@@ -177,11 +177,12 @@ abstract class MorphPivot extends Pivot
         foreach ($ids as $id) {
             $segments = explode(':', $id);
 
-            $query->orWhere(function ($query) use ($segments) {
-                return $query->where($segments[0], $segments[1])
+            $query->orWhere(
+                fn ($query) => $query
+                    ->where($segments[0], $segments[1])
                     ->where($segments[2], $segments[3])
-                    ->where($segments[4], $segments[5]);
-            });
+                    ->where($segments[4], $segments[5]),
+            );
         }
 
         return $query;

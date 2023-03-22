@@ -19,8 +19,8 @@ trait OpeningHours
                     ),
                 )
                 : null;
-        } catch (\Exception $e) {
-            return;
+        } catch (\Exception) {
+            return null;
         }
     }
 }

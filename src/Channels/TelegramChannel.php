@@ -9,10 +9,8 @@ class TelegramChannel
 {
     /**
      * Send the given notification.
-     *
-     * @param mixed $notifiable
      */
-    public function send($notifiable, Notification $notification): void
+    public function send(mixed $notifiable, Notification $notification): void
     {
         $key = 'telegram';
 

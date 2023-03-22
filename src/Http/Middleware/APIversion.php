@@ -11,11 +11,10 @@ class APIversion
      * Handle an incoming request.
      *
      * @param \Illuminate\Http\Request $request
-     * @param mixed $guard
      *
      * @return mixed
      */
-    public function handle($request, Closure $next, $guard)
+    public function handle($request, Closure $next, mixed $guard)
     {
         Config::set('logic-containers.api_version', (int) $guard);
 

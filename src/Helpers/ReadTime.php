@@ -4,7 +4,7 @@ namespace Stepanenko3\LaravelLogicContainers\Helpers;
 
 use Exception;
 
-class ReadTime
+class ReadTime implements \Stringable
 {
     /**
      * Whether or not minutes/seconds should be abbreviated as min/sec.
@@ -43,17 +43,13 @@ class ReadTime
 
     /**
      * An array containing the read time estimate data.
-     *
-     * @var array
      */
-    private $estimate;
+    private ?array $estimate = null;
 
     /**
      * The sum total number of words in the content.
-     *
-     * @var int
      */
-    private $wordsInContent;
+    private readonly int $wordsInContent;
 
     public function __construct($content, bool $omitSeconds = true, bool $abbreviated = false, int $wordsPerMinute = 230)
     {
@@ -62,10 +58,10 @@ class ReadTime
         $this->ltr = true;
         $this->omitSeconds = $omitSeconds;
         $this->wordsInContent = $this->wordsCount($this->content);
-        $this->wordsPerMinute = (int) $wordsPerMinute;
+        $this->wordsPerMinute = $wordsPerMinute;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->get();
     }
@@ -158,7 +154,7 @@ class ReadTime
             'abbreviated' => (bool) $this->abbreviated,
             'left_to_right' => (bool) $this->ltr,
             'omit_seconds' => (bool) $this->omitSeconds,
-            'words_in_content' => (int) $this->wordsInContent,
+            'words_in_content' => $this->wordsInContent,
             'words_per_minute' => (int) $this->wordsPerMinute,
         ]);
     }
@@ -168,7 +164,7 @@ class ReadTime
      */
     public function toJson(): string
     {
-        return json_encode($this->toArray());
+        return json_encode($this->toArray(), JSON_THROW_ON_ERROR);
     }
 
     /**
@@ -212,16 +208,6 @@ class ReadTime
     }
 
     /**
-     * Remove any double spaces or post/prefixed spaces.
-     *
-     * @param string $string
-     */
-    private function cleanReadTimeString($string): string
-    {
-        return trim(preg_replace('/\s+/u', ' ', $string));
-    }
-
-    /**
      * Set the estimate property.
      */
     private function estimate(): void
@@ -234,10 +220,8 @@ class ReadTime
 
     /**
      * Check if the given content is formatted appropriately.
-     *
-     * @param mixed $content
      */
-    private function invalidContent($content): bool
+    private function invalidContent(mixed $content): bool
     {
         if (is_array($content) || is_string($content)) {
             return false;
@@ -253,7 +237,7 @@ class ReadTime
      *
      * @return string
      */
-    private function parseContent($receivedContent)
+    private function parseContent(mixed $receivedContent)
     {
         if ($this->invalidContent($receivedContent)) {
             throw new Exception('Content must be type of array or string');
@@ -265,22 +249,12 @@ class ReadTime
                 if (is_array($item)) {
                     $item = $this->parseContent($item);
                 }
-                $content .= trim($item);
+                $content .= trim((string) $item);
             }
         } else {
             $content = $receivedContent;
         }
 
         return $this->cleanContent($content);
-    }
-
-    /**
-     * Reverse the words in a string.
-     *
-     * @param string $string
-     */
-    private function reverseWords($string): string
-    {
-        return implode(' ', array_reverse(explode(' ', $string)));
     }
 }

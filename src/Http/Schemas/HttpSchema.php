@@ -144,7 +144,7 @@ abstract class HttpSchema
      */
     public static function fromJson(string $json): self
     {
-        $jsonDecoded = json_decode($json, true);
+        $jsonDecoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
         if (!is_array($jsonDecoded)) {
             throw new InvalidJsonException();
         }
@@ -198,7 +198,7 @@ abstract class HttpSchema
     {
         return $pretty
             ? json_encode($this->validatedData, JSON_PRETTY_PRINT)
-            : json_encode($this->validatedData);
+            : json_encode($this->validatedData, JSON_THROW_ON_ERROR);
     }
 
     protected function bootTraits(): void

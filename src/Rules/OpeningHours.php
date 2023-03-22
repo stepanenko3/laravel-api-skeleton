@@ -12,7 +12,7 @@ class OpeningHours implements InvokableRule
     {
         try {
             SpatieOpeningHours::create($value);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $fail(trans('app.open_hours.error_overlap'));
         }
     }

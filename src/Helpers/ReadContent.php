@@ -15,7 +15,7 @@ class ReadContent
 
     public function __construct(
         private string $content,
-        private Closure $routeMaker,
+        private readonly Closure $routeMaker,
     ) {
         $this->applyHeadings();
         $this->applyTags();
@@ -75,7 +75,7 @@ class ReadContent
     {
         preg_match_all('/#(\w+)/', $this->content, $tags);
 
-        $link = str_ireplace('_1_', '$1', ($this->routeMaker)('_1_'));
+        $link = str_ireplace('_1_', '$1', (string) ($this->routeMaker)('_1_'));
 
         $pat = ['/#(\w+)/', '/@(\w+)/'];
         $rep = [
@@ -89,10 +89,10 @@ class ReadContent
             ->unique()
             ->filter()
             ->values()
-            ->sortByDesc(fn ($tag) => mb_strlen($tag))
+            ->sortByDesc(fn ($tag) => mb_strlen((string) $tag))
             ->map(fn ($tag) => [
                 'text' => $tag,
-                'link' => str_ireplace('$1', $tag, $link),
+                'link' => str_ireplace('$1', (string) $tag, $link),
             ])
             ->toArray();
     }

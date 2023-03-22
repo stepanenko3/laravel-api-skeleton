@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 class CollectionCast implements DtoCastInterface
 {
     public function __construct(
-        private ?DtoCastInterface $type = null,
+        private readonly ?DtoCastInterface $type = null,
     ) {
         //
     }

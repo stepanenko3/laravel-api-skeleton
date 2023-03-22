@@ -8,19 +8,21 @@ if (!function_exists('get_media_url')) {
     /**
      * get_media_url.
      *
-     * @param mixed $conversion
      * @param bool $version
      * @param bool $absolute
-     *
      * @return string
      */
-    function get_media_url(Media $media, $conversion, $version = false, $absolute = true)
-    {
+    function get_media_url(
+        Media $media,
+        mixed $conversion,
+        $version = false,
+        $absolute = true,
+    ) {
         $pathGenerator = app(config('media-library.path_generator'));
         $model = new $media->model_type();
         $fileExtension = $model->getConversionExtension($conversion);
 
-        $fileName = pathinfo($media->file_name, PATHINFO_FILENAME);
+        $fileName = pathinfo((string) $media->file_name, PATHINFO_FILENAME);
         $conversionFileName = substr(base_convert(md5($fileName), 16, 32), 0, 12) . '-' . $conversion;
 
         $path = $pathGenerator->getPathForConversions($media, $model);
@@ -43,17 +45,15 @@ if (!function_exists('get_media_url')) {
 if (!function_exists('process_text_editor')) {
     /**
      * process_text_editor.
-     *
-     * @return array|string
      */
-    function process_text_editor(string | array $field)
+    function process_text_editor(string | array $field): array|string
     {
         if (is_array($field)) {
             foreach ($field as $lang => $body) {
                 $field[$lang] = str_ireplace([
                     '<p data-f-id="pbf" style="text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;">Powered by <a href="https://www.froala.com/wysiwyg-editor?pb=1" title="Froala Editor">Froala Editor</a></p>',
                     '<p data-f-id=\"pbf\" style=\"text-align: center; font-size: 14px; margin-top: 30px; opacity: 0.65; font-family: sans-serif;\">Powered by <a href=\"https:\/\/www.froala.com\/wysiwyg-editor?pb=1\" title=\"Froala Editor\">Froala Editor<\/a><\/p>',
-                ], '', $body);
+                ], '', (string) $body);
             }
         } else {
             $field = str_ireplace([
@@ -176,9 +176,13 @@ if (!function_exists('geocode')) {
         }
 
         if ($geo_type) {
-            $lang = str_replace(['_', 'ua'], ['-', 'uk'], config('app.locale'));
+            $lang = str_replace(
+                ['_', 'ua'],
+                ['-', 'uk'],
+                (string) config('app.locale'),
+            );
 
-            $googleParam = $geo_type == 'address' ? 'address=' . urlencode($address) : 'latlng=' . $latlng;
+            $googleParam = $geo_type == 'address' ? 'address=' . urlencode((string) $address) : 'latlng=' . $latlng;
             $googleLink = 'https://maps.googleapis.com/maps/api/geocode/json?' . $googleParam . '&sensor=false&key=' . env('GEOCODE_KEY') . '&language=' . $lang;
 
             $res = Http::get($googleLink);
@@ -192,7 +196,7 @@ if (!function_exists('geocode')) {
                 $sort_arr = ['route', 'street_number'];
                 $geo_name = $geo_res
                     ->filter(function ($value, $key) use ($sort_arr) {
-                        $count = count($value['types']);
+                        $count = is_countable($value['types']) ? count($value['types']) : 0;
 
                         return count(array_diff($value['types'], $sort_arr)) < $count;
                     })
@@ -212,11 +216,10 @@ if (!function_exists('get_location')) {
     /**
      * get_location.
      *
-     * @param mixed $ip
      *
      * @return array
      */
-    function get_location($ip = null)
+    function get_location(mixed $ip = null)
     {
         if (!$ip) {
             $ip = get_ip();
@@ -239,7 +242,7 @@ if (!function_exists('get_location')) {
             ->json();
 
         if ($res['loc'] ?? null) {
-            $loc = explode(',', $res['loc']);
+            $loc = explode(',', (string) $res['loc']);
 
             $data = [
                 'continent_code' => '',

@@ -37,12 +37,10 @@ class RefererParser
     /**
      * Parse a referer.
      *
-     * @param mixed $refererUrl
-     * @param mixed $pageUrl
      *
      * @return RefererParser
      */
-    public function parse($refererUrl, $pageUrl)
+    public function parse(mixed $refererUrl, mixed $pageUrl)
     {
         $this->setReferer($this->parser->parse($refererUrl, $pageUrl));
 

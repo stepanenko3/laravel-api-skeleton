@@ -8,10 +8,8 @@ class CrawlerDetect
 {
     /**
      * Crawler detector.
-     *
-     * @var \Jaybizzle\CrawlerDetect\CrawlerDetect
      */
-    private $detector;
+    private readonly Detector $detector;
 
     /**
      * Instantiate detector.

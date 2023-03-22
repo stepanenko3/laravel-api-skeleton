@@ -10,10 +10,8 @@ class PhoneChannel
 {
     /**
      * Send the given notification.
-     *
-     * @param mixed $notifiable
      */
-    public function send($notifiable, Notification $notification)
+    public function send(mixed $notifiable, Notification $notification)
     {
         $key = 'phone';
 

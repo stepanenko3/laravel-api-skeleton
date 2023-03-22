@@ -23,13 +23,9 @@ class MakeLogicContainer extends Command
      */
     protected $description = 'Make logic container';
 
-    protected Filesystem $filesystem;
-
-    public function __construct(Filesystem $filesystem)
+    public function __construct(protected Filesystem $filesystem)
     {
         parent::__construct();
-
-        $this->filesystem = $filesystem;
     }
 
     /**
@@ -38,8 +34,8 @@ class MakeLogicContainer extends Command
     public function handle(): void
     {
         dd(11);
-        $name = trim($this->input->getArgument('name'));
-        $dto = trim($this->input->getOption('dto'));
+        $name = trim((string) $this->input->getArgument('name'));
+        trim((string) $this->input->getOption('dto'));
 
         if (!$name) {
             $name = $this->ask('Как вы хотите назвать Logic Container?');

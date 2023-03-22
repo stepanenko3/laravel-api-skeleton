@@ -8,22 +8,9 @@ use Intervention\Image\Facades\Image;
 
 class EmojiParser
 {
-    public const URL = 'https://unicode.org/Public/emoji/%s/emoji-test.txt';
+    final public const URL = 'https://unicode.org/Public/emoji/%s/emoji-test.txt';
 
-    /**
-     * @var string
-     */
-    private $dir;
-
-    /**
-     * @var string
-     */
-    private $version;
-
-    /**
-     * @var array
-     */
-    private $options = [
+    private array $options = [
         'sort' => null,
         'filename' => 'emoji-%s',
     ];
@@ -34,10 +21,11 @@ class EmojiParser
      * @param string $dir dir of emoji images, json and txt files
      * @param string $version unicode emojis version
      */
-    public function __construct(string $dir, string $version = '13.1', array $options = [])
-    {
-        $this->version = $version;
-        $this->dir = $dir;
+    public function __construct(
+        private readonly string $dir,
+        private readonly string $version = '13.1',
+        array $options = [],
+    ) {
         $this->options = array_merge($this->options, $options);
     }
 
@@ -50,7 +38,7 @@ class EmojiParser
     {
         $contents = $this->load();
 
-        $blocks = explode("\n\n", trim($contents));
+        $blocks = explode("\n\n", trim((string) $contents));
 
         $result = $this->parseHeader(array_shift($blocks));
         $result['emoji'] = $this->parseBody($blocks, $result['version']);
@@ -69,7 +57,7 @@ class EmojiParser
 
         $data['emoji'] = array_filter($data['emoji'], fn ($emoji) => file_exists($this->getImgPath($emoji['code'], 160)));
 
-        file_put_contents($file_path, json_encode($data));
+        file_put_contents($file_path, json_encode($data, JSON_THROW_ON_ERROR));
     }
 
     public function resizeImages($src = 160, $sizes = [16, 32, 64, 128]): void
@@ -82,7 +70,7 @@ class EmojiParser
                     ->resize($size, null, fn ($constraint) => $constraint->aspectRatio())
                     ->save(str_ireplace('/160/', '/' . $size . '/', storage_path('/app/public/' . $file)));
 
-                dump('resize: ' . $file . ', to: ' . str_ireplace('/160/', '/' . $size . '/', $file));
+                dump('resize: ' . $file . ', to: ' . str_ireplace('/160/', '/' . $size . '/', (string) $file));
             }
         }
     }
@@ -109,7 +97,7 @@ class EmojiParser
         $result = [];
         $group = null;
         foreach ($blocks as $block) {
-            $rows = explode("\n", trim($block));
+            $rows = explode("\n", trim((string) $block));
 
             if (($value = $this->getValue($rows[0], '# group:')) !== false) {
                 $group = $value;
@@ -163,7 +151,7 @@ class EmojiParser
 
             $code = '';
 
-            ecollect(preg_split('/(:|,) /', trim($emoji['name'])))
+            ecollect(preg_split('/(:|,) /', trim((string) $emoji['name'])))
                 ->map(fn ($part) => Str::slug($part))
                 ->sort(fn ($part) => mb_stripos($part, 'tone') ? 1 : -1)
                 ->map(function ($part) use (&$code): void {
@@ -171,14 +159,14 @@ class EmojiParser
                 });
 
             $code = trim($code, '-_');
-            $code .= '_' . mb_strtolower(Str::slug(trim($emoji['code'])));
+            $code .= '_' . mb_strtolower(Str::slug(trim((string) $emoji['code'])));
 
-            $code_parts = explode(' ', trim($emoji['code']));
-            if (count($code_parts) >= 2 && mb_stripos(trim($emoji['name']), ': ') !== false) {
-                $code .= '_' . mb_strtolower(last($code_parts));
+            $code_parts = explode(' ', trim((string) $emoji['code']));
+            if (count($code_parts) >= 2 && mb_stripos(trim((string) $emoji['name']), ': ') !== false) {
+                $code .= '_' . mb_strtolower((string) last($code_parts));
             }
 
-            $url = 'https://emojigraph.org/media/apple/' . Str::slug($emoji['name']) . '_' . mb_strtolower(Str::slug(trim($emoji['code']))) . '.png';
+            $url = 'https://emojigraph.org/media/apple/' . Str::slug($emoji['name']) . '_' . mb_strtolower(Str::slug(trim((string) $emoji['code']))) . '.png';
 
             if ($img = @file_get_contents($url)) {
                 file_put_contents($imgPath, $img);
@@ -194,6 +182,7 @@ class EmojiParser
 
     private function sort(array $array, string $key)
     {
+        $sort = [];
         foreach ($array as $row) {
             $sort[] = $row[$key];
         }
@@ -204,11 +193,11 @@ class EmojiParser
 
     private function getValue($row, $key)
     {
-        if (!str_starts_with($row, $key)) {
+        if (!str_starts_with((string) $row, (string) $key)) {
             return false;
         }
 
-        return substr($row, strlen($key) + 1);
+        return substr((string) $row, strlen((string) $key) + 1);
     }
 
     private function getImgPath($code, $size = 160)

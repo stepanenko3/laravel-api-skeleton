@@ -11,7 +11,7 @@ class ArrayCast implements DtoCastInterface
         mixed $value,
     ): array {
         if (is_string($value)) {
-            $jsonDecoded = json_decode($value, true);
+            $jsonDecoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
 
             return is_array($jsonDecoded) ? $jsonDecoded : [$value];
         }

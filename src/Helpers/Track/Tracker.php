@@ -15,41 +15,24 @@ class Tracker
     private $app;
 
     /**
-     * Referer parser instance.
-     *
-     * @var RefererParser
-     */
-    private $referer;
-
-    /**
      * User agent parser instance.
-     *
-     * @var UserAgentParser
      */
-    private $userAgent;
+    private ?\Stepanenko3\LaravelLogicContainers\Helpers\Track\UserAgentParser $userAgent = null;
 
     /**
      * Mobile detector instance.
-     *
-     * @var MobileDetect
      */
-    private $mobileDetect;
+    private ?\Stepanenko3\LaravelLogicContainers\Helpers\Track\MobileDetect $mobileDetect = null;
 
     /**
      * Crawler detector instance.
-     *
-     * @var CrawlerDetect
      */
-    private $crawlerDetect;
+    private ?\Stepanenko3\LaravelLogicContainers\Helpers\Track\CrawlerDetect $crawlerDetect = null;
 
     /**
      * Language detector instance.
-     *
-     * @var LanguageDetect
      */
-    private $langDetect;
-
-    private $enabled = true;
+    private ?\Stepanenko3\LaravelLogicContainers\Helpers\Track\LanguageDetect $langDetect = null;
 
     private $sessionId;
 
@@ -60,10 +43,6 @@ class Tracker
     private $isSecure;
 
     private $userId;
-
-    private $refererUrl;
-
-    private $currentUrl;
 
     public function __construct()
     {
@@ -218,7 +197,7 @@ class Tracker
             return;
         }
 
-        $parsed = parse_url($pageUrl);
+        $parsed = parse_url((string) $pageUrl);
 
         if (!($parsed['path'] ?? '')) {
             return;
@@ -234,7 +213,7 @@ class Tracker
         }
 
         if ($session = session('tracker.country')) {
-            $session['payload'] = json_encode($session);
+            $session['payload'] = json_encode($session, JSON_THROW_ON_ERROR);
 
             return Track\TrackerGeoip::findOrCreateCached($session, ['payload']);
         }
@@ -257,7 +236,7 @@ class Tracker
 
             session(['tracker.country' => $attributes]);
 
-            $attributes['payload'] = md5(json_encode($attributes));
+            $attributes['payload'] = md5(json_encode($attributes, JSON_THROW_ON_ERROR));
 
             return Track\TrackerGeoip::findOrCreateCached($attributes, ['payload']);
         }
@@ -271,7 +250,7 @@ class Tracker
             return;
         }
 
-        $url = parse_url($refererUrl);
+        $url = parse_url((string) $refererUrl);
 
         if (!isset($url['host'])) {
             return;
@@ -286,7 +265,7 @@ class Tracker
             'name' => $name = $this->userAgentOriginal ?: 'Other',
             'browser' => optional($this->userAgent->ua)->family ?? '',
             'browser_version' => $this->userAgent->getUAVersion(),
-            'name_hash' => hash('sha256', $name),
+            'name_hash' => hash('sha256', (string) $name),
         ];
     }
 
@@ -397,7 +376,7 @@ class Tracker
     {
         $forbidden = $this->config->get('tracker.do_not_track_paths');
 
-        $parsed = parse_url($pageUrl);
+        $parsed = parse_url((string) $pageUrl);
 
         return !$forbidden || empty($parsed['path'] ?? '') || !in_array_wildcard($parsed['path'], $forbidden);
     }
@@ -410,7 +389,7 @@ class Tracker
 
         $cacheKey = "className={$identifier};";
 
-        $keys = $this->extractKeys($attributes, $keys, $identifier);
+        $keys = $this->extractKeys($attributes, $keys);
 
         foreach ($keys as $key) {
             if (isset($attributes[$key])) {
@@ -479,7 +458,7 @@ class Tracker
             return;
         }
 
-        $parsed = parse_url($pageUrl);
+        $parsed = parse_url((string) $pageUrl);
 
         if (!isset($parsed['host'])) {
             return;
@@ -548,7 +527,7 @@ class Tracker
             $attributes['medium'] = $parsed->getMedium();
             $attributes['source'] = $parsed->getSource();
             $attributes['search_term'] = $parsed->getSearchTerm();
-            $attributes['search_terms_hash'] = sha1($parsed->getSearchTerm());
+            $attributes['search_terms_hash'] = sha1((string) $parsed->getSearchTerm());
         }
 
         $referer = Track\TrackerReferer::findOrCreateCached($attributes, ['url', 'search_terms_hash']);
@@ -623,7 +602,7 @@ class Tracker
 
     private function storeSearchTerms($referer, $parsed): void
     {
-        foreach (explode(' ', $parsed->getSearchTerm()) as $term) {
+        foreach (explode(' ', (string) $parsed->getSearchTerm()) as $term) {
             $attributes = [
                 'referer_id' => $referer->id,
                 'search_term' => $term,

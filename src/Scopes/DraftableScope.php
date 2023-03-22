@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Scope;
 
 class DraftableScope implements Scope
 {
-    private $extensions = [
+    private array $extensions = [
         'MarkAsPublished',
         'MarkAsDraft',
 

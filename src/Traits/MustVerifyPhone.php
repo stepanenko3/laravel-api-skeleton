@@ -53,13 +53,11 @@ trait MustVerifyPhone
             ]);
 
             return true;
-        } catch (Exception $e) {
+        } catch (Exception) {
             $token->delete();
 
             return false;
         }
-
-        return false;
     }
 
     /**

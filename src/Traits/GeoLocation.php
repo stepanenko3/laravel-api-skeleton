@@ -15,10 +15,14 @@ trait GeoLocation
 
     public function getDistance()
     {
+        $distance = null;
+        $suffix = null;
+
         if ($this->distance > 10) {
             $distance = round($this->distance);
             $suffix = 'km';
         } elseif ($this->disnace > 1) {
+            //
         } else {
             $distance = round($this->distance * 1000);
             $suffix = 'm';
@@ -30,7 +34,7 @@ trait GeoLocation
     public function coordinates(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => unpack('x/x/x/x/corder/Ltype/dlat/dlng', $value),
+            get: fn ($value) => unpack('x/x/x/x/corder/Ltype/dlat/dlng', (string) $value),
         );
     }
 
