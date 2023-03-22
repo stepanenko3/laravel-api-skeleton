@@ -21,8 +21,8 @@ abstract class DTO implements DtoInterface
     private \Illuminate\Contracts\Validation\Validator | \Illuminate\Validation\Validator $validator;
 
     public function __construct(
-        protected array $data)
-    {
+        protected array $data
+    ) {
         $this->boot();
 
         $this->isValidData()

@@ -37,7 +37,6 @@ class RefererParser
     /**
      * Parse a referer.
      *
-     *
      * @return RefererParser
      */
     public function parse(mixed $refererUrl, mixed $pageUrl)

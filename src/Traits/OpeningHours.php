@@ -20,7 +20,6 @@ trait OpeningHours
                 )
                 : null;
         } catch (\Exception) {
-            return null;
         }
     }
 }

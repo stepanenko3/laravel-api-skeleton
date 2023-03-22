@@ -291,8 +291,6 @@ class GifCreator
      *
      * $param integer $char ASCII char
      *
-     * @param mixed $char
-     *
      * @return string
      */
     public function encodeAsciiToChar(mixed $char)

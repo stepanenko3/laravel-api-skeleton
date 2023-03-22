@@ -12,7 +12,7 @@ class SMS
 
     public function send(string $phone, string $message): self
     {
-        return $this->{$this->via}($phone, $message);
+        return ($this->{$this->via})($phone, $message);
     }
 
     public function via(string $via): self

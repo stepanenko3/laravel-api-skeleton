@@ -10,6 +10,7 @@ if (!function_exists('get_media_url')) {
      *
      * @param bool $version
      * @param bool $absolute
+     *
      * @return string
      */
     function get_media_url(
@@ -46,7 +47,7 @@ if (!function_exists('process_text_editor')) {
     /**
      * process_text_editor.
      */
-    function process_text_editor(string | array $field): array|string
+    function process_text_editor(string | array $field): array | string
     {
         if (is_array($field)) {
             foreach ($field as $lang => $body) {
@@ -215,7 +216,6 @@ if (!function_exists('geocode')) {
 if (!function_exists('get_location')) {
     /**
      * get_location.
-     *
      *
      * @return array
      */
