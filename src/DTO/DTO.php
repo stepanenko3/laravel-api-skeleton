@@ -2,6 +2,7 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\DTO;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -10,39 +11,101 @@ use Illuminate\Validation\ValidationException;
 use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastTargetException;
 use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\InvalidJsonException;
 use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\MissingCastTypeException;
-use Illuminate\Support\Arr;
+use ReflectionObject;
+use ReflectionProperty;
 use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoCastInterface;
 use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoInterface;
 
 abstract class DTO implements DtoInterface
 {
-    protected array $validatedData = [];
+    protected array $properties = [];
 
-    private \Illuminate\Contracts\Validation\Validator | \Illuminate\Validation\Validator $validator;
+    protected array $validated = [];
 
     public function __construct(
-        protected array $data
+        protected array $data,
     ) {
         $this->boot();
 
-        $this->isValidData()
-            ? $this->passedValidation()
-            : $this->failedValidation();
-    }
+        $this->properties = $this->getProperties();
 
-    public function __set(string $name, mixed $value): void
-    {
-        $this->{$name} = $value;
-    }
-
-    public function __get(string $name): mixed
-    {
-        return $this->{$name} ?? null;
+        $this->validated = $this->validate(
+            $this->data,
+        );
     }
 
     public function boot(): void
     {
         $this->bootTraits();
+    }
+
+    protected function bootTraits(): void
+    {
+        $class = static::class;
+
+        $booted = [];
+
+        foreach (class_uses_recursive($class) as $trait) {
+            $method = 'boot' . class_basename($trait);
+
+            if (method_exists($class, $method) && !in_array($method, $booted)) {
+                $this->{$method}();
+
+                $booted[] = $method;
+            }
+        }
+    }
+
+    public function __set(string $name, mixed $value): void
+    {
+        $this->setAttribute($name, $value);
+    }
+
+    public function __get(string $name): mixed
+    {
+        return $this->getAttribute($name);
+    }
+
+    public function __call(string $name, array $values)
+    {
+        if (preg_match('~^(set|get)([A-Z])(.*)$~', $name, $matches)) {
+            $split = preg_split('/(?=[A-Z])/', $name);
+            $property = strtolower(implode('_', array_slice($split, 1)));
+
+            switch ($matches[1]) {
+                case 'set':
+                    return $this->setAttribute($property, $values[0]);
+
+                case 'get':
+                    return $this->getAttribute($property);
+            }
+        }
+
+        return $this->{$name}(...$values);
+    }
+
+    public function setAttribute(string $attribute, mixed $value): self
+    {
+        if (!in_array($attribute, $this->properties)) {
+            throw new Exception(get_class($this) . ' has no attribute named "' . $attribute . '"');
+        }
+
+        $this->{$attribute} = $value;
+
+        return $this;
+    }
+
+    public function getAttribute(string $attribute): mixed
+    {
+        if (!in_array($attribute, $this->properties)) {
+            throw new Exception(get_class($this) . ' has no attribute named "' . $attribute . '"');
+        }
+
+        if ($this->isPropInitialized($attribute)) {
+            return $this->{$attribute};
+        }
+
+        return null;
     }
 
     /**
@@ -55,6 +118,7 @@ abstract class DTO implements DtoInterface
     public static function fromJson(string $json): self
     {
         $jsonDecoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+
         if (!is_array($jsonDecoded)) {
             throw new InvalidJsonException();
         }
@@ -130,7 +194,7 @@ abstract class DTO implements DtoInterface
      */
     public function toArray(): array
     {
-        return $this->validatedData;
+        return $this->validated;
     }
 
     /**
@@ -139,8 +203,8 @@ abstract class DTO implements DtoInterface
     public function toJson(bool $pretty = false): string
     {
         return $pretty
-            ? json_encode($this->validatedData, JSON_PRETTY_PRINT)
-            : json_encode($this->validatedData, JSON_THROW_ON_ERROR);
+            ? json_encode($this->validated, JSON_PRETTY_PRINT)
+            : json_encode($this->validated, JSON_THROW_ON_ERROR);
     }
 
     /**
@@ -148,7 +212,7 @@ abstract class DTO implements DtoInterface
      */
     public function toModel(string $model): Model
     {
-        return new $model($this->validatedData);
+        return new $model($this->validated);
     }
 
     /**
@@ -167,169 +231,101 @@ abstract class DTO implements DtoInterface
         return [];
     }
 
-    protected function bootTraits(): void
-    {
-        $class = static::class;
-
-        $booted = [];
-
-        foreach (class_uses_recursive($class) as $trait) {
-            $method = 'boot' . class_basename($trait);
-
-            if (method_exists($class, $method) && !in_array($method, $booted)) {
-                $this->{$method}();
-
-                $booted[] = $method;
-            }
-        }
-    }
-
     /**
      * Defines the validation rules for the DTO.
      */
     abstract protected function rules(): array;
 
     /**
-     * Defines the default values for the properties of the DTO.
-     */
-    abstract protected function defaults(): array;
-
-    /**
      * Defines the type casting for the properties of the DTO.
      */
     abstract protected function casts(): array;
 
-    /**
-     * Handles a passed validation attempt.
-     *
-     * @throws CastTargetException|MissingCastTypeException
-     */
-    protected function passedValidation(): void
+    protected function validate(array $data): array
     {
-        $this->validatedData = $this->validatedData();
-
-        $result = self::dot($this->validatedData);
-
-        $casts = self::dot(
-            $this->casts(),
-        );
-
-        $defaults = self::dot(
-            $this->defaults(),
-        );
-
-        foreach ($defaults as $key => $value) {
-            if (
-                !isset($result[$key])
-                || empty($result[$key])
-            ) {
-                if (!array_key_exists($key, $casts)) {
-                    if (config('laravel-api-skeleton.dto_require_casting', false)) {
-                        throw new MissingCastTypeException($key);
-                    }
-
-                    $result[$key] = $value;
-
-                    continue;
-                }
-
-                if (!$casts[$key] instanceof DtoCastInterface) {
-                    throw new CastTargetException($key);
-                }
-
-                $formatted = $casts[$key]->cast($key, $value);
-
-                $result[$key] = $formatted;
-            }
-        }
-
-        $result = Arr::undot($result);
-
-        foreach ($result as $key => $value) {
-            $this->{$key} = $value;
-        }
-
-        $this->validatedData = $result;
-    }
-
-    /**
-     * Handles a failed validation attempt.
-     *
-     * @throws ValidationException
-     */
-    protected function failedValidation(): void
-    {
-        throw new ValidationException($this->validator);
-    }
-
-    protected static function dot(array $array, string $prepend = ''): array
-    {
-        $results = [];
-
-        foreach ($array as $key => $value) {
-            if (is_array($value) && !empty($value) && !Arr::isList($value)) {
-                $results = array_merge(
-                    $results,
-                    static::dot($value, $prepend . $key . '.'),
-                );
-            } else {
-                $results[$prepend . $key] = $value;
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Checks if the data is valid for the DTO.
-     */
-    private function isValidData(): bool
-    {
-        $this->validator = Validator::make(
-            $this->data,
+        $validator = Validator::make(
+            $data,
             $this->rules(),
             $this->messages(),
             $this->attributes()
         );
 
-        return $this->validator->passes();
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        return $this->applyDefaults(
+            $validator->validated(),
+        );
     }
 
-    /**
-     * Builds the validated data from the given data and the rules.
-     *
-     * @throws CastTargetException|MissingCastTypeException
-     */
-    private function validatedData(): array
+    protected function applyDefaults(array $data): array
     {
-        $acceptedKeys = array_keys($this->rules());
-        $result = [];
+        foreach ($this->properties as $prop) {
+            if (isset($data[$prop]) && !empty($data[$prop])) {
+                continue;
+            }
 
-        /** @var array<Castable> $casts */
-        $casts = $this->casts();
-
-        $data = self::dot($this->data);
-
-        foreach ($data as $key => $value) {
-            if (in_array($key, $acceptedKeys)) {
-                if (!array_key_exists($key, $casts)) {
-                    if (config('app.dto_require_casting', false)) {
-                        throw new MissingCastTypeException($key);
-                    }
-
-                    $result[$key] = $value;
-
-                    continue;
-                }
-
-                if (!$casts[$key] instanceof DtoCastInterface) {
-                    throw new CastTargetException($key);
-                }
-
-                $result[$key] = $casts[$key]->cast($key, $value);
+            if ($this->isPropInitialized($prop)) {
+                $data[$prop] = $this->{$prop};
             }
         }
 
-        return Arr::undot($result);
+        return $this->applyCasts(
+            $data,
+        );
+    }
+
+    protected function applyCasts(array $data): array
+    {
+        $casts = $this->casts();
+
+        foreach ($data as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+
+            if (!array_key_exists($key, $casts)) {
+                if (config('laravel-api-skeleton.dto_require_casting', false)) {
+                    throw new MissingCastTypeException($key);
+                }
+
+                $data[$key] = $value;
+
+                continue;
+            }
+
+            if (!$casts[$key] instanceof DtoCastInterface) {
+                throw new CastTargetException($key);
+            }
+
+            $data[$key] = $casts[$key]->cast($key, $value);
+        }
+
+        return $data;
+    }
+
+    private function getProperties(): array
+    {
+        $properties = (new ReflectionObject($this))
+            ->getProperties();
+
+        $properties = array_filter(
+            $properties,
+            fn ($prop) => $prop->class !== self::class,
+        );
+
+
+        $properties = array_map(
+            fn ($prop) => $prop->name,
+            $properties,
+        );
+
+        return $properties;
+    }
+
+    private function isPropInitialized(string $name)
+    {
+        return (new ReflectionProperty($this, $name))->isInitialized($this);
     }
 }
