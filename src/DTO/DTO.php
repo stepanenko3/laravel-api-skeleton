@@ -34,28 +34,6 @@ abstract class DTO implements DtoInterface
         );
     }
 
-    public function boot(): void
-    {
-        $this->bootTraits();
-    }
-
-    protected function bootTraits(): void
-    {
-        $class = static::class;
-
-        $booted = [];
-
-        foreach (class_uses_recursive($class) as $trait) {
-            $method = 'boot' . class_basename($trait);
-
-            if (method_exists($class, $method) && !in_array($method, $booted)) {
-                $this->{$method}();
-
-                $booted[] = $method;
-            }
-        }
-    }
-
     public function __set(string $name, mixed $value): void
     {
         $this->setAttribute($name, $value);
@@ -82,30 +60,6 @@ abstract class DTO implements DtoInterface
         }
 
         return $this->{$name}(...$values);
-    }
-
-    public function setAttribute(string $attribute, mixed $value): self
-    {
-        if (!in_array($attribute, $this->properties)) {
-            throw new Exception(get_class($this) . ' has no attribute named "' . $attribute . '"');
-        }
-
-        $this->{$attribute} = $value;
-
-        return $this;
-    }
-
-    public function getAttribute(string $attribute): mixed
-    {
-        if (!in_array($attribute, $this->properties)) {
-            throw new Exception(get_class($this) . ' has no attribute named "' . $attribute . '"');
-        }
-
-        if ($this->isPropInitialized($attribute)) {
-            return $this->{$attribute};
-        }
-
-        return null;
     }
 
     /**
@@ -189,6 +143,35 @@ abstract class DTO implements DtoInterface
         return new static(array_merge($command->arguments(), $command->options()));
     }
 
+    public function boot(): void
+    {
+        $this->bootTraits();
+    }
+
+    public function setAttribute(string $attribute, mixed $value): self
+    {
+        if (!in_array($attribute, $this->properties)) {
+            throw new Exception(static::class . ' has no attribute named "' . $attribute . '"');
+        }
+
+        $this->{$attribute} = $value;
+
+        return $this;
+    }
+
+    public function getAttribute(string $attribute): mixed
+    {
+        if (!in_array($attribute, $this->properties)) {
+            throw new Exception(static::class . ' has no attribute named "' . $attribute . '"');
+        }
+
+        if ($this->isPropInitialized($attribute)) {
+            return $this->{$attribute};
+        }
+
+        return null;
+    }
+
     /**
      * Returns the DTO validated data in array format.
      */
@@ -229,6 +212,23 @@ abstract class DTO implements DtoInterface
     public function attributes(): array
     {
         return [];
+    }
+
+    protected function bootTraits(): void
+    {
+        $class = static::class;
+
+        $booted = [];
+
+        foreach (class_uses_recursive($class) as $trait) {
+            $method = 'boot' . class_basename($trait);
+
+            if (method_exists($class, $method) && !in_array($method, $booted)) {
+                $this->{$method}();
+
+                $booted[] = $method;
+            }
+        }
     }
 
     /**
@@ -315,13 +315,10 @@ abstract class DTO implements DtoInterface
             fn ($prop) => $prop->class !== self::class,
         );
 
-
-        $properties = array_map(
+        return array_map(
             fn ($prop) => $prop->name,
             $properties,
         );
-
-        return $properties;
     }
 
     private function isPropInitialized(string $name)

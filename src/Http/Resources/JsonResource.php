@@ -18,6 +18,11 @@ abstract class JsonResource extends BaseJsonResource
 
     private static $relationshipResourceGuesser;
 
+    public static function guessRelationshipResourceUsing(callable | null $callback): void
+    {
+        self::$relationshipResourceGuesser = $callback;
+    }
+
     public function toAttributes(Request $request): array
     {
         return [];
@@ -50,9 +55,22 @@ abstract class JsonResource extends BaseJsonResource
             ];
     }
 
-    public static function guessRelationshipResourceUsing(callable | null $callback): void
+    private static function guessRelationshipResource(string $relationship, self $resource)
     {
-        self::$relationshipResourceGuesser = $callback;
+        return (self::$relationshipResourceGuesser ?? function (string $relationship, self $resource): string {
+            $relationship = Str::of($relationship);
+
+            foreach ([
+                "App\\Http\\Resources\\{$relationship->singular()->studly()}Resource",
+                "App\\Http\\Resources\\{$relationship->studly()}Resource",
+            ] as $class) {
+                if (class_exists($class)) {
+                    return $class;
+                }
+            }
+
+            throw new RuntimeException('Unable to guess the resource class for relationship [' . $relationship . '] for [' . $resource::class . '].');
+        })($relationship, $resource);
     }
 
     private function resolveAttributes(Request $request): array
@@ -96,23 +114,5 @@ abstract class JsonResource extends BaseJsonResource
             )
             ->merge($this->toRelationships($request))
             ->toArray();
-    }
-
-    private static function guessRelationshipResource(string $relationship, self $resource)
-    {
-        return (self::$relationshipResourceGuesser ?? function (string $relationship, self $resource): string {
-            $relationship = Str::of($relationship);
-
-            foreach ([
-                "App\\Http\\Resources\\{$relationship->singular()->studly()}Resource",
-                "App\\Http\\Resources\\{$relationship->studly()}Resource",
-            ] as $class) {
-                if (class_exists($class)) {
-                    return $class;
-                }
-            }
-
-            throw new RuntimeException('Unable to guess the resource class for relationship [' . $relationship . '] for [' . $resource::class . '].');
-        })($relationship, $resource);
     }
 }

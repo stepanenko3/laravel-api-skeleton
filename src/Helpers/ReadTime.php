@@ -61,12 +61,12 @@ class ReadTime implements \Stringable
         $this->wordsPerMinute = $wordsPerMinute;
     }
 
-    public function __toString(): string
+    public function __invoke()
     {
         return $this->get();
     }
 
-    public function __invoke()
+    public function __toString(): string
     {
         return $this->get();
     }

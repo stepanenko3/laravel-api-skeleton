@@ -6,11 +6,6 @@ use Stepanenko3\LaravelApiSkeleton\Scopes\DraftableScope;
 
 trait Draftable
 {
-    public function scopeAnyStatus($q)
-    {
-        return $q->withAnyDraftStatus();
-    }
-
     public static function bootDraftable(): void
     {
         static::addGlobalScope(new DraftableScope());
@@ -28,24 +23,6 @@ trait Draftable
         return (new static())
             ->newQueryWithoutScope(new DraftableScope())
             ->markAsDraft($id);
-    }
-
-    public function markAsPublished()
-    {
-        $new = (new static())
-            ->newQueryWithoutScope(new DraftableScope())
-            ->markAsPublished($this->id);
-
-        return $this->setRawAttributes($new->attributesToArray());
-    }
-
-    public function markAsDraft()
-    {
-        $new = (new static())
-            ->newQueryWithoutScope(new DraftableScope())
-            ->markAsDraft($this->id);
-
-        return $this->setRawAttributes($new->attributesToArray());
     }
 
     public static function onlyPublished()
@@ -80,6 +57,29 @@ trait Draftable
     {
         return (new static())
             ->newQueryWithoutScope(new DraftableScope());
+    }
+
+    public function scopeAnyStatus($q)
+    {
+        return $q->withAnyDraftStatus();
+    }
+
+    public function markAsPublished()
+    {
+        $new = (new static())
+            ->newQueryWithoutScope(new DraftableScope())
+            ->markAsPublished($this->id);
+
+        return $this->setRawAttributes($new->attributesToArray());
+    }
+
+    public function markAsDraft()
+    {
+        $new = (new static())
+            ->newQueryWithoutScope(new DraftableScope())
+            ->markAsDraft($this->id);
+
+        return $this->setRawAttributes($new->attributesToArray());
     }
 
     public function isPublished()

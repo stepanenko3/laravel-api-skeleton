@@ -44,6 +44,38 @@ abstract class HttpSchema
         return $this->{$name} ?? null;
     }
 
+    /**
+     * Creates a DTO instance from a valid JSON string.
+     *
+     * @throws CastTargetException|InvalidJsonException|MissingCastTypeException|ValidationException
+     *
+     * @return $this
+     */
+    public static function fromJson(string $json): self
+    {
+        $jsonDecoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        if (!is_array($jsonDecoded)) {
+            throw new InvalidJsonException();
+        }
+
+        return new static($jsonDecoded);
+    }
+
+    /**
+     * Creates a DTO instance from a Request.
+     *
+     * @throws CastTargetException|MissingCastTypeException|ValidationException
+     *
+     * @return $this
+     */
+    public static function fromRequest(Request $request): self
+    {
+        return new static([
+            ...$request->route()->parameters(),
+            ...$request->all(),
+        ]);
+    }
+
     public function boot(): void
     {
         //
@@ -136,38 +168,6 @@ abstract class HttpSchema
     }
 
     /**
-     * Creates a DTO instance from a valid JSON string.
-     *
-     * @throws CastTargetException|InvalidJsonException|MissingCastTypeException|ValidationException
-     *
-     * @return $this
-     */
-    public static function fromJson(string $json): self
-    {
-        $jsonDecoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-        if (!is_array($jsonDecoded)) {
-            throw new InvalidJsonException();
-        }
-
-        return new static($jsonDecoded);
-    }
-
-    /**
-     * Creates a DTO instance from a Request.
-     *
-     * @throws CastTargetException|MissingCastTypeException|ValidationException
-     *
-     * @return $this
-     */
-    public static function fromRequest(Request $request): self
-    {
-        return new static([
-            ...$request->route()->parameters(),
-            ...$request->all(),
-        ]);
-    }
-
-    /**
      * Defines the custom messages for validator errors.
      */
     public function messages(): array
@@ -199,6 +199,24 @@ abstract class HttpSchema
         return $pretty
             ? json_encode($this->validatedData, JSON_PRETTY_PRINT)
             : json_encode($this->validatedData, JSON_THROW_ON_ERROR);
+    }
+
+    protected static function dot(array $array, string $prepend = ''): array
+    {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            if (is_array($value) && !empty($value) && !Arr::isList($value)) {
+                $results = array_merge(
+                    $results,
+                    static::dot($value, $prepend . $key . '.'),
+                );
+            } else {
+                $results[$prepend . $key] = $value;
+            }
+        }
+
+        return $results;
     }
 
     protected function bootTraits(): void
@@ -257,24 +275,6 @@ abstract class HttpSchema
     protected function failedValidation(): void
     {
         throw new ValidationException($this->validator);
-    }
-
-    protected static function dot(array $array, string $prepend = ''): array
-    {
-        $results = [];
-
-        foreach ($array as $key => $value) {
-            if (is_array($value) && !empty($value) && !Arr::isList($value)) {
-                $results = array_merge(
-                    $results,
-                    static::dot($value, $prepend . $key . '.'),
-                );
-            } else {
-                $results[$prepend . $key] = $value;
-            }
-        }
-
-        return $results;
     }
 
     private function isValidData(): bool

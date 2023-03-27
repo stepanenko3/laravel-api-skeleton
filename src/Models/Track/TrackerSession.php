@@ -19,6 +19,13 @@ class TrackerSession extends Model
         'last_activity' => 'datetime',
     ];
 
+    //
+
+    public static function findByUuid($uuid)
+    {
+        return self::findCached(['uuid' => $uuid]);
+    }
+
     public function user()
     {
         return $this->belongsTo('App\Models\User');
@@ -47,13 +54,6 @@ class TrackerSession extends Model
     public function language()
     {
         return $this->belongsTo('App\Models\Track\TrackerLanguage');
-    }
-
-    //
-
-    public static function findByUuid($uuid)
-    {
-        return self::findCached(['uuid' => $uuid]);
     }
 
     public function last($minutes)
