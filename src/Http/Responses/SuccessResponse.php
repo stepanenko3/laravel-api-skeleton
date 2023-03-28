@@ -10,7 +10,7 @@ use Stepanenko3\LaravelApiSkeleton\Helpers\ApiPagination;
 class SuccessResponse implements Responsable
 {
     public function __construct(
-        private readonly mixed $data,
+        private readonly mixed $data = [],
         private array $metadata = [],
         private readonly int $code = Response::HTTP_OK,
         private readonly array $headers = [],
@@ -23,12 +23,14 @@ class SuccessResponse implements Responsable
 
     public function toResponse($request): JsonResponse
     {
+        $data = [
+            'success' => true,
+            'data' => $this->data,
+            'metadata' => $this->metadata,
+        ];
+
         return response()->json(
-            [
-                'success' => true,
-                'data' => $this->data,
-                'metadata' => $this->metadata,
-            ],
+            array_filter($data, fn ($v) => !empty($v)),
             $this->code,
             $this->headers,
         );
