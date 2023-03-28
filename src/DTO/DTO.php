@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Pipeline;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastTargetException;
@@ -243,6 +244,18 @@ abstract class DTO implements DtoInterface
 
     protected function validate(array $data): array
     {
+        return Pipeline::send(
+            passable: $data,
+        )->through([
+            fn ($passable, $next) => $next($this->getValidatedData($passable)),
+            fn ($passable, $next) => $next($this->applyDefaults($passable)),
+            fn ($passable, $next) => $next($this->applyCasts($passable)),
+            fn ($passable, $next) => $next($this->applyProps($passable)),
+        ])->thenReturn();
+    }
+
+    protected function getValidatedData(array $data): array
+    {
         $validator = Validator::make(
             $data,
             $this->rules(),
@@ -254,9 +267,7 @@ abstract class DTO implements DtoInterface
             throw new ValidationException($validator);
         }
 
-        return $this->applyDefaults(
-            $validator->validated(),
-        );
+        return $validator->validated();
     }
 
     protected function applyDefaults(array $data): array
@@ -271,9 +282,7 @@ abstract class DTO implements DtoInterface
             }
         }
 
-        return $this->applyCasts(
-            $data,
-        );
+        return $data;
     }
 
     protected function applyCasts(array $data): array
@@ -300,6 +309,19 @@ abstract class DTO implements DtoInterface
             }
 
             $data[$key] = $casts[$key]->cast($key, $value);
+        }
+
+        return $data;
+    }
+
+    protected function applyProps(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+
+            $this->{$key} = $value;
         }
 
         return $data;
