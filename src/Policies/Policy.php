@@ -91,6 +91,6 @@ abstract class Policy
 
     protected function getKey(string $suffix = ''): string
     {
-        return Str::plural($this->key()) . ($suffix ? '.' . $suffix : '');
+        return $this->key() . ($suffix ? '.' . $suffix : '');
     }
 }
