@@ -3,7 +3,7 @@
 namespace Stepanenko3\LaravelApiSkeleton\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 abstract class Policy
