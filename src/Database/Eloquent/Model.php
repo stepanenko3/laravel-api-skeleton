@@ -2,10 +2,10 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Database\Eloquent;
 
+use App\DTO\Blog\Categories\BlogCategoriesFetchDTO;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
-use Stepanenko3\LaravelApiSkeleton\Http\Schemas\SchemaQueryBuilder;
 
 abstract class Model extends BaseModel
 {
@@ -16,9 +16,9 @@ abstract class Model extends BaseModel
 
     public function scopeApplySchema(
         QueryBuilder | EloquentBuilder $builder,
-        SchemaQueryBuilder $schema,
+        BlogCategoriesFetchDTO $dto,
     ): QueryBuilder | EloquentBuilder {
-        return $schema->applyToQuery($builder);
+        return $dto->applyToQuery($builder);
     }
 
     public function scopeOnly(

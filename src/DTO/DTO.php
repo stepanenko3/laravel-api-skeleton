@@ -16,9 +16,12 @@ use ReflectionObject;
 use ReflectionProperty;
 use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoCastInterface;
 use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoInterface;
+use Stepanenko3\LaravelApiSkeleton\Traits\WorkWithUses;
 
 abstract class DTO implements DtoInterface
 {
+    use WorkWithUses;
+
     protected array $properties = [];
 
     protected array $validated = [];
@@ -217,19 +220,10 @@ abstract class DTO implements DtoInterface
 
     protected function bootTraits(): void
     {
-        $class = static::class;
-
-        $booted = [];
-
-        foreach (class_uses_recursive($class) as $trait) {
-            $method = 'boot' . class_basename($trait);
-
-            if (method_exists($class, $method) && !in_array($method, $booted)) {
-                $this->{$method}();
-
-                $booted[] = $method;
-            }
-        }
+        $this->runMethodOnUses(
+            class: static::class,
+            method: 'boot',
+        );
     }
 
     /**
@@ -242,24 +236,47 @@ abstract class DTO implements DtoInterface
      */
     abstract protected function casts(): array;
 
+    protected function getFromUses(string $method): array
+    {
+        return $this
+            ->runMethodOnUses(
+                class: static::class,
+                method: $method,
+            )
+            ->values()
+            ->reduce(fn ($prev, $next) => array_merge($prev ?? [], $next ?? [])) ?? [];
+    }
+
     protected function getRules(): array
     {
-        return $this->rules();
+        return array_merge(
+            $this->rules(),
+            $this->getFromUses('rules'),
+        );
     }
 
     protected function getCasts(): array
     {
-        return $this->casts();
+        return array_merge(
+            $this->casts(),
+            $this->getFromUses('casts'),
+        );
     }
 
     protected function getMessages(): array
     {
-        return $this->messages();
+        return array_merge(
+            $this->messages(),
+            $this->getFromUses('messages'),
+        );
     }
 
     protected function getAttributes(): array
     {
-        return $this->attributes();
+        return array_merge(
+            $this->attributes(),
+            $this->getFromUses('attributes'),
+        );
     }
 
     protected function getDefaults(): array
