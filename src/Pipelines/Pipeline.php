@@ -1,17 +1,17 @@
 <?php
 
-namespace Stepanenko3\LaravelApiSkeleton\Processes;
+namespace Stepanenko3\LaravelApiSkeleton\Pipelines;
 
-use Illuminate\Support\Facades\Pipeline;
+use Illuminate\Support\Facades\Pipeline as IlluminatePipeline;
 
-abstract class Process
+abstract class Pipeline
 {
     public array $tasks;
 
     public function handle(
         object $payload,
     ): mixed {
-        return Pipeline::send(
+        return IlluminatePipeline::send(
             passable: $payload,
         )->through(
             pipes: $this->tasks,

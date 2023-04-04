@@ -242,6 +242,39 @@ abstract class DTO implements DtoInterface
      */
     abstract protected function casts(): array;
 
+    protected function getRules(): array
+    {
+        return $this->rules();
+    }
+
+    protected function getCasts(): array
+    {
+        return $this->casts();
+    }
+
+    protected function getMessages(): array
+    {
+        return $this->messages();
+    }
+
+    protected function getAttributes(): array
+    {
+        return $this->attributes();
+    }
+
+    protected function getDefaults(): array
+    {
+        $data = [];
+
+        foreach ($this->properties as $prop) {
+            if ($this->isPropInitialized($prop)) {
+                $data[$prop] = $this->{$prop};
+            }
+        }
+
+        return $data;
+    }
+
     protected function validate(array $data): array
     {
         return Pipeline::send(
@@ -258,9 +291,9 @@ abstract class DTO implements DtoInterface
     {
         $validator = Validator::make(
             $data,
-            $this->rules(),
-            $this->messages(),
-            $this->attributes()
+            $this->getRules(),
+            $this->getMessages(),
+            $this->getAttributes()
         );
 
         if ($validator->fails()) {
@@ -272,14 +305,12 @@ abstract class DTO implements DtoInterface
 
     protected function applyDefaults(array $data): array
     {
-        foreach ($this->properties as $prop) {
+        foreach ($this->getDefaults() as $prop => $value) {
             if (isset($data[$prop]) && !empty($data[$prop])) {
                 continue;
             }
 
-            if ($this->isPropInitialized($prop)) {
-                $data[$prop] = $this->{$prop};
-            }
+            $data[$prop] = $value;
         }
 
         return $data;
@@ -287,7 +318,7 @@ abstract class DTO implements DtoInterface
 
     protected function applyCasts(array $data): array
     {
-        $casts = $this->casts();
+        $casts = $this->getCasts();
 
         foreach ($data as $key => $value) {
             if ($value === null) {

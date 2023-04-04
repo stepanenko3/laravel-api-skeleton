@@ -4,7 +4,6 @@ namespace Stepanenko3\LaravelApiSkeleton\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 abstract class Policy
 {
@@ -51,7 +50,18 @@ abstract class Policy
             return false;
         }
 
-        if ($subject->can($this->getKey('edit'))) {
+        if ($subject->can($this->getKey('update'))) {
+            return true;
+        }
+    }
+
+    public function replicate(Model $subject, Model $item)
+    {
+        if ($subject === null) {
+            return false;
+        }
+
+        if ($subject->can($this->getKey('replicate'))) {
             return true;
         }
     }
@@ -84,7 +94,29 @@ abstract class Policy
             return false;
         }
 
-        if ($subject->can($this->getKey('force-delete'))) {
+        if ($subject->can($this->getKey('forceDelete'))) {
+            return true;
+        }
+    }
+
+    public function runAction(Model $subject, Model $item)
+    {
+        if ($subject === null) {
+            return false;
+        }
+
+        if ($subject->can($this->getKey('runAction'))) {
+            return true;
+        }
+    }
+
+    public function runDestructiveAction(Model $subject, Model $item)
+    {
+        if ($subject === null) {
+            return false;
+        }
+
+        if ($subject->can($this->getKey('runDestructiveAction'))) {
             return true;
         }
     }

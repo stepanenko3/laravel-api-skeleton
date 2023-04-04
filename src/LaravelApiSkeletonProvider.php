@@ -12,11 +12,11 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Stepanenko3\LaravelApiSkeleton\Commands\ContainerActionMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\Commands\ContainerControllerMakeCommand;
-use Stepanenko3\LaravelApiSkeleton\Commands\ContainerDtoMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\Commands\ContainerModelMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\Commands\ContainerResourceMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\DTO\DTO;
-use Stepanenko3\LaravelApiSkeleton\Http\Schemas\HttpSchema;
+use Stepanenko3\LaravelApiSkeleton\Http\Schemas\Schema as SchemasSchema;
+use Stepanenko3\LaravelApiSkeleton\Http\Schemas\SchemaQueryBuilder;
 
 class LaravelApiSkeletonProvider extends PackageServiceProvider
 {
@@ -60,7 +60,8 @@ class LaravelApiSkeletonProvider extends PackageServiceProvider
 
         foreach ([
             DTO::class,
-            HttpSchema::class,
+            SchemasSchema::class,
+            SchemaQueryBuilder::class,
         ] as $abstract) {
             $this->app->beforeResolving($abstract, function ($class, $parameters, $app): void {
                 if ($app->has($class)) {

@@ -5,7 +5,7 @@ namespace Stepanenko3\LaravelApiSkeleton\Database\Eloquent;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
-use Stepanenko3\LaravelApiSkeleton\Http\Schemas\HttpSchema;
+use Stepanenko3\LaravelApiSkeleton\Http\Schemas\SchemaQueryBuilder;
 
 abstract class Model extends BaseModel
 {
@@ -16,7 +16,7 @@ abstract class Model extends BaseModel
 
     public function scopeApplySchema(
         QueryBuilder | EloquentBuilder $builder,
-        HttpSchema $schema,
+        SchemaQueryBuilder $schema,
     ): QueryBuilder | EloquentBuilder {
         return $schema->applyToQuery($builder);
     }
