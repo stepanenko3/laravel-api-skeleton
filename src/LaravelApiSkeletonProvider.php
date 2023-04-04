@@ -12,6 +12,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Stepanenko3\LaravelApiSkeleton\Commands\ContainerActionMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\Commands\ContainerControllerMakeCommand;
+use Stepanenko3\LaravelApiSkeleton\Commands\ContainerDtoMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\Commands\ContainerModelMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\Commands\ContainerResourceMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\DTO\DTO;

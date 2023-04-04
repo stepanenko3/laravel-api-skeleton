@@ -13,8 +13,10 @@ abstract class Pipeline
     ): mixed {
         return IlluminatePipeline::send(
             passable: $payload,
-        )->through(
-            pipes: $this->tasks,
-        )->thenReturn();
+        )
+            ->through(
+                pipes: $this->tasks,
+            )
+            ->thenReturn();
     }
 }
