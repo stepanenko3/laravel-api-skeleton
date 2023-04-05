@@ -23,17 +23,10 @@ class MediaPathGenerator implements PathGenerator
         return $this->getBasePath($media) . '/r/';
     }
 
-    // Get a unique base path for the given media.
     private function getBasePath(Media $media, $model = null): string
     {
         $model = $model ?: new $media->model_type();
 
-        if ($model->publicDir) {
-            return Storage::disk(config('media-library.disk_name'))
-                ->path('/' . $model->getTable() . '/' . $media->model_id . '/' . $media->getKey());
-        }
-
-        return Storage::disk('private')
-            ->path('/' . $model->getTable() . '/' . $media->model_id . '/' . $media->getKey());
+        return  '/' . $model->getTable() . '/' . $media->model_id . '/' . $media->getKey();
     }
 }

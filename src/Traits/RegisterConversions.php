@@ -10,8 +10,6 @@ trait RegisterConversions
 {
     use InteractsWithMedia;
 
-    public $publicDir = true;
-
     protected $conversions;
 
     protected $conversionsExtensions = [];
