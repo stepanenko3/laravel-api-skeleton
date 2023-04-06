@@ -61,12 +61,23 @@ trait SchemaDTO
     public function applyToQuery($builder): EloquentBuilder | QueryBuilder
     {
         return $builder
-            ->select($this->fields)
+            ->select($this->getFields())
             ->with($this->relationsToQuery());
+    }
+
+    public function getFields(): array
+    {
+        if (empty($this->fields)) {
+            return $this->schema::defaultFields();
+        }
+
+        return $this->fields;
     }
 
     private function relationsToQuery(array $relations = []): array
     {
+        // Load default relations
+        // Load default fields for each relation
         $data = [];
 
         foreach (($relations ?: $this->with) as $key => $relation) {
