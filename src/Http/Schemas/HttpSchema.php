@@ -4,12 +4,6 @@ namespace Stepanenko3\LaravelApiSkeleton\Http\Schemas;
 
 abstract class HttpSchema
 {
-    abstract public static function fields(): array;
-
-    abstract public static function relations(): array;
-
-    abstract public static function countRelations(): array;
-
     public static function defaultFields(): array
     {
         return static::fields();
@@ -54,4 +48,10 @@ abstract class HttpSchema
 
         return [$fields, $relations, $countRelations];
     }
+
+    abstract public static function fields(): array;
+
+    abstract public static function relations(): array;
+
+    abstract public static function countRelations(): array;
 }

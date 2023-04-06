@@ -2,7 +2,6 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Database\Eloquent;
 
-use App\DTO\Blog\Categories\BlogCategoriesFetchDTO;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;

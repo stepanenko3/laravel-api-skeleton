@@ -8,7 +8,7 @@ trait WorkWithUses
 {
     public function runMethodOnUses(string $class, string $method, ...$arguments): Collection
     {
-        $booted = new Collection;
+        $booted = new Collection();
 
         foreach (class_uses_recursive($class) as $trait) {
             $classMethod = $method . class_basename($trait);

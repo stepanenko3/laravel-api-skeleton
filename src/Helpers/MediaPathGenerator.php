@@ -2,7 +2,6 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Helpers;
 
-use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\Support\PathGenerator\PathGenerator;
 
@@ -27,6 +26,6 @@ class MediaPathGenerator implements PathGenerator
     {
         $model = $model ?: new $media->model_type();
 
-        return  '/' . $model->getTable() . '/' . $media->model_id . '/' . $media->getKey();
+        return '/' . $model->getTable() . '/' . $media->model_id . '/' . $media->getKey();
     }
 }
