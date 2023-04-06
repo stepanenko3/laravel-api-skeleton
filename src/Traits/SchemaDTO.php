@@ -58,7 +58,7 @@ trait SchemaDTO
         ];
     }
 
-    public function applyToQuery(EloquentBuilder | QueryBuilder $builder): EloquentBuilder | QueryBuilder
+    public function applyToQuery($builder): EloquentBuilder | QueryBuilder
     {
         return $builder
             ->select($this->fields)
@@ -69,10 +69,19 @@ trait SchemaDTO
     {
         $data = [];
 
-        foreach (($this->with ?: $relations) as $key => $relation) {
+        foreach (($relations ?: $this->with) as $key => $relation) {
             $data[$key] = fn ($q) => $q
-                ->select($realtion['fields'] ?? [])
-                ->with($this->relationsToQuery($relation['with'] ?? []));
+                ->select(
+                    ...$realtion['fields'] ?? [],
+                )
+                ->when(
+                    !empty($relation['with'] ?? []),
+                    fn ($query) => $query->with(
+                        $this->relationsToQuery(
+                            $relation['with'] ?? [],
+                        ),
+                    ),
+                );
         }
 
         return $data;

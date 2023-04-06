@@ -46,13 +46,13 @@ abstract class JsonResource extends BaseJsonResource
 
         return is_array($this->resource)
             ? $this->resource
-            : [
+            : arr_clean_empty_values([
                 'id' => $this->whenNotNull($this->getKey()),
                 'type' => $this->getTable(),
                 'attributes' => $this->resolveAttributes($request),
                 'metadata' => $this->toMeta($request),
                 'relations' => $this->resolveRelationships($request),
-            ];
+            ]);
     }
 
     private static function guessRelationshipResource(string $relationship, self $resource)

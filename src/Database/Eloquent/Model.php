@@ -6,6 +6,7 @@ use App\DTO\Blog\Categories\BlogCategoriesFetchDTO;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
+use Stepanenko3\LaravelApiSkeleton\DTO\DTO;
 
 abstract class Model extends BaseModel
 {
@@ -16,7 +17,7 @@ abstract class Model extends BaseModel
 
     public function scopeApplySchema(
         QueryBuilder | EloquentBuilder $builder,
-        BlogCategoriesFetchDTO $dto,
+        DTO $dto,
     ): QueryBuilder | EloquentBuilder {
         return $dto->applyToQuery($builder);
     }
