@@ -62,9 +62,15 @@ trait SchemaDTO
 
     public function applyToQuery($builder): EloquentBuilder | QueryBuilder
     {
+        $fields = array_merge(
+            $this->schema::basicFields(),
+            $this->fields ?: $this->schema::defaultFields(),
+        );
+
         return $builder
-            ->select(
-                $this->fields ?: $this->schema::defaultFields()
+            ->when(
+                !empty($fields),
+                fn ($q) => $q->select($fields),
             )
             ->with(
                 $this->getRelationsFromSchema(
@@ -113,7 +119,6 @@ trait SchemaDTO
                 $key . '.fields' => [
                     'nullable',
                     'array',
-                    'max:' . count($allowedFields),
                     Rule::in($allowedFields),
                 ],
             ];
@@ -152,18 +157,26 @@ trait SchemaDTO
         $result = [];
 
         foreach ($relations as $key => $relation) {
+            $relationSchema = $allowedRelations[$key];
+
+            $fields = array_merge(
+                $relationSchema::basicFields(),
+                ($relation['fields'] ?? []) ?: $relationSchema::defaultFields(),
+            );
+
             $result[$key] = fn ($q) => $q
-                ->select(
-                    ($relation['fields'] ?? []) ?: $allowedRelations[$key]::defaultFields(),
+                ->when(
+                    !empty($fields),
+                    fn ($q) => $q->select($fields),
                 )
                 ->with(
                     $this->getRelationsFromSchema(
                         relations: $relation['with'] ?? [],
-                        schemaClass: $allowedRelations[$key],
+                        schemaClass: $relationSchema,
                     )
                 )
                 ->withCount(
-                    ($relation['with_count'] ?? []) ?: $allowedRelations[$key]::defaultCountRelations(),
+                    ($relation['with_count'] ?? []) ?: $relationSchema::defaultCountRelations(),
                 );
         }
 

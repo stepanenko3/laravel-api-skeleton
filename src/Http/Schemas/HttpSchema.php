@@ -16,7 +16,16 @@ abstract class HttpSchema
 
     public static function defaultCountRelations(): array
     {
-        return static::countRelations();
+        return [];
+    }
+
+    public static function basicFields(): array
+    {
+        if (property_exists(static::class, 'basicFields')) {
+            return static::$basicFields;
+        }
+
+        return [];
     }
 
     abstract public static function fields(): array;
