@@ -23,9 +23,15 @@ trait RegisterConversions
                 'model_type',
                 'model_id',
                 'collection_name',
+                'mime_type',
                 'file_name',
                 'disk',
                 'conversions_disk',
+                'custom_properties',
+                'generated_conversions',
+                'size',
+                'order_column',
+                'created_at',
                 'updated_at',
             ]);
     }

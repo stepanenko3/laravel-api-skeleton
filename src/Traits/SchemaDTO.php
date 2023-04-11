@@ -26,8 +26,6 @@ trait SchemaDTO
 
     public function rulesSchemaDTO(): array
     {
-        [$fields, $relations, $countRelations] = $this->schema::getAllowed();
-
         return array_merge(
             [
                 'fields' => [
@@ -37,7 +35,9 @@ trait SchemaDTO
                 'fields.*' => [
                     'required',
                     'string',
-                    Rule::in($fields),
+                    Rule::in(
+                        $this->schema::fields(),
+                    ),
                 ],
 
                 'with' => [
@@ -45,7 +45,9 @@ trait SchemaDTO
                     'array',
                 ],
             ],
-            $this->relationsToRules($relations),
+            $this->schemaRelationsToRules(
+                relations: $this->schema::relations(),
+            ),
         );
     }
 
@@ -61,45 +63,30 @@ trait SchemaDTO
     public function applyToQuery($builder): EloquentBuilder | QueryBuilder
     {
         return $builder
-            ->select($this->getFields())
-            ->with($this->relationsToQuery());
+            ->select(
+                $this->fields ?: $this->schema::defaultFields()
+            )
+            ->with(
+                $this->getRelationsFromSchema(
+                    relations: $this->with,
+                    schemaClass: $this->schema,
+                ),
+            )
+            ->withCount(
+                $this->with_count ?: $this->schema::defaultCountRelations(),
+            );
     }
 
-    public function getFields(): array
-    {
-        if (empty($this->fields)) {
-            return $this->schema::defaultFields();
+    private function schemaRelationsToRules(
+        string $prefix = '',
+        array $relations = [],
+        int $level = 0,
+        int $maxLevel = 1,
+    ): array {
+        if ($level > $maxLevel) {
+            return [];
         }
 
-        return $this->fields;
-    }
-
-    private function relationsToQuery(array $relations = []): array
-    {
-        // Load default relations
-        // Load default fields for each relation
-        $data = [];
-
-        foreach (($relations ?: $this->with) as $key => $relation) {
-            $data[$key] = fn ($q) => $q
-                ->select(
-                    ...$realtion['fields'] ?? [],
-                )
-                ->when(
-                    !empty($relation['with'] ?? []),
-                    fn ($query) => $query->with(
-                        $this->relationsToQuery(
-                            $relation['with'] ?? [],
-                        ),
-                    ),
-                );
-        }
-
-        return $data;
-    }
-
-    private function relationsToRules(array $relations, string $prefix = ''): array
-    {
         $rules = [
             $prefix . 'with' => [
                 'nullable',
@@ -108,38 +95,78 @@ trait SchemaDTO
             ],
         ];
 
-        foreach ($relations as $relationName => $relation) {
-            $key = $prefix . 'with.' . $relationName;
+        $level++;
 
-            $rules[$key] = [
-                'nullable',
-                'array',
+        foreach ($relations as $relation => $relationClass) {
+            $key = $prefix . 'with.' . $relation;
+
+            $allowedFields = $relationClass::fields();
+            $allowedRelations = $relationClass::relations();
+
+            $rules += [
+                $key => [
+                    'nullable',
+                    'array',
+                    'required_array_keys:fields',
+                ],
+
+                $key . '.fields' => [
+                    'nullable',
+                    'array',
+                    'max:' . count($allowedFields),
+                    Rule::in($allowedFields),
+                ],
             ];
 
-            if (!empty($relation['fields'] ?? [])) {
-                $rules[$key . '.fields'] = [
-                    'required_with:' . $key,
-                    'array',
-                    Rule::in($relation['fields']),
-                ];
-            }
-
-            if (!empty($relation['with'] ?? [])) {
+            if (!empty($allowedRelations)) {
                 $rules[$key . '.with'] = [
                     'nullable',
                     'array',
+                    'max:' . count($allowedRelations),
                 ];
 
-                $rules = array_merge(
-                    $rules,
-                    $this->relationsToRules(
-                        $relation['with'],
-                        $key . '.',
-                    ),
+                $rules += $this->schemaRelationsToRules(
+                    prefix: $key . '.',
+                    relations: $allowedRelations,
+                    level: $level,
+                    maxLevel: $maxLevel,
                 );
             }
         }
 
         return $rules;
+    }
+
+    private function getRelationsFromSchema(
+        array $relations,
+        string $schemaClass,
+    ): array {
+        $allowedRelations = $schemaClass::relations();
+
+        if (empty($relations)) {
+            $relations = collect($schemaClass::defaultRelations())
+                ->mapWithKeys(fn ($relation) => [$relation => []])
+                ->toArray();
+        }
+
+        $result = [];
+
+        foreach ($relations as $key => $relation) {
+            $result[$key] = fn ($q) => $q
+                ->select(
+                    ($relation['fields'] ?? []) ?: $allowedRelations[$key]::defaultFields(),
+                )
+                ->with(
+                    $this->getRelationsFromSchema(
+                        relations: $relation['with'] ?? [],
+                        schemaClass: $allowedRelations[$key],
+                    )
+                )
+                ->withCount(
+                    ($relation['with_count'] ?? []) ?: $allowedRelations[$key]::defaultCountRelations(),
+                );
+        }
+
+        return $result;
     }
 }
