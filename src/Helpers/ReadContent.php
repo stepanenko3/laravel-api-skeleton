@@ -7,8 +7,6 @@ use Illuminate\Support\Str;
 
 class ReadContent
 {
-    private array $estimate = [];
-
     private array $headings = [];
 
     private array $tags = [];
@@ -21,6 +19,16 @@ class ReadContent
         $this->applyTags();
     }
 
+    public static function make(
+        string $content,
+        Closure $routeMaker,
+    ): self {
+        return new self(
+            content: $content,
+            routeMaker: $routeMaker,
+        );
+    }
+
     public function __invoke()
     {
         return $this->toArray();
@@ -31,9 +39,12 @@ class ReadContent
      */
     public function toArray(): array
     {
-        $this->estimate();
-
-        return $this->estimate;
+        return [
+            'tags' => $this->tags,
+            'headings' => $this->headings,
+            'content' => make_body($this->content),
+            'read_time' => ReadTime::make($this->content)->toArray(),
+        ];
     }
 
     private function applyHeadings(): array
@@ -95,19 +106,5 @@ class ReadContent
                 'link' => str_ireplace('$1', (string) $tag, $link),
             ])
             ->toArray();
-    }
-
-    /**
-     * Set the estimate property.
-     */
-    private function estimate(): void
-    {
-        $this->estimate = [
-            'tags' => $this->tags,
-            'headings' => $this->headings,
-            'content' => make_body($this->content),
-            'read_time' => (new ReadTime($this->content))
-                ->toArray(),
-        ];
     }
 }

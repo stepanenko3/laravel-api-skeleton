@@ -51,14 +51,32 @@ class ReadTime implements \Stringable
      */
     private readonly int $wordsInContent;
 
-    public function __construct($content, bool $omitSeconds = true, bool $abbreviated = false, int $wordsPerMinute = 230)
-    {
+    public function __construct(
+        string $content,
+        bool $omitSeconds = true,
+        bool $abbreviated = false,
+        int $wordsPerMinute = 230,
+    ) {
         $this->abbreviated = $abbreviated;
         $this->content = $this->parseContent($content);
         $this->ltr = true;
         $this->omitSeconds = $omitSeconds;
         $this->wordsInContent = $this->wordsCount($this->content);
         $this->wordsPerMinute = $wordsPerMinute;
+    }
+
+    public static function make(
+        string $content,
+        bool $omitSeconds = true,
+        bool $abbreviated = false,
+        int $wordsPerMinute = 23
+    ): self {
+        return new self(
+            content: $content,
+            omitSeconds: $omitSeconds,
+            abbreviated: $abbreviated,
+            wordsPerMinute: $wordsPerMinute,
+        );
     }
 
     public function __invoke()
