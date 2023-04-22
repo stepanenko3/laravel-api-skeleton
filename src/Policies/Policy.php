@@ -13,116 +13,99 @@ abstract class Policy
 
     public function viewAny(Model $subject)
     {
-        if ($subject === null) {
-            return false;
-        }
-
-        if ($subject->can($this->getKey('view'))) {
-            return true;
-        }
+        return $this->can(
+            subject: $subject,
+            key: 'viewAny',
+        );
     }
 
     public function view(?Model $subject, Model $item)
     {
-        if ($subject === null) {
-            return false;
-        }
-
-        if ($subject->can($this->getKey('view'))) {
-            return true;
-        }
+        return $this->can(
+            subject: $subject,
+            key: 'view',
+        );
     }
 
     public function create(Model $subject)
     {
-        if ($subject === null) {
-            return false;
-        }
-
-        if ($subject->can($this->getKey('create'))) {
-            return true;
-        }
+        return $this->can(
+            subject: $subject,
+            key: 'create',
+        );
     }
 
     public function update(Model $subject, Model $item)
     {
-        if ($subject === null) {
-            return false;
-        }
-
-        if ($subject->can($this->getKey('update'))) {
-            return true;
-        }
+        return $this->can(
+            subject: $subject,
+            key: 'update',
+        );
     }
 
     public function replicate(Model $subject, Model $item)
     {
-        if ($subject === null) {
-            return false;
-        }
-
-        if ($subject->can($this->getKey('replicate'))) {
-            return true;
-        }
+        return $this->can(
+            subject: $subject,
+            key: 'replicate',
+        );
     }
 
     public function delete(Model $subject, Model $item)
     {
-        if ($subject === null) {
-            return false;
-        }
-
-        if ($subject->can($this->getKey('delete'))) {
-            return true;
-        }
+        return $this->can(
+            subject: $subject,
+            key: 'create',
+        );
     }
 
     public function restore(Model $subject, Model $item)
     {
-        if ($subject === null) {
-            return false;
-        }
-
-        if ($subject->can($this->getKey('restore'))) {
-            return true;
-        }
+        return $this->can(
+            subject: $subject,
+            key: 'restore',
+        );
     }
 
     public function forceDelete(Model $subject, Model $item)
     {
-        if ($subject === null) {
-            return false;
-        }
-
-        if ($subject->can($this->getKey('forceDelete'))) {
-            return true;
-        }
+        return $this->can(
+            subject: $subject,
+            key: 'forceDelete',
+        );
     }
 
-    public function runAction(Model $subject, Model $item)
+    protected function can(?Model $subject, string $key): bool
     {
         if ($subject === null) {
             return false;
         }
 
-        if ($subject->can($this->getKey('runAction'))) {
+        if ($subject->can($this->getKey(suffix: $key))) {
             return true;
         }
-    }
 
-    public function runDestructiveAction(Model $subject, Model $item)
-    {
-        if ($subject === null) {
-            return false;
-        }
-
-        if ($subject->can($this->getKey('runDestructiveAction'))) {
-            return true;
-        }
+        return false;
     }
 
     protected function getKey(string $suffix = ''): string
     {
         return $this->key() . ($suffix ? '.' . $suffix : '');
+    }
+
+    public function runAction(Model $subject, Model $item)
+    {
+        return $this->can(
+            subject: $subject,
+            key: 'runAction',
+        );
+    }
+
+    public function runDestructiveAction(Model $subject, Model $item)
+    {
+        return $this->can(
+            subject: $subject,
+            key: 'runDestructiveAction',
+        );
     }
 }
