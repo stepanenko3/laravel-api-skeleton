@@ -50,7 +50,7 @@ abstract class JsonResource extends BaseJsonResource
                 'id' => $this->whenNotNull($this->getKey()),
                 'type' => $this->getTable(),
                 'attributes' => $this->resolveAttributes($request),
-                'metadata' => $this->toMeta($request),
+                'meta' => $this->toMeta($request),
                 'relations' => $this->resolveRelationships($request),
             ]);
     }

@@ -1,11 +1,11 @@
 <?php
 
-namespace Stepanenko3\LaravelApiSkeleton\DTO\Casts;
+namespace Stepanenko3\LaravelApiSkeleton\ValidatedDTO\Casts;
 
 use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastException;
-use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoCastInterface;
+use Stepanenko3\LaravelApiSkeleton\Contracts\ValidatedDtoCastContract;
 
-class FloatCast implements DtoCastInterface
+class FloatCast implements ValidatedDtoCastContract
 {
     public function cast(
         string $property,

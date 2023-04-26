@@ -1,30 +1,47 @@
 <?php
 
-namespace Stepanenko3\LaravelApiSkeleton\Traits;
+namespace Stepanenko3\LaravelApiSkeleton\Http;
 
-use Exception;
 use Illuminate\Validation\Rule;
-use Stepanenko3\LaravelApiSkeleton\DTO\Casts\ArrayCast;
+use Stepanenko3\LaravelApiSkeleton\Rules\KeysIn;
 use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Contracts\Database\Query\Builder as QueryBuilder;
-use Stepanenko3\LaravelApiSkeleton\Rules\KeysIn;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
 
-trait SchemaDTO
+abstract class Schema
 {
-    protected array $fields = [];
-
-    protected array $with = [];
-
-    protected array $with_count = [];
-
-    public function bootSchemaDTO(): void
+    public static function defaultFields(): array
     {
-        if (!$this->isPropInitialized('schema')) {
-            throw new Exception(static::class . ' schema is required prop');
-        }
+        return static::fields();
     }
 
-    public function rulesSchemaDTO(): array
+    public static function defaultRelations(): array
+    {
+        return [];
+    }
+
+    public static function defaultCountRelations(): array
+    {
+        return [];
+    }
+
+    public static function basicFields(): array
+    {
+        if (property_exists(static::class, 'basicFields')) {
+            return static::$basicFields;
+        }
+
+        return [];
+    }
+
+    abstract public static function fields(): array;
+
+    abstract public static function relations(): array;
+
+    abstract public static function countRelations(): array;
+
+
+    public static function rules(): array
     {
         return array_merge(
             [
@@ -36,35 +53,36 @@ trait SchemaDTO
                     'required',
                     'string',
                     Rule::in(
-                        $this->schema::fields(),
+                        static::fields(),
                     ),
                 ],
-
                 'with' => [
                     'nullable',
                     'array',
                 ],
+                'with_count' => [
+                    'nullable',
+                    'array',
+                    Rule::in(
+                        static::countRelations(),
+                    ),
+                ],
             ],
-            $this->schemaRelationsToRules(
-                relations: $this->schema::relations(),
+            static::schemaRelationsToRules(
+                relations: static::relations(),
             ),
         );
     }
 
-    public function castsSchemaDTO(): array
-    {
-        return [
-            'fields' => new ArrayCast(),
-            'with' => new ArrayCast(),
-            'with_count' => new ArrayCast(),
-        ];
-    }
-
-    public function applyToQuery($builder): EloquentBuilder | QueryBuilder
-    {
+    public static function applyToQuery(
+        EloquentBuilder | QueryBuilder | Builder $builder,
+        array $fields = [],
+        array $with = [],
+        array $withCount = [],
+    ): EloquentBuilder | QueryBuilder {
         $fields = array_merge(
-            $this->schema::basicFields(),
-            $this->fields ?: $this->schema::defaultFields(),
+            static::basicFields(),
+            $fields ?: static::defaultFields(),
         );
 
         return $builder
@@ -73,17 +91,18 @@ trait SchemaDTO
                 fn ($q) => $q->select($fields),
             )
             ->with(
-                $this->getRelationsFromSchema(
-                    relations: $this->with,
-                    schemaClass: $this->schema,
+                static::getRelationsFromSchema(
+                    relations: $with,
+                    schemaClass: static::class,
                 ),
             )
             ->withCount(
-                $this->with_count ?: $this->schema::defaultCountRelations(),
+                $withCount ?: static::defaultCountRelations(),
             );
     }
 
-    private function schemaRelationsToRules(
+
+    private static function schemaRelationsToRules(
         string $prefix = '',
         array $relations = [],
         int $level = 0,
@@ -108,12 +127,11 @@ trait SchemaDTO
 
             $allowedFields = $relationClass::fields();
             $allowedRelations = $relationClass::relations();
+            $allowedCountRelations = $relationClass::countRelations();
 
             $rules += [
                 $key => [
                     'nullable',
-                    'array',
-                    'required_array_keys:fields',
                 ],
 
                 $key . '.fields' => [
@@ -130,19 +148,29 @@ trait SchemaDTO
                     'max:' . count($allowedRelations),
                 ];
 
-                $rules += $this->schemaRelationsToRules(
+                $rules += static::schemaRelationsToRules(
                     prefix: $key . '.',
                     relations: $allowedRelations,
                     level: $level,
                     maxLevel: $maxLevel,
                 );
             }
+
+            if (!empty($allowedCountRelations)) {
+                $rules[$key . '.with_count'] = [
+                    'nullable',
+                    'array',
+                    Rule::in(
+                        static::countRelations(),
+                    ),
+                ];
+            }
         }
 
         return $rules;
     }
 
-    private function getRelationsFromSchema(
+    private static function getRelationsFromSchema(
         array $relations,
         string $schemaClass,
     ): array {
@@ -170,7 +198,7 @@ trait SchemaDTO
                     fn ($q) => $q->select($fields),
                 )
                 ->with(
-                    $this->getRelationsFromSchema(
+                    static::getRelationsFromSchema(
                         relations: $relation['with'] ?? [],
                         schemaClass: $relationSchema,
                     )

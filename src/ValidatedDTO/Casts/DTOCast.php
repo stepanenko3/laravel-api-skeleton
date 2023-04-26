@@ -1,14 +1,14 @@
 <?php
 
-namespace Stepanenko3\LaravelApiSkeleton\DTO\Casts;
+namespace Stepanenko3\LaravelApiSkeleton\ValidatedDTO\Casts;
 
-use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoCastInterface;
+use Stepanenko3\LaravelApiSkeleton\Contracts\ValidatedDtoCastContract;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastException;
 use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastTargetException;
 
-class DTOCast implements DtoCastInterface
+class DTOCast implements ValidatedDtoCastContract
 {
     public function __construct(
         private readonly string $dtoClass,
@@ -19,7 +19,7 @@ class DTOCast implements DtoCastInterface
     public function cast(
         string $property,
         mixed $value,
-    ): DtoCastInterface {
+    ): ValidatedDtoCastContract {
         if (is_string($value)) {
             $value = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
         }
@@ -36,7 +36,7 @@ class DTOCast implements DtoCastInterface
             throw new CastException($property);
         }
 
-        if (!$dto instanceof DtoCastInterface) {
+        if (!$dto instanceof ValidatedDtoCastContract) {
             throw new CastTargetException($property);
         }
 

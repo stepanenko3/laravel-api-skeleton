@@ -2,10 +2,8 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Actions;
 
-use Stepanenko3\LaravelApiSkeleton\DTO\DTO;
-use Stepanenko3\LaravelApiSkeleton\Interfaces\ActionInterface;
+use Stepanenko3\LaravelApiSkeleton\Contracts\ActionContract;
 
-abstract class Action implements ActionInterface
+abstract class Action implements ActionContract
 {
-    abstract public function handle(DTO $dto): mixed;
 }

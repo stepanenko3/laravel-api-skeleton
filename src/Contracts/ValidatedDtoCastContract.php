@@ -1,8 +1,8 @@
 <?php
 
-namespace Stepanenko3\LaravelApiSkeleton\Interfaces;
+namespace Stepanenko3\LaravelApiSkeleton\Contracts;
 
-interface DtoCastInterface
+interface ValidatedDtoCastContract
 {
     public function cast(
         string $property,

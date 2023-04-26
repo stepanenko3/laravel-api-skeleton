@@ -1,14 +1,14 @@
 <?php
 
-namespace Stepanenko3\LaravelApiSkeleton\DTO\Casts;
+namespace Stepanenko3\LaravelApiSkeleton\ValidatedDTO\Casts;
 
-use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoCastInterface;
+use Stepanenko3\LaravelApiSkeleton\Contracts\ValidatedDtoCastContract;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;
 use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastException;
 use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\CastTargetException;
 
-class ModelCast implements DtoCastInterface
+class ModelCast implements ValidatedDtoCastContract
 {
     public function __construct(
         private readonly string $modelClass,

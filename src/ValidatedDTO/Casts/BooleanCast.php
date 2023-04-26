@@ -1,10 +1,10 @@
 <?php
 
-namespace Stepanenko3\LaravelApiSkeleton\DTO\Casts;
+namespace Stepanenko3\LaravelApiSkeleton\ValidatedDTO\Casts;
 
-use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoCastInterface;
+use Stepanenko3\LaravelApiSkeleton\Contracts\ValidatedDtoCastContract;
 
-class BooleanCast implements DtoCastInterface
+class BooleanCast implements ValidatedDtoCastContract
 {
     public function cast(
         string $property,

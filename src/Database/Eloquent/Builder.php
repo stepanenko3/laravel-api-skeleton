@@ -25,7 +25,7 @@ class Builder extends BaseBuilder
         ]);
     }
 
-    public function toRawSql()
+    public function toRawSql(): string
     {
         return get_query_raw($this);
     }

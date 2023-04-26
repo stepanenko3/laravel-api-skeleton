@@ -5,7 +5,6 @@ namespace Stepanenko3\LaravelApiSkeleton\Database\Eloquent;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
-use Stepanenko3\LaravelApiSkeleton\DTO\DTO;
 
 abstract class Model extends BaseModel
 {
@@ -16,9 +15,17 @@ abstract class Model extends BaseModel
 
     public function scopeApplySchema(
         QueryBuilder | EloquentBuilder $builder,
-        DTO $dto,
+        string $schema,
+        array $fields,
+        array $with,
+        array $withCount,
     ): QueryBuilder | EloquentBuilder {
-        return $dto->applyToQuery($builder);
+        return $schema::applyToQuery(
+            builder: $builder,
+            fields: $fields,
+            with: $with,
+            withCount: $withCount,
+        );
     }
 
     public function scopeOnly(

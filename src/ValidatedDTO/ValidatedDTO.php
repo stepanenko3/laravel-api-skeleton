@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelApiSkeleton\DTO;
+namespace Stepanenko3\LaravelApiSkeleton\ValidatedDTO;
 
 use Exception;
 use Illuminate\Console\Command;
@@ -14,11 +14,11 @@ use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\InvalidJsonException;
 use Stepanenko3\LaravelApiSkeleton\Exceptions\DTO\MissingCastTypeException;
 use ReflectionObject;
 use ReflectionProperty;
-use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoCastInterface;
-use Stepanenko3\LaravelApiSkeleton\Interfaces\DtoInterface;
+use Stepanenko3\LaravelApiSkeleton\Contracts\ValidatedDtoCastContract;
+use Stepanenko3\LaravelApiSkeleton\Contracts\ValidatedDtoContract;
 use Stepanenko3\LaravelApiSkeleton\Traits\WorkWithUses;
 
-abstract class DTO implements DtoInterface
+abstract class ValidatedDTO implements ValidatedDtoContract
 {
     use WorkWithUses;
 
@@ -28,6 +28,7 @@ abstract class DTO implements DtoInterface
 
     public function __construct(
         protected array $data,
+        protected bool $validate = true,
     ) {
         $this->boot();
 
@@ -43,10 +44,10 @@ abstract class DTO implements DtoInterface
         $this->setAttribute($name, $value);
     }
 
-    public function __get(string $name): mixed
-    {
-        return $this->getAttribute($name);
-    }
+    // public function __get(string $name): mixed
+    // {
+    //     return $this->getAttribute($name);
+    // }
 
     public function __call(string $name, array $values)
     {
@@ -306,6 +307,10 @@ abstract class DTO implements DtoInterface
 
     protected function getValidatedData(array $data): array
     {
+        if (!$this->validate) {
+            return $data;
+        }
+
         $validator = Validator::make(
             $data,
             $this->getRules(),
@@ -352,7 +357,7 @@ abstract class DTO implements DtoInterface
                 continue;
             }
 
-            if (!$casts[$key] instanceof DtoCastInterface) {
+            if (!$casts[$key] instanceof ValidatedDtoCastContract) {
                 throw new CastTargetException($key);
             }
 
