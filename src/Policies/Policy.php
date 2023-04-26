@@ -75,6 +75,22 @@ abstract class Policy
         );
     }
 
+    public function runAction(Model $subject, Model $item)
+    {
+        return $this->can(
+            subject: $subject,
+            key: 'runAction',
+        );
+    }
+
+    public function runDestructiveAction(Model $subject, Model $item)
+    {
+        return $this->can(
+            subject: $subject,
+            key: 'runDestructiveAction',
+        );
+    }
+
     protected function can(?Model $subject, string $key): bool
     {
         if ($subject === null) {
@@ -91,21 +107,5 @@ abstract class Policy
     protected function getKey(string $suffix = ''): string
     {
         return $this->key() . ($suffix ? '.' . $suffix : '');
-    }
-
-    public function runAction(Model $subject, Model $item)
-    {
-        return $this->can(
-            subject: $subject,
-            key: 'runAction',
-        );
-    }
-
-    public function runDestructiveAction(Model $subject, Model $item)
-    {
-        return $this->can(
-            subject: $subject,
-            key: 'runDestructiveAction',
-        );
     }
 }

@@ -2,6 +2,6 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Contracts;
 
-interface ProcessContract {
-
+interface ProcessContract
+{
 }

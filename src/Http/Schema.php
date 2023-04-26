@@ -34,13 +34,6 @@ abstract class Schema
         return [];
     }
 
-    abstract public static function fields(): array;
-
-    abstract public static function relations(): array;
-
-    abstract public static function countRelations(): array;
-
-
     public static function rules(): array
     {
         return array_merge(
@@ -101,6 +94,11 @@ abstract class Schema
             );
     }
 
+    abstract public static function fields(): array;
+
+    abstract public static function relations(): array;
+
+    abstract public static function countRelations(): array;
 
     private static function schemaRelationsToRules(
         string $prefix = '',

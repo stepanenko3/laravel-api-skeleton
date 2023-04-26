@@ -19,6 +19,11 @@ class ReadContent
         $this->applyTags();
     }
 
+    public function __invoke()
+    {
+        return $this->toArray();
+    }
+
     public static function make(
         string $content,
         Closure $routeMaker,
@@ -27,11 +32,6 @@ class ReadContent
             content: $content,
             routeMaker: $routeMaker,
         );
-    }
-
-    public function __invoke()
-    {
-        return $this->toArray();
     }
 
     /**

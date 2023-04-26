@@ -65,6 +65,16 @@ class ReadTime implements \Stringable
         $this->wordsPerMinute = $wordsPerMinute;
     }
 
+    public function __invoke()
+    {
+        return $this->get();
+    }
+
+    public function __toString(): string
+    {
+        return $this->get();
+    }
+
     public static function make(
         string $content,
         bool $omitSeconds = true,
@@ -77,16 +87,6 @@ class ReadTime implements \Stringable
             abbreviated: $abbreviated,
             wordsPerMinute: $wordsPerMinute,
         );
-    }
-
-    public function __invoke()
-    {
-        return $this->get();
-    }
-
-    public function __toString(): string
-    {
-        return $this->get();
     }
 
     /**
