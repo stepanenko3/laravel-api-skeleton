@@ -79,7 +79,7 @@ class ReadTime implements \Stringable
         string $content,
         bool $omitSeconds = true,
         bool $abbreviated = false,
-        int $wordsPerMinute = 23
+        int $wordsPerMinute = 230
     ): self {
         return new self(
             content: $content,

@@ -73,9 +73,14 @@ abstract class Schema
         array $with = [],
         array $withCount = [],
     ): EloquentBuilder | QueryBuilder {
-        $fields = array_merge(
-            static::basicFields(),
-            $fields ?: static::defaultFields(),
+        $table = $builder->getModel()->getTable();
+
+        $fields = array_map(
+            callback: fn ($value) => $table . '.' . $value,
+            array: array_merge(
+                static::basicFields(),
+                $fields ?: static::defaultFields(),
+            ),
         );
 
         return $builder
