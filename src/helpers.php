@@ -4,6 +4,34 @@ use Illuminate\Support\Facades\{Http, Storage};
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Stepanenko3\LaravelApiSkeleton\Helpers\ExtendedCollection;
 
+if (!function_exists('get_media_path')) {
+    function get_media_path(
+        Media $media,
+        mixed $conversion = '',
+    ) {
+        $pathGenerator = app(config('media-library.path_generator'));
+
+        $baseFileName = pathinfo((string) $media->file_name, PATHINFO_FILENAME);
+
+        if ($conversion) {
+            $model = new $media->model_type();
+            $fileExtension = $model->getConversionExtension($conversion);
+
+            $fileName = substr(base_convert(md5($baseFileName), 16, 32), 0, 12) . '-' . $conversion;
+
+            $path = $pathGenerator->getPathForConversions($media);
+        } else {
+            $fileExtension = pathinfo((string) $media->file_name, PATHINFO_EXTENSION);
+
+            $fileName = $baseFileName;
+
+            $path = $pathGenerator->getPath($media);
+        }
+
+        return "{$path}{$fileName}.{$fileExtension}";
+    }
+}
+
 if (!function_exists('get_media_url')) {
     /**
      * get_media_url.
@@ -15,19 +43,11 @@ if (!function_exists('get_media_url')) {
      */
     function get_media_url(
         Media $media,
-        mixed $conversion,
+        mixed $conversion = '',
         $version = false,
         $absolute = true,
     ) {
-        $pathGenerator = app(config('media-library.path_generator'));
-        $model = new $media->model_type();
-        $fileExtension = $model->getConversionExtension($conversion);
-
-        $fileName = pathinfo((string) $media->file_name, PATHINFO_FILENAME);
-        $conversionFileName = substr(base_convert(md5($fileName), 16, 32), 0, 12) . '-' . $conversion;
-
-        $path = $pathGenerator->getPathForConversions($media, $model);
-        $url = "{$path}{$conversionFileName}.{$fileExtension}";
+        $url = get_media_path($media, $conversion);
 
         if ($version) {
             $url = "{$url}?v={$media->updated_at->timestamp}";

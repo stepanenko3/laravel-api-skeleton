@@ -26,6 +26,7 @@ class MediaPathGenerator implements PathGenerator
     {
         $model = $model ?: new $media->model_type();
 
-        return '/' . $model->getTable() . '/' . $media->model_id . '/' . $media->getKey();
+        return '/' . $model->getTable() . '/' . $media->model_id;
+        // return '/' . $model->getTable() . '/' . $media->model_id . '/' . $media->getKey();
     }
 }
