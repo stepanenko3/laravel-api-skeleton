@@ -5,7 +5,6 @@ namespace Stepanenko3\LaravelApiSkeleton\Listeners;
 use Illuminate\Support\Facades\Storage;
 use Thumbhash\Thumbhash;
 use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAdded;
-
 use Intervention\Image\ImageManagerStatic as Image;
 
 class AddThumbHashForMedia
@@ -16,7 +15,7 @@ class AddThumbHashForMedia
 
         $image = Image::make(
             data: $content,
-        )->resize(100, 100, function ($constraint) {
+        )->resize(100, 100, function ($constraint): void {
             $constraint->aspectRatio();
             $constraint->upsize();
         });
@@ -38,11 +37,12 @@ class AddThumbHashForMedia
         }
 
         $hash = Thumbhash::RGBAToHash($width, $height, $pixels);
+        $key = Thumbhash::convertHashToString($hash);
 
         $event->media
             ->setCustomProperty(
                 name: 'thumbhash',
-                value: $hash,
+                value: $key,
             )
             ->save();
     }
