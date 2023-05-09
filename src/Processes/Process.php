@@ -8,6 +8,14 @@ abstract class Process
 {
     public array $tasks;
 
+    public static function run(
+        object $payload,
+    ): mixed {
+        return (new static())->handle(
+            payload: $payload,
+        );
+    }
+
     public function handle(
         object $payload,
     ): mixed {
