@@ -44,15 +44,17 @@ abstract class JsonResource extends BaseJsonResource
             return [];
         }
 
-        return is_array($this->resource)
+        $response = is_array($this->resource)
             ? $this->resource
-            : arr_clean_empty_values([
+            : [
                 'id' => $this->whenNotNull($this->getKey()),
                 'type' => $this->getTable(),
                 'attributes' => $this->resolveAttributes($request),
                 'meta' => $this->toMeta($request),
                 'relations' => $this->resolveRelationships($request),
-            ]);
+            ];
+
+        return array_filter($response);
     }
 
     private static function guessRelationshipResource(string $relationship, self $resource)
@@ -73,6 +75,11 @@ abstract class JsonResource extends BaseJsonResource
         })($relationship, $resource);
     }
 
+    public function mapAttributes(array $attributes): array
+    {
+        return $attributes;
+    }
+
     private function resolveAttributes(Request $request): array
     {
         return Collection::make($this->attributes)
@@ -83,7 +90,7 @@ abstract class JsonResource extends BaseJsonResource
                     $attribute => $this->whenNotNull(
                         method_exists($this->resource, 'isTranslatableAttribute') && $this->resource->isTranslatableAttribute($resolvedKey)
                             ? $this->resource->getOriginal($resolvedKey)
-                            : $this->resource->{$resolvedKey},
+                            : (isset($this->resource->{$resolvedKey}) ? $this->resource->{$resolvedKey} : $this->resource->getOriginal($resolvedKey)),
                     ),
                 ];
             })
