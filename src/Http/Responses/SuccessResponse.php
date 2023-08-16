@@ -11,13 +11,17 @@ class SuccessResponse implements Responsable
 {
     public function __construct(
         private readonly mixed $data = [],
-        private array $meta = [],
+        private mixed $meta = [],
         private readonly int $code = Response::HTTP_OK,
         private readonly array $headers = [],
         private readonly mixed $pagination = null,
     ) {
         if ($this->pagination) {
-            $this->meta['pagination'] = (new ApiPagination($this->pagination))->toArray();
+            data_set(
+                target: $this->meta,
+                key: 'pagination',
+                value: (new ApiPagination($this->pagination))->toArray(),
+            );
         }
     }
 

@@ -57,6 +57,11 @@ abstract class JsonResource extends BaseJsonResource
         return array_filter($response);
     }
 
+    public function mapAttributes(array $attributes): array
+    {
+        return $attributes;
+    }
+
     private static function guessRelationshipResource(string $relationship, self $resource)
     {
         return (self::$relationshipResourceGuesser ?? function (string $relationship, self $resource): string {
@@ -75,11 +80,6 @@ abstract class JsonResource extends BaseJsonResource
         })($relationship, $resource);
     }
 
-    public function mapAttributes(array $attributes): array
-    {
-        return $attributes;
-    }
-
     private function resolveAttributes(Request $request): array
     {
         return Collection::make($this->attributes)
@@ -90,7 +90,7 @@ abstract class JsonResource extends BaseJsonResource
                     $attribute => $this->whenNotNull(
                         method_exists($this->resource, 'isTranslatableAttribute') && $this->resource->isTranslatableAttribute($resolvedKey)
                             ? $this->resource->getOriginal($resolvedKey)
-                            : (isset($this->resource->{$resolvedKey}) ? $this->resource->{$resolvedKey} : $this->resource->getOriginal($resolvedKey)),
+                            : ($this->resource->{$resolvedKey} ?? $this->resource->getOriginal($resolvedKey)),
                     ),
                 ];
             })
