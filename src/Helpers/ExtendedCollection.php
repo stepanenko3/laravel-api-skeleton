@@ -36,4 +36,17 @@ class ExtendedCollection extends Collection
             ->filter($this->operatorForWhere(...func_get_args()))
             ->isNotEmpty();
     }
+
+    public function isEmpty(?string $key = null): bool
+    {
+        if ($key) {
+            return empty(
+                $this->get(
+                    key: $key,
+                )
+            );
+        }
+
+        return empty($this->items);
+    }
 }

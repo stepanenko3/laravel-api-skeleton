@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelApiSkeleton\Http;
+namespace Stepanenko3\LaravelApiSkeleton\Http\Schemas;
 
 use Illuminate\Validation\Rule;
 use Stepanenko3\LaravelApiSkeleton\Rules\KeysIn;
@@ -27,15 +27,14 @@ abstract class Schema
     }
 
     public static function applyLogic(
-        array $fields,
-        array $with,
-        array $withCount,
-    ): array {
-        return [
-            $fields,
-            $with,
-            $withCount,
-        ];
+        SchemaCollection $collection,
+    ): SchemaCollection {
+        return $collection;
+    }
+
+    public static function protectedRelations(): array
+    {
+        return [];
     }
 
     public static function basicFields(): array
@@ -88,30 +87,37 @@ abstract class Schema
     ): EloquentBuilder | QueryBuilder {
         $table = $builder->getModel()->getTable();
 
-        [$fields, $with, $withCount] = static::applyLogic(
-            fields: array_merge(
-                static::basicFields(),
-                $fields ?: static::defaultFields(),
-            ),
-            with: static::getRelationsFromSchema(
-                relations: $with,
-                schemaClass: static::class,
-            ),
-            withCount: $withCount ?: static::defaultCountRelations(),
+        $collection = static::applyLogic(
+            collection: new SchemaCollection(
+                fields: $fields,
+                with: $with,
+                withCount: $withCount,
+            )
         );
 
         return $builder
-            ->when(
-                !empty($fields),
-                fn ($q) => $q->select(
-                    array_map(
-                        callback: fn ($value) => $table . '.' . $value,
-                        array: $fields,
+            ->select(
+                array_map(
+                    callback: fn ($value) => $table . '.' . $value,
+                    array: array_merge(
+                        static::basicFields(),
+                        $collection->getFields(
+                            default: static::defaultFields(),
+                        ),
                     ),
                 ),
             )
-            ->with($with)
-            ->withCount($withCount);
+            ->with(
+                static::getRelationsFromSchema(
+                    relations: $collection->getRelations(),
+                    schemaClass: static::class,
+                )
+            )
+            ->withCount(
+                $collection->getCountRelations(
+                    default: static::defaultCountRelations(),
+                ),
+            );
     }
 
     abstract public static function fields(): array;
@@ -151,7 +157,7 @@ abstract class Schema
 
             $rules += [
                 $key => [
-                    new ArrayOrTrue,
+                    new ArrayOrTrue(),
                     new KeysIn(
                         values: ['fields', 'with', 'with_count'],
                     ),
@@ -199,7 +205,10 @@ abstract class Schema
         array $relations,
         string $schemaClass,
     ): array {
-        $allowedRelations = $schemaClass::relations();
+        $allowedRelations = array_merge(
+            $schemaClass::relations(),
+            $schemaClass::protectedRelations()
+        );
 
         if (empty($relations)) {
             $relations = collect($schemaClass::defaultRelations())
@@ -212,34 +221,41 @@ abstract class Schema
         foreach ($relations as $key => $relation) {
             $relationSchema = $allowedRelations[$key];
 
-            [$fields, $with, $withCount] = $relationSchema::applyLogic(
-                fields: array_merge(
-                    $relationSchema::basicFields(),
-                    ($relation['fields'] ?? []) ?: $relationSchema::defaultFields(),
+            $collection = $relationSchema::applyLogic(
+                collection: new SchemaCollection(
+                    fields: $relation['fields'] ?? [],
+                    with: $relation['with'] ?? [],
+                    withCount: $relation['with_count'] ?? [],
                 ),
-                with: static::getRelationsFromSchema(
-                    relations: $relation['with'] ?? [],
-                    schemaClass: $relationSchema,
-                ),
-                withCount: ($relation['with_count'] ?? []) ?: $relationSchema::defaultCountRelations(),
             );
 
-            $result[$key] = fn ($q) => $q
-                ->when(
-                    !empty($fields),
-                    function ($q) use ($fields) {
-                        $table = $q->getModel()->getTable();
+            $result[$key] = function (EloquentBuilder | QueryBuilder | Builder $q) use ($relationSchema, $collection) {
+                $table = $q->getModel()->getTable();
 
-                        return $q->select(
-                            array_map(
-                                callback: fn ($field) => $table . '.' . $field,
-                                array: $fields,
-                            )
-                        );
-                    },
-                )
-                ->with($with)
-                ->withCount($withCount);
+                return $q
+                    ->select(
+                        array_map(
+                            callback: fn ($field) => $table . '.' . $field,
+                            array: array_merge(
+                                $relationSchema::basicFields(),
+                                $collection->getFields(
+                                    default: $relationSchema::defaultFields(),
+                                ),
+                            ),
+                        ),
+                    )
+                    ->with(
+                        static::getRelationsFromSchema(
+                            relations: $collection->getRelations(),
+                            schemaClass: $relationSchema,
+                        ),
+                    )
+                    ->withCount(
+                        $collection->getCountRelations(
+                            default: $relationSchema::defaultCountRelations(),
+                        ),
+                    );
+            };
         }
 
         return $result;
