@@ -95,15 +95,20 @@ abstract class Schema
             )
         );
 
+        $fields = array_merge(
+            static::basicFields(),
+            $collection->getFields(
+                default: static::defaultFields(),
+            ),
+        );
+
         return $builder
-            ->select(
-                array_map(
-                    callback: fn ($value) => $table . '.' . $value,
-                    array: array_merge(
-                        static::basicFields(),
-                        $collection->getFields(
-                            default: static::defaultFields(),
-                        ),
+            ->when(
+                value: !empty($fields),
+                callback: fn ($builder) => $builder->select(
+                    array_map(
+                        callback: fn ($value) => $table . '.' . $value,
+                        array: $fields,
                     ),
                 ),
             )
@@ -232,17 +237,22 @@ abstract class Schema
             $result[$key] = function (EloquentBuilder | QueryBuilder | Builder $q) use ($relationSchema, $collection) {
                 $table = $q->getModel()->getTable();
 
+                $fields = array_merge(
+                    $relationSchema::basicFields(),
+                    $collection->getFields(
+                        default: $relationSchema::defaultFields(),
+                    ),
+                );
+
                 return $q
-                    ->select(
-                        array_map(
-                            callback: fn ($field) => $table . '.' . $field,
-                            array: array_merge(
-                                $relationSchema::basicFields(),
-                                $collection->getFields(
-                                    default: $relationSchema::defaultFields(),
-                                ),
+                    ->when(
+                        value: !empty($fields),
+                        callback: fn ($builder) => $builder->select(
+                            array_map(
+                                callback: fn ($field) => $table . '.' . $field,
+                                array: $fields,
                             ),
-                        ),
+                        )
                     )
                     ->with(
                         static::getRelationsFromSchema(
