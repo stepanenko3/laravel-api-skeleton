@@ -37,9 +37,14 @@ class ErrorResponse implements Responsable
         }
 
         return response()->json(
-            $response,
-            $this->code,
-            $this->headers,
+            data: $response,
+            status: $this->code,
+            headers: array_merge(
+                [
+                    'Content-Type' => 'application/problem+json',
+                ],
+                $this->headers,
+            ),
         );
     }
 }
