@@ -9,11 +9,11 @@ use Throwable;
 class TooManyAttemptsResponse extends ErrorResponse implements Responsable
 {
     public function __construct(
-        private readonly string $message = 'Too Many Attempts.',
-        private readonly array $data = [],
-        private readonly ?Throwable $exception = null,
-        private readonly int $code = Response::HTTP_TOO_MANY_REQUESTS,
-        private readonly array $headers = [],
+        protected readonly string $message = 'Too Many Attempts.',
+        protected readonly array $data = [],
+        protected readonly ?Throwable $exception = null,
+        protected readonly int $code = Response::HTTP_TOO_MANY_REQUESTS,
+        protected readonly array $headers = [],
     ) {
         //
     }

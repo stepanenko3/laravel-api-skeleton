@@ -9,11 +9,11 @@ use Throwable;
 class BadRequestResponse extends ErrorResponse implements Responsable
 {
     public function __construct(
-        private readonly string $message = 'Bad request',
-        private readonly array $data = [],
-        private readonly ?Throwable $exception = null,
-        private readonly int $code = Response::HTTP_BAD_REQUEST,
-        private readonly array $headers = [],
+        protected readonly string $message = 'Bad request',
+        protected readonly array $data = [],
+        protected readonly ?Throwable $exception = null,
+        protected readonly int $code = Response::HTTP_BAD_REQUEST,
+        protected readonly array $headers = [],
     ) {
         //
     }

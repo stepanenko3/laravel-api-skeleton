@@ -9,11 +9,11 @@ use Throwable;
 class UnAuthorizedResponse extends ErrorResponse implements Responsable
 {
     public function __construct(
-        private readonly string $message = 'You are not authorized to preform this actions',
-        private readonly array $data = [],
-        private readonly ?Throwable $exception = null,
-        private readonly int $code = Response::HTTP_FORBIDDEN,
-        private readonly array $headers = [],
+        protected readonly string $message = 'You are not authorized to preform this actions',
+        protected readonly array $data = [],
+        protected readonly ?Throwable $exception = null,
+        protected readonly int $code = Response::HTTP_FORBIDDEN,
+        protected readonly array $headers = [],
     ) {
         //
     }

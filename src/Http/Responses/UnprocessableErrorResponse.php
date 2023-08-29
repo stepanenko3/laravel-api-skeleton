@@ -9,11 +9,11 @@ use Throwable;
 class UnprocessableErrorResponse extends ErrorResponse implements Responsable
 {
     public function __construct(
-        private readonly string $message = 'Unprocessable entity',
-        private readonly array $data = [],
-        private readonly ?Throwable $exception = null,
-        private readonly int $code = Response::HTTP_UNPROCESSABLE_ENTITY,
-        private readonly array $headers = [],
+        protected readonly string $message = 'Unprocessable entity',
+        protected readonly array $data = [],
+        protected readonly ?Throwable $exception = null,
+        protected readonly int $code = Response::HTTP_UNPROCESSABLE_ENTITY,
+        protected readonly array $headers = [],
     ) {
         //
     }

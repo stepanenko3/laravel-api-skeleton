@@ -47,7 +47,7 @@ class Handler extends ExceptionHandler
             exception: $e,
         );
 
-        if ($request->expectsJson()) {
+        // if ($request->expectsJson()) {
             if ($e instanceof ThrottleRequestsException) {
                 return $this->responseForThrottleRequestsException($e);
             }
@@ -87,7 +87,7 @@ class Handler extends ExceptionHandler
             if ($e instanceof NotAcceptableHttpException) {
                 return $this->responseForNotAcceptableHttpException($e);
             }
-        }
+        // }
 
         return new ErrorResponse(
             message: $e->getMessage(),

@@ -9,11 +9,11 @@ use Throwable;
 class ConflictErrorResponse extends ErrorResponse implements Responsable
 {
     public function __construct(
-        private readonly string $message = 'Conflict',
-        private readonly array $data = [],
-        private readonly ?Throwable $exception = null,
-        private readonly int $code = Response::HTTP_CONFLICT,
-        private readonly array $headers = [],
+        protected readonly string $message = 'Conflict',
+        protected readonly array $data = [],
+        protected readonly ?Throwable $exception = null,
+        protected readonly int $code = Response::HTTP_CONFLICT,
+        protected readonly array $headers = [],
     ) {
         //
     }
