@@ -1,6 +1,6 @@
 <?php
 
-namespace Stepanenko3\LaravelApiSkeleton;
+namespace Stepanenko3\LaravelApiSkeleton\DTO;
 
 use Illuminate\Http\Request;
 use Stepanenko3\LaravelApiSkeleton\Contracts\DtoContract;

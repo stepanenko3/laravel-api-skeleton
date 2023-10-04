@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 trait HasCreatedBy
 {
-    public function createdBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, self::createdByField());
-    }
-
     public static function createdByField(): string
     {
         return 'created_by';
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, self::createdByField());
     }
 
     protected static function bootHasCreatedBy(): void

@@ -48,45 +48,45 @@ class Handler extends ExceptionHandler
         );
 
         // if ($request->expectsJson()) {
-            if ($e instanceof ThrottleRequestsException) {
-                return $this->responseForThrottleRequestsException($e);
-            }
+        if ($e instanceof ThrottleRequestsException) {
+            return $this->responseForThrottleRequestsException($e);
+        }
 
-            if ($e instanceof ValidationException) {
-                return $this->responseForValidationException($e);
-            }
+        if ($e instanceof ValidationException) {
+            return $this->responseForValidationException($e);
+        }
 
-            if ($e instanceof ModelNotFoundException) {
-                return $this->responseForModelNotFoundException($e);
-            }
+        if ($e instanceof ModelNotFoundException) {
+            return $this->responseForModelNotFoundException($e);
+        }
 
-            if ($e instanceof QueryException) {
-                return $this->responseForQueryException($e);
-            }
+        if ($e instanceof QueryException) {
+            return $this->responseForQueryException($e);
+        }
 
-            if ($e instanceof AuthorizationException) {
-                return $this->responseForAuthorizationException($e);
-            }
+        if ($e instanceof AuthorizationException) {
+            return $this->responseForAuthorizationException($e);
+        }
 
-            if ($e instanceof NotFoundHttpException) {
-                return $this->responseForNotFoundHttpException($e);
-            }
+        if ($e instanceof NotFoundHttpException) {
+            return $this->responseForNotFoundHttpException($e);
+        }
 
-            if ($e instanceof UnprocessableEntityHttpException) {
-                return $this->responseForUnprocessableEntityHttpException($e);
-            }
+        if ($e instanceof UnprocessableEntityHttpException) {
+            return $this->responseForUnprocessableEntityHttpException($e);
+        }
 
-            if ($e instanceof AuthenticationException) {
-                return $this->responseForAuthenticationException($e);
-            }
+        if ($e instanceof AuthenticationException) {
+            return $this->responseForAuthenticationException($e);
+        }
 
-            if ($e instanceof BadRequestHttpException) {
-                return $this->responseForBadRequestHttpException($e);
-            }
+        if ($e instanceof BadRequestHttpException) {
+            return $this->responseForBadRequestHttpException($e);
+        }
 
-            if ($e instanceof NotAcceptableHttpException) {
-                return $this->responseForNotAcceptableHttpException($e);
-            }
+        if ($e instanceof NotAcceptableHttpException) {
+            return $this->responseForNotAcceptableHttpException($e);
+        }
         // }
 
         return new ErrorResponse(

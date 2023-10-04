@@ -2,12 +2,16 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Rules;
 
-use Illuminate\Contracts\Validation\InvokableRule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class ArrayOrTrue implements InvokableRule
+class ArrayOrTrue implements ValidationRule
 {
-    public function __invoke($attribute, $value, $fail): void
-    {
+    public function validate(
+        string $attribute,
+        mixed $value,
+        Closure $fail,
+    ): void {
         if ((!is_array($value) || (is_array($value) && empty($value))) && $value !== true) {
             $fail(trans(':attribute contains invalid fields'));
         }

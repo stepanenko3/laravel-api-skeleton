@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait HasStatus
 {
+    public static function statusField(): string
+    {
+        return 'status';
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where(self::statusField(), 1);
@@ -21,10 +26,5 @@ trait HasStatus
         $this->{self::statusField()} = !$this->{self::statusField()};
 
         $this->save();
-    }
-
-    public static function statusField(): string
-    {
-        return 'status';
     }
 }

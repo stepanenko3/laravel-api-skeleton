@@ -2,12 +2,16 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Rules;
 
-use Illuminate\Contracts\Validation\InvokableRule;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class CorrectBool implements InvokableRule
+class CorrectBool implements ValidationRule
 {
-    public function __invoke($attribute, $value, $fail): void
-    {
+    public function validate(
+        string $attribute,
+        mixed $value,
+        Closure $fail
+    ): void {
         if (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) === null) {
             $fail(trans(':attribute contains invalid fields'));
         }

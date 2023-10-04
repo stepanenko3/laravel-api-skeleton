@@ -10,19 +10,22 @@ class OneOf implements ValidationRule
     public function __construct(
         private array $oneOf,
     ) {
-        //
     }
 
     /**
      * Run the validation rule.
-     *
-     * @param \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString $fail
      */
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
+    public function validate(
+        string $attribute,
+        mixed $value,
+        Closure $fail,
+    ): void {
         $keys = array_filter(
-            array_keys($value),
-            fn ($key) => in_array($key, $this->oneOf),
+            array: array_keys($value),
+            callback: fn ($key) => in_array(
+                needle: $key,
+                haystack: $this->oneOf,
+            ),
         );
 
         if (count($keys) === 0) {
