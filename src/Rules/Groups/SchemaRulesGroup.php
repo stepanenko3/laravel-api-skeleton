@@ -66,7 +66,7 @@ class SchemaRulesGroup extends AbstractRulesGroup
                         ),
                     ),
                 ],
-               'with.*' => [
+                'with.*' => [
                     Includable::make(
                         request: $this->request,
                         schema: $this->schema,
@@ -114,12 +114,10 @@ class SchemaRulesGroup extends AbstractRulesGroup
             ];
         }
 
-        $rules = $this->withPrefix(
+        return $this->withPrefix(
             rules: $rules,
             prefix: $this->prefix,
         );
-
-        return $rules;
     }
 
     private function withPrefix(

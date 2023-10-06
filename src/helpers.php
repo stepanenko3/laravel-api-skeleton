@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\{Http, Storage};
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Stepanenko3\LaravelApiSkeleton\Helpers\ExtendedCollection;

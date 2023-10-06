@@ -8,7 +8,7 @@ use Stepanenko3\LaravelApiSkeleton\Rules\Groups\SchemaRulesGroup;
 
 class Request extends FormRequest
 {
-    public string $schema;
+    public ?string $schema = null;
 
     public function validationData(): array
     {
@@ -16,15 +16,6 @@ class Request extends FormRequest
             $this->route()->parameters(),
             $this->all(),
         );
-    }
-
-    private function schemaRules(): array
-    {
-        return SchemaRulesGroup::make(
-            request: $this,
-            schema: new $this->schema,
-        )
-            ->toArray();
     }
 
     protected function createDefaultValidator(
@@ -54,5 +45,18 @@ class Request extends FormRequest
         }
 
         return $validator;
+    }
+
+    private function schemaRules(): array
+    {
+        if (!$this->schema) {
+            return [];
+        }
+
+        return SchemaRulesGroup::make(
+            request: $this,
+            schema: new $this->schema(),
+        )
+            ->toArray();
     }
 }

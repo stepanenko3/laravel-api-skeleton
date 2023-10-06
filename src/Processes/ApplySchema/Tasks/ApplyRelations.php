@@ -25,14 +25,13 @@ class ApplyRelations extends Task
 
         $payload->builder->when(
             value: !empty($relations),
-            callback:  fn (EloquentBuilderContract | QueryBuilderContract | Builder $query) => $query->with(
+            callback: fn (EloquentBuilderContract | QueryBuilderContract | Builder $query) => $query->with(
                 relations: $relations,
             ),
         );
 
         return $next($payload);
     }
-
 
     private function getRelations(
         array $relations,
@@ -61,7 +60,7 @@ class ApplyRelations extends Task
                 callback: fn (array $with) => [
                     $with['relation'] => fn (EloquentBuilderContract | QueryBuilderContract | Builder $query) => $query->tap(
                         new ApplySchema(
-                            schema: new $allowedRelations[$with['relation']],
+                            schema: new $allowedRelations[$with['relation']](),
                             dto: new SchemaDTO(
                                 fields: $with['fields'] ?? [],
                                 with: $with['with'] ?? [],

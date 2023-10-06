@@ -2,9 +2,6 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\DTO;
 
-use Stepanenko3\LaravelApiSkeleton\DTO\DTO;
-use Stepanenko3\LaravelApiSkeleton\Traits\Authorizable;
-
 class SchemaDTO extends DTO
 {
     public function __construct(

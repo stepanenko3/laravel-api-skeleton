@@ -51,7 +51,7 @@ class Includable implements DataAwareRule, ValidationRule
     ): array {
         $relations = $this->schema->relations();
 
-        $schema = $relations[$value['relation']] ?? null;
+        $schema = $relations[$value['relation'] ?? null] ?? null;
 
         if (!$schema) {
             return [];
@@ -59,7 +59,7 @@ class Includable implements DataAwareRule, ValidationRule
 
         return SchemaRulesGroup::make(
             request: $this->request,
-            schema: new $schema,
+            schema: new $schema(),
             prefix: $attribute,
             level: $this->level,
         )
