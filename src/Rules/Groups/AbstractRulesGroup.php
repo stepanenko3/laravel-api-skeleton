@@ -9,4 +9,19 @@ abstract class AbstractRulesGroup
     use Makeable;
 
     abstract public function toArray(): array;
+
+    protected function withPrefix(
+        array $rules,
+        string $prefix,
+    ): array {
+        return array_combine(
+            keys: array_map(
+                callback: fn (string $key) => $prefix . $key,
+                array: array_keys(
+                    array: $rules,
+                ),
+            ),
+            values: $rules,
+        );
+    }
 }

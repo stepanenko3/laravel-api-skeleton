@@ -65,6 +65,7 @@ class ApplyRelations extends Task
                                 fields: $with['fields'] ?? [],
                                 with: $with['with'] ?? [],
                                 with_count: $with['with_count'] ?? [],
+                                scopes: $with['scopes'] ?? [],
                             ),
                         ),
                     ),

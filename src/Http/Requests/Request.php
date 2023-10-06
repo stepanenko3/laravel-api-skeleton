@@ -4,7 +4,7 @@ namespace Stepanenko3\LaravelApiSkeleton\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
-use Stepanenko3\LaravelApiSkeleton\Rules\Groups\SchemaRulesGroup;
+use Stepanenko3\LaravelApiSkeleton\Rules\Groups\SchemaRules;
 
 class Request extends FormRequest
 {
@@ -53,7 +53,7 @@ class Request extends FormRequest
             return [];
         }
 
-        return SchemaRulesGroup::make(
+        return SchemaRules::make(
             request: $this,
             schema: new $this->schema(),
         )

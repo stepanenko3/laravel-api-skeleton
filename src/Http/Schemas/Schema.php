@@ -63,6 +63,20 @@ abstract class Schema
 
     abstract public function countRelations(): array;
 
+    public function scopes(
+        Request $request,
+    ): array {
+        return [];
+    }
+
+    public function getScopes(
+        Request $request,
+    ): array {
+        return $this->scopes(
+            request: $request,
+        );
+    }
+
     public function limits(
         Request $request,
     ): array {
@@ -75,6 +89,14 @@ abstract class Schema
             25,
             50,
         ];
+    }
+
+    public function getLimits(
+        Request $request,
+    ): array {
+        return $this->limits(
+            request: $request,
+        );
     }
 
     public function jsonSerialize(): mixed

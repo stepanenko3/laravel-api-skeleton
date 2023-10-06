@@ -5,6 +5,7 @@ namespace Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema;
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\ApplyCountRelations;
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\ApplyFields;
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\ApplyRelations;
+use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\ApplyScopes;
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\Authorize;
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\MutateDTO;
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\PerformQuery;
@@ -19,5 +20,6 @@ class ApplySchemaProcess extends Process
         ApplyFields::class,
         ApplyRelations::class,
         ApplyCountRelations::class,
+        ApplyScopes::class,
     ];
 }

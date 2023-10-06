@@ -15,6 +15,7 @@ class ApplySchemaDTO extends SchemaDTO
         public array $fields,
         public array $with,
         public array $with_count,
+        public array $scopes,
         public bool $isAuthorizingEnabled = false,
     ) {
     }

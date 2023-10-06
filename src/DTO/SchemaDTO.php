@@ -8,6 +8,7 @@ class SchemaDTO extends DTO
         public array $fields,
         public array $with,
         public array $with_count,
+        public array $scopes,
     ) {
     }
 

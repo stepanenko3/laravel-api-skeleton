@@ -32,6 +32,7 @@ class ApplySchema
                 fields: $this->dto->fields,
                 with: $this->dto->with,
                 with_count: $this->dto->with_count,
+                scopes: $this->dto->scopes,
             ),
         );
     }

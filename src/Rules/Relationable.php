@@ -8,10 +8,10 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Validator;
 use Stepanenko3\LaravelApiSkeleton\Http\Requests\Request;
 use Stepanenko3\LaravelApiSkeleton\Http\Schemas\Schema;
-use Stepanenko3\LaravelApiSkeleton\Rules\Groups\SchemaRulesGroup;
+use Stepanenko3\LaravelApiSkeleton\Rules\Groups\SchemaRules;
 use Stepanenko3\LaravelApiSkeleton\Traits\Makeable;
 
-class Includable implements DataAwareRule, ValidationRule
+class Relationable implements DataAwareRule, ValidationRule
 {
     use Makeable;
 
@@ -57,7 +57,7 @@ class Includable implements DataAwareRule, ValidationRule
             return [];
         }
 
-        return SchemaRulesGroup::make(
+        return SchemaRules::make(
             request: $this->request,
             schema: new $schema(),
             prefix: $attribute,
