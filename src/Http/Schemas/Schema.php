@@ -2,140 +2,93 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Http\Schemas;
 
-use Laravel\Nova\Actions\Actionable;
-use Stepanenko3\LaravelApiSkeleton\Concerns\Authorizable;
-use Stepanenko3\LaravelApiSkeleton\Concerns\PerformsModelOperations;
-use Stepanenko3\LaravelApiSkeleton\Concerns\PerformsQueries;
-use Stepanenko3\LaravelApiSkeleton\Concerns\Schemas\ConfiguresRestParameters;
-use Stepanenko3\LaravelApiSkeleton\Concerns\Schemas\Rulable;
-use Stepanenko3\LaravelApiSkeleton\Concerns\Schemas\Relationable;
-use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Model;
+use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
+use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
+use Stepanenko3\LaravelApiSkeleton\DTO\SchemaDTO;
 use Stepanenko3\LaravelApiSkeleton\Http\Requests\Request;
-use Stepanenko3\LaravelApiSkeleton\Instructions\Instructionable;
+use Stepanenko3\LaravelApiSkeleton\Traits\Authorizable;
 
 abstract class Schema
 {
-    use Actionable;
     use Authorizable;
-    use ConfiguresRestParameters;
-    use Instructionable;
-    use PerformsModelOperations;
-    use PerformsQueries;
-    use Relationable;
-    use Rulable;
 
-    /**
-     * Get a fresh instance of the model represented by the resource.
-     */
-    public static function newModel(): Model
+    public function defaultFields(): array
     {
-        $model = static::model();
-
-        return new $model();
+        return $this->fields();
     }
 
-    abstract public static function model(): string;
-
-    public function fields(
-        Request $request,
-    ): array {
-        return [
-            'id',
-        ];
-    }
-
-    public function defaultFields(
-        Request $request,
-    ): array {
-        return [
-            'id',
-        ];
-    }
-
-    public function relations(
-        Request $request,
-    ): array {
+    public function defaultRelations(): array
+    {
         return [];
     }
 
-    public function scopes(
-        Request $request,
-    ): array {
+    public function defaultCountRelations(): array
+    {
         return [];
     }
+
+    public function performQuery(
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
+        SchemaDTO $dto,
+    ): EloquentBuilderContract | QueryBuilderContract | Builder {
+        return $query;
+    }
+
+    public function mutateDTO(
+        SchemaDTO $dto,
+    ): SchemaDTO {
+        return $dto;
+    }
+
+    public function protectedRelations(): array
+    {
+        return [];
+    }
+
+    public function basicFields(): array
+    {
+        $propertyKey = 'basicFields';
+
+        if (property_exists($this, $propertyKey)) {
+            return $this->{$propertyKey};
+        }
+
+        return [];
+    }
+
+    abstract public function fields(): array;
+
+    abstract public function relations(): array;
+
+    abstract public function countRelations(): array;
 
     public function limits(
         Request $request,
     ): array {
         return [
+            1,
+            5,
             10,
+            15,
+            20,
             25,
             50,
         ];
     }
 
-    public function actions(
-        Request $request,
-    ): array {
-        return [];
-    }
-
-    public function instructions(
-        Request $request,
-    ): array {
-        return [];
-    }
-
-    /**
-     * Return the default ordering for resource queries.
-     */
-    public function defaultOrderBy(
-        Request $request,
-    ): array {
-        return [
-            'id' => 'desc',
-        ];
-    }
-
-    /**
-     * Serialize the resource into a JSON-serializable format.
-     */
     public function jsonSerialize(): mixed
     {
-        $request = app(Request::class);
+        $request = app(
+            abstract: Request::class,
+        );
 
         return [
-            'actions' => collect($this->getActions($request))->map->jsonSerialize()->toArray(),
-            'instructions' => collect($this->getInstructions($request))->map->jsonSerialize()->toArray(),
-            'fields' => $this->getFields(
+            'fields' => $this->fields(),
+            'limits' => $this->limits(
                 request: $request,
             ),
-            'limits' => $this->getLimits(
-                request: $request,
-            ),
-            'scopes' => $this->getScopes(
-                request: $request,
-            ),
-            'relations' => collect(
-                value: $this->getRelations(
-                    request: $request,
-                ),
-            )
-                ->map
-                ->jsonSerialize()
-                ->toArray(),
-
-            'rules' => [
-                'all' => $this->rules(
-                    request: $request,
-                ),
-                'create' => $this->createRules(
-                    request: $request,
-                ),
-                'update' => $this->updateRules(
-                    request: $request,
-                ),
-            ],
+            'realtions' => $this->relations(),
         ];
     }
 }

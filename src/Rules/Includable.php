@@ -6,24 +6,23 @@ use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Validator;
-use Stepanenko3\LaravelApiSkeleton\Concerns\Makeable;
-use Stepanenko3\LaravelApiSkeleton\Concerns\Schemable;
-use Stepanenko3\LaravelApiSkeleton\Http\Requests\SearchRequest;
-use Stepanenko3\LaravelApiSkeleton\Rules\Groups\SearchRules;
+use Stepanenko3\LaravelApiSkeleton\Http\Requests\Request;
+use Stepanenko3\LaravelApiSkeleton\Http\Schemas\Schema;
+use Stepanenko3\LaravelApiSkeleton\Rules\Groups\SchemaRulesGroup;
+use Stepanenko3\LaravelApiSkeleton\Traits\Makeable;
 
 class Includable implements DataAwareRule, ValidationRule
 {
     use Makeable;
-    use Schemable;
 
-    /**
-     * The data under validation.
-     */
     protected array $data;
 
-    /**
-     * Determine if the validation rule passes.
-     */
+    public function __construct(
+        public Request $request,
+        public Schema $schema,
+    ) {
+    }
+
     public function validate(
         string $attribute,
         mixed $value,
@@ -37,9 +36,6 @@ class Includable implements DataAwareRule, ValidationRule
         $validator->validate();
     }
 
-    /**
-     * Set the current data under validation.
-     */
     public function setData(
         array $data,
     ): self {
@@ -48,27 +44,21 @@ class Includable implements DataAwareRule, ValidationRule
         return $this;
     }
 
-    /**
-     * Build the array of underlying validation rules based on the current state.
-     */
     protected function buildValidationRules(
         mixed $attribute,
         mixed $value,
     ): array {
-        $relationSchema = $this->schema
-            ->relationSchema(
-                name: $value['relation'],
-            );
+        $relations = $this->schema->relations();
 
-        if (null === $relationSchema) {
+        $schema = $relations[$value['relation']] ?? null;
+
+        if (!$schema) {
             return [];
         }
 
-        return SearchRules::make(
-            request: app(
-                abstract: SearchRequest::class,
-            ),
-            schema: $relationSchema,
+        return SchemaRulesGroup::make(
+            request: $this->request,
+            schema: new $schema,
             prefix: $attribute,
         )
             ->isRootSearchRules(

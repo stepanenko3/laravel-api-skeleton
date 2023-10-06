@@ -5,23 +5,6 @@ use Illuminate\Support\Facades\{Http, Storage};
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Stepanenko3\LaravelApiSkeleton\Helpers\ExtendedCollection;
 
-if (!function_exists('relation_without_pivot')) {
-    function relation_without_pivot(
-        string $relation,
-    ): string {
-        return Str::contains(
-            haystack: $relation,
-            needles: '.pivot.',
-        )
-            ? Str::replaceLast(
-                search: 'pivot.',
-                replace: '',
-                subject: $relation,
-            )
-            : $relation;
-    }
-}
-
 if (!function_exists('get_media_path')) {
     function get_media_path(
         Media $media,

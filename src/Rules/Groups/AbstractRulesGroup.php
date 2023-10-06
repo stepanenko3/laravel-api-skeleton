@@ -2,7 +2,7 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Rules\Groups;
 
-use Stepanenko3\LaravelApiSkeleton\Concerns\Makeable;
+use Stepanenko3\LaravelApiSkeleton\Traits\Makeable;
 
 abstract class AbstractRulesGroup
 {
