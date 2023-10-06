@@ -20,6 +20,7 @@ class Includable implements DataAwareRule, ValidationRule
     public function __construct(
         public Request $request,
         public Schema $schema,
+        public int $level = 0,
     ) {
     }
 
@@ -60,6 +61,7 @@ class Includable implements DataAwareRule, ValidationRule
             request: $this->request,
             schema: new $schema,
             prefix: $attribute,
+            level: $this->level,
         )
             ->isRootSearchRules(
                 value: false,

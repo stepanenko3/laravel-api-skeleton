@@ -15,6 +15,7 @@ class SchemaRulesGroup extends AbstractRulesGroup
         public Request $request,
         public Schema $schema,
         public string $prefix = '',
+        public int $level = 0,
     ) {
     }
 
@@ -51,6 +52,30 @@ class SchemaRulesGroup extends AbstractRulesGroup
             ],
         );
 
+        if ($this->level <= 1) {
+            $rules += [
+                'with' => [
+                    'nullable',
+                    'array',
+                ],
+                'with.*.relation' => [
+                    'required',
+                    Rule::in(
+                        values: array_keys(
+                            array: $this->schema->relations(),
+                        ),
+                    ),
+                ],
+               'with.*' => [
+                    Includable::make(
+                        request: $this->request,
+                        schema: $this->schema,
+                        level: $this->level + 1,
+                    ),
+                ],
+            ];
+        }
+
         if ($this->isRootSearchRules) {
             $rules += [
                 'page' => [
@@ -86,27 +111,6 @@ class SchemaRulesGroup extends AbstractRulesGroup
                 //             'array',
                 //         ],
                 //     ],
-                'with' => [
-                    'nullable',
-                    'array',
-                ],
-                'with.*.relation' => [
-                    'required',
-                    Rule::in(
-                        values: array_keys(
-                            array: $this->schema->relations(),
-                        ),
-                    ),
-                ],
-               'with.*.includes' => [
-                    'prohibited',
-                ],
-               'with.*' => [
-                    Includable::make(
-                        request: $this->request,
-                        schema: $this->schema,
-                    ),
-                ],
             ];
         }
 
