@@ -57,6 +57,14 @@ abstract class Schema
         return [];
     }
 
+    public function basicFieldsWithDefaultFields(): array
+    {
+        return [
+            ...$this->defaultFields(),
+            ...$this->basicFields(),
+        ];
+    }
+
     abstract public function fields(): array;
 
     abstract public function relations(): array;

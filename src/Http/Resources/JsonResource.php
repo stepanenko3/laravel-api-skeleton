@@ -57,6 +57,38 @@ abstract class JsonResource extends BaseJsonResource
         return array_filter($response);
     }
 
+    public function whenLoadMorph(
+        string $relationship,
+        array $types = [],
+    ) {
+        return $this->whenLoaded(
+            relationship: 'owner',
+            value: function () use ($relationship, $types) {
+                $relation = $this->getRelation($relationship);
+
+                if (!$relation) {
+                    return;
+                }
+
+                [$resource, $fields] = $types[$relation::class] ?? null;
+
+                if (!$resource || !$fields) {
+                    return;
+                }
+
+                return new $resource(
+                    $relation->setRawAttributes(
+                        attributes: Arr::only(
+                            array: $relation->getAttributes(),
+                            keys: $fields,
+                        ),
+                        sync: true,
+                    ),
+                );
+            },
+        );
+    }
+
     public function mapAttributes(array $attributes): array
     {
         return $attributes;

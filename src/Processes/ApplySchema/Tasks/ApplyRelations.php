@@ -57,19 +57,27 @@ class ApplyRelations extends Task
             value: $relations,
         )
             ->mapWithKeys(
-                callback: fn (array $with) => [
-                    $with['relation'] => fn (EloquentBuilderContract | QueryBuilderContract | Builder $query) => $query->tap(
-                        new ApplySchema(
-                            schema: new $allowedRelations[$with['relation']](),
-                            dto: new SchemaDTO(
-                                fields: $with['fields'] ?? [],
-                                with: $with['with'] ?? [],
-                                with_count: $with['with_count'] ?? [],
-                                scopes: $with['scopes'] ?? [],
+                callback: function ($with) use ($allowedRelations) {
+                    if ($allowedRelations[$with['relation']] === null) {
+                        return [
+                            $with['relation'],
+                        ];
+                    }
+
+                    return [
+                        $with['relation'] => fn (EloquentBuilderContract | QueryBuilderContract | Builder $query) => $query->tap(
+                            new ApplySchema(
+                                schema: new $allowedRelations[$with['relation']](),
+                                dto: new SchemaDTO(
+                                    fields: $with['fields'] ?? [],
+                                    with: $with['with'] ?? [],
+                                    with_count: $with['with_count'] ?? [],
+                                    scopes: $with['scopes'] ?? [],
+                                ),
                             ),
                         ),
-                    ),
-                ],
+                    ];
+                },
             )
             ->toArray();
     }
