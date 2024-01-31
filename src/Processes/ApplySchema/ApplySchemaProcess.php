@@ -16,10 +16,10 @@ class ApplySchemaProcess extends Process
     public array $tasks = [
         Authorize::class,
         MutateDTO::class,
-        PerformQuery::class,
         ApplyFields::class,
         ApplyRelations::class,
         ApplyCountRelations::class,
         ApplyScopes::class,
+        PerformQuery::class,
     ];
 }

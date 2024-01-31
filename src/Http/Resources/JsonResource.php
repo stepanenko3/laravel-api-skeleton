@@ -60,31 +60,28 @@ abstract class JsonResource extends BaseJsonResource
     public function whenLoadMorph(
         string $relationship,
         array $types = [],
+        array $map = [],
     ) {
         return $this->whenLoaded(
-            relationship: 'owner',
-            value: function () use ($relationship, $types) {
+            relationship: $relationship,
+            value: function () use ($relationship, $types, $map) {
                 $relation = $this->getRelation($relationship);
 
                 if (!$relation) {
                     return;
                 }
 
-                [$resource, $fields] = $types[$relation::class] ?? null;
+                $resource = $types[$relation::class] ?? null;
 
-                if (!$resource || !$fields) {
+                if (!$resource) {
                     return;
                 }
 
-                return new $resource(
-                    $relation->setRawAttributes(
-                        attributes: Arr::only(
-                            array: $relation->getAttributes(),
-                            keys: $fields,
-                        ),
-                        sync: true,
-                    ),
-                );
+                $relation = isset($map[$relation::class])
+                    ? $map[$relation::class]($relation)
+                    : $relation;
+
+                return new $resource($relation);
             },
         );
     }

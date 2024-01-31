@@ -3,6 +3,7 @@
 namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -17,7 +18,10 @@ trait RegisterConversions
     public function media(): MorphMany
     {
         return $this
-            ->morphMany(config('media-library.media_model'), 'model')
+            ->morphMany(
+                related: config('media-library.media_model'),
+                name: 'model',
+            )
             ->select([
                 'id',
                 'model_type',
@@ -34,6 +38,26 @@ trait RegisterConversions
                 'created_at',
                 'updated_at',
             ]);
+    }
+
+    public function latestMedia(): MorphOne
+    {
+        return $this
+            ->morphOne(
+                related: config('media-library.media_model'),
+                name: 'model',
+            )
+            ->latest();
+    }
+
+    public function oldestMedia(): MorphOne
+    {
+        return $this
+            ->morphOne(
+                related: config('media-library.media_model'),
+                name: 'model',
+            )
+            ->oldest();
     }
 
     public function setCoversions($conversions): void

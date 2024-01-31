@@ -26,9 +26,11 @@ class ApplyFields extends Task
                 callback: function (EloquentBuilderContract | QueryBuilderContract | Builder $builder) use ($fields): EloquentBuilderContract | QueryBuilderContract | Builder {
                     $table = $builder->getModel()->getTable();
 
-                    $fields = array_map(
-                        callback: fn ($value) => $table . '.' . $value,
-                        array: $fields,
+                    $fields = array_unique(
+                        array_map(
+                            callback: fn ($value) => $table . '.' . $value,
+                            array: $fields,
+                        ),
                     );
 
                     return $builder->select(

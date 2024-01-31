@@ -25,7 +25,14 @@ class KeysIn implements ValidationRule
             $unknownKeys = array_diff_key($value, $allowedKeys);
 
             if (count($unknownKeys) !== 0) {
-                $fail(trans(':attribute contains invalid fields'));
+                $fail('The selected :attribute must be in: :list')->translate(
+                    replace: [
+                        'list' => implode(
+                            separator: ', ',
+                            array: $this->values,
+                        ),
+                    ]
+                );
             }
         }
     }
