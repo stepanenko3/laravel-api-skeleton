@@ -40,33 +40,41 @@ trait Searchable
         $search = str_ireplace(['\'', '"'], ['', ''], (string) $search);
         $words = $words ?: explode(' ', trim($search));
 
+        $locales = array_keys(
+            config('laravellocalization.supportedLocales'),
+        );
+
         $sql = [];
+
         foreach ($this->searchableFields as $field => $params) {
-            $weight = $params['weight'] ?? 1;
-
-            $wrapWord = '';
-
             if (
                 in_array(HasTranslations::class, class_uses($this))
                 && $this->isTranslatableAttribute($field)
             ) {
-                $locale ??= app()->getLocale();
-                $field .= '->>\'$.' . $locale . '\'';
-                $wrapWord = '';
-            }
-
-            if (!($params['strict'] ?? false)) {
-                foreach ($words as $word) {
-                    $whens = [
-                        'WHEN LOWER(' . $field . ') = \'' . $wrapWord . mb_strtolower((string) $word) . $wrapWord . '\' THEN ' . round($weight / count($words) * 2, 2),
-                        'WHEN LOWER(' . $field . ') LIKE \'%' . mb_strtolower((string) $word) . '%\' THEN ' . round($weight / count($words), 2),
-                    ];
-
-                    $sql[] = '(CASE ' . implode(' ', $whens) . ' ELSE 0 END)';
+                foreach ($locales as $locale) {
+                    $sql = array_merge(
+                        $sql,
+                        $this->getSearchCases(
+                            field: $field . '->>\'$.' . $locale . '\'',
+                            search: $search,
+                            words: $words,
+                            weight: $params['weight'] ?? 1,
+                            strict: $params['strict'] ?? false,
+                        ),
+                    );
                 }
+            } else {
+                $sql = array_merge(
+                    $sql,
+                    $this->getSearchCases(
+                        field: $field,
+                        search: $search,
+                        words: $words,
+                        weight: $params['weight'] ?? 1,
+                        strict: $params['strict'] ?? false,
+                    ),
+                );
             }
-
-            $sql[] = '(CASE WHEN LOWER(' . $field . ') = \'' . mb_strtolower(trim($search)) . '\' THEN ' . $weight * 2 . ' ELSE 0 END)';
         }
 
         $calcRelevance = '(' . implode(' + ', $sql) . ')';
@@ -83,5 +91,25 @@ trait Searchable
             ->orderByDesc(
                 column: 'relevance'
             );
+    }
+
+    private function getSearchCases(
+        string $field,
+        string $search,
+        array $words,
+        float $weight = 1,
+        bool $strict = false,
+    ): array {
+        $cases = [];
+
+        if (!$strict) {
+            foreach ($words as $word) {
+                $cases[] = '(CASE WHEN LOWER(' . $field . ') LIKE \'%' . mb_strtolower((string) $word) . '%\' THEN ' . round($weight / count($words), 2) . ' ELSE 0 END)';
+            }
+        }
+
+        $cases[] = '(CASE WHEN LOWER(' . $field . ') = \'' . mb_strtolower(trim($search)) . '\' THEN ' . $weight * 2 . ' ELSE 0 END)';
+
+        return $cases;
     }
 }
