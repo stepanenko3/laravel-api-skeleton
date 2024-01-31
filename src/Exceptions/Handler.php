@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Psr\Log\LoggerInterface;
 use Stepanenko3\LaravelApiSkeleton\Http\Responses\BadRequestResponse;
+use Stepanenko3\LaravelApiSkeleton\Http\Responses\TokenMismatchResponse;
 use Stepanenko3\LaravelApiSkeleton\Http\Responses\ErrorResponse;
 use Stepanenko3\LaravelApiSkeleton\Http\Responses\NotFoundResponse;
 use Stepanenko3\LaravelApiSkeleton\Http\Responses\TooManyAttemptsResponse;
@@ -87,6 +89,10 @@ class Handler extends ExceptionHandler
         if ($e instanceof NotAcceptableHttpException) {
             return $this->responseForNotAcceptableHttpException($e);
         }
+
+        if ($e instanceof TokenMismatchException) {
+            return $this->responseForTokenMismatchException($e);
+        }
         // }
 
         return new ErrorResponse(
@@ -109,6 +115,14 @@ class Handler extends ExceptionHandler
                     'exception' => $exception,
                 ],
             ),
+        );
+    }
+
+    protected function responseForTokenMismatchException(TokenMismatchException $e): Responsable
+    {
+        return new TokenMismatchResponse(
+            message: $e->getMessage(),
+            exception: $e,
         );
     }
 

@@ -27,14 +27,16 @@ class Request extends FormRequest
 
         $rules += $this->schemaRules();
 
-        $validator = $factory->make(
-            data: $this->validationData(),
-            rules: $rules,
-            messages: $this->messages(),
-            attributes: $this->attributes(),
-        )->stopOnFirstFailure(
-            stopOnFirstFailure: $this->stopOnFirstFailure,
-        );
+        $validator = $factory
+            ->make(
+                data: $this->validationData(),
+                rules: $rules,
+                messages: $this->messages(),
+                attributes: $this->attributes(),
+            )
+            ->stopOnFirstFailure(
+                stopOnFirstFailure: $this->stopOnFirstFailure,
+            );
 
         if ($this->isPrecognitive()) {
             $validator->setRules(

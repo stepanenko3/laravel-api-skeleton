@@ -65,6 +65,14 @@ abstract class Schema
         ];
     }
 
+    public function getRelations(): array
+    {
+        return [
+            ...$this->relations(),
+            ...$this->protectedRelations(),
+        ];
+    }
+
     abstract public function fields(): array;
 
     abstract public function relations(): array;
@@ -115,7 +123,7 @@ abstract class Schema
 
         return [
             'fields' => $this->fields(),
-            'limits' => $this->limits(
+            'limits' => $this->getLimits(
                 request: $request,
             ),
             'realtions' => $this->relations(),
