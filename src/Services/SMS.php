@@ -53,7 +53,7 @@ class SMS
                 'from' => env('TWILIO_NUMBER'),
                 'body' => $message,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error($e->getMessage());
 
             return false;

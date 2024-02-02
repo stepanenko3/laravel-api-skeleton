@@ -18,7 +18,7 @@ abstract class JsonResource extends BaseJsonResource
 
     private static $relationshipResourceGuesser;
 
-    public static function guessRelationshipResourceUsing(callable | null $callback): void
+    public static function guessRelationshipResourceUsing(?callable $callback): void
     {
         self::$relationshipResourceGuesser = $callback;
     }
