@@ -2,6 +2,7 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
+use Exception;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 trait GeoLocation
@@ -34,7 +35,17 @@ trait GeoLocation
     public function coordinates(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => unpack('x/x/x/x/corder/Ltype/dlat/dlng', (string) $value),
+            get: function ($value) {
+                if (!$value) {
+                    return null;
+                }
+
+                try {
+                    return unpack('x/x/x/x/corder/Ltype/dlat/dlng', (string) $value);
+                } catch (Exception $e) {
+                    return null;
+                }
+            },
         );
     }
 
