@@ -3,22 +3,27 @@
 namespace Stepanenko3\LaravelApiSkeleton\Listeners;
 
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Imagick\Driver;
 use Thumbhash\Thumbhash;
-use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAdded;
-use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\ImageManager;
+use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAddedEvent;
 
 class AddThumbHashForMedia
 {
-    public function handle(MediaHasBeenAdded $event): void
+    public function handle(MediaHasBeenAddedEvent $event): void
     {
         $content = Storage::disk(config('media-library.disk_name'))->get(get_media_path($event->media));
 
-        $image = Image::make(
-            data: $content,
-        )->resize(100, 100, function ($constraint): void {
-            $constraint->aspectRatio();
-            $constraint->upsize();
-        });
+        $manager = new ImageManager(new Driver());
+
+        $image = $manager
+            ->read(
+                input: $content,
+            )
+            ->resize(
+                width: 100,
+                height: 100,
+            );
 
         $width = $image->width();
         $height = $image->height();

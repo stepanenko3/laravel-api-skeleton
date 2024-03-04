@@ -4,7 +4,8 @@ namespace Stepanenko3\LaravelApiSkeleton\Helpers;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Drivers\Imagick\Driver;
+use Intervention\Image\ImageManager;
 
 class EmojiParser
 {
@@ -64,11 +65,20 @@ class EmojiParser
     {
         $files = Storage::disk('public')->files('emoji/img/' . $src);
 
+        $manager = new ImageManager(new Driver());
+
         foreach ($sizes as $size) {
             foreach ($files as $file) {
-                Image::make(storage_path('/app/public/' . $file))
-                    ->resize($size, null, fn ($constraint) => $constraint->aspectRatio())
-                    ->save(str_ireplace('/160/', '/' . $size . '/', storage_path('/app/public/' . $file)));
+                $manager
+                    ->read(
+                        input: storage_path('/app/public/' . $file),
+                    )
+                    ->resize(
+                        width: 400,
+                    )
+                    ->save(
+                        path: str_ireplace('/160/', '/' . $size . '/', storage_path('/app/public/' . $file)),
+                    );
 
                 dump('resize: ' . $file . ', to: ' . str_ireplace('/160/', '/' . $size . '/', (string) $file));
             }

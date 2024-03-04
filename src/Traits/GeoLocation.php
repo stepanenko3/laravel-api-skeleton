@@ -37,13 +37,13 @@ trait GeoLocation
         return Attribute::make(
             get: function ($value) {
                 if (!$value) {
-                    return null;
+                    return;
                 }
 
                 try {
                     return unpack('x/x/x/x/corder/Ltype/dlat/dlng', (string) $value);
                 } catch (Exception $e) {
-                    return null;
+                    return;
                 }
             },
         );
