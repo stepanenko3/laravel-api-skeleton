@@ -8,6 +8,8 @@ abstract class Model extends BaseModel
 {
     public function newEloquentBuilder($query)
     {
-        return new Builder($query);
+        return new Builder(
+            query: $query,
+        );
     }
 }

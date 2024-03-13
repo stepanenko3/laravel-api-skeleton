@@ -12,7 +12,9 @@ class Migration extends MigrationsMigration
     public function schema(): Builder
     {
         $schema = DB::connection()->getSchemaBuilder();
-        $schema->blueprintResolver(fn ($table, $callback) => new Blueprint($table, $callback));
+        $schema->blueprintResolver(
+            resolver: fn ($table, $callback) => new Blueprint($table, $callback),
+        );
 
         return $schema;
     }
