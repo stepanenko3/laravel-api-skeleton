@@ -13,9 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Create .env
-        uses: ./.github/workflows/setup-env
-
       - name: "Setup PHP"
         uses: "shivammathur/setup-php@v2"
         with:
