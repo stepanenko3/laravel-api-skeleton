@@ -14,10 +14,11 @@ class UserAgentParser
 
     public $device;
 
-    public $originalUserAgent;
+    public string $originalUserAgent;
 
-    public function __construct($userAgent = null)
-    {
+    public function __construct(
+        ?string $userAgent = null,
+    ) {
         if (!$userAgent) {
             $userAgent = request()->userAgent();
         }
@@ -30,14 +31,14 @@ class UserAgentParser
         $this->originalUserAgent = $this->parser->originalUserAgent;
     }
 
-    public function getOSVersion()
+    public function getOSVersion(): string
     {
         return $this->os->major
             . ($this->os->minor !== null ? '.' . $this->os->minor : '')
             . ($this->os->patch !== null ? '.' . $this->os->patch : '');
     }
 
-    public function getUAVersion()
+    public function getUAVersion(): string
     {
         return $this->ua->major
             . ($this->ua->minor !== null ? '.' . $this->ua->minor : '')

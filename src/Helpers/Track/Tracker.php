@@ -4,6 +4,7 @@ namespace Stepanenko3\LaravelApiSkeleton\Helpers\Track;
 
 use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerSession;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerAgent;
 use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerDevice;
@@ -19,127 +20,121 @@ use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerRefererSearchTerm;
 
 class Tracker
 {
-    /**
-     * @var Illuminate\Foundation\Application
-     */
-    private $app;
+    private ?UserAgentParser $userAgent = null;
+    private ?MobileDetect $mobileDetect = null;
+    private ?CrawlerDetect $crawlerDetect = null;
+    private ?LanguageDetect $langDetect = null;
 
-    /**
-     * User agent parser instance.
-     */
-    private ?\Stepanenko3\LaravelApiSkeleton\Helpers\Track\UserAgentParser $userAgent = null;
+    private string $sessionId;
+    private string $userAgentOriginal;
+    private string $clientIp;
+    private bool $isSecure;
+    private ?int $userId;
 
-    /**
-     * Mobile detector instance.
-     */
-    private ?\Stepanenko3\LaravelApiSkeleton\Helpers\Track\MobileDetect $mobileDetect = null;
-
-    /**
-     * Crawler detector instance.
-     */
-    private ?\Stepanenko3\LaravelApiSkeleton\Helpers\Track\CrawlerDetect $crawlerDetect = null;
-
-    /**
-     * Language detector instance.
-     */
-    private ?\Stepanenko3\LaravelApiSkeleton\Helpers\Track\LanguageDetect $langDetect = null;
-
-    private $sessionId;
-
-    private $userAgentOriginal;
-
-    private $client_ip;
-
-    private $isSecure;
-
-    private $userId;
-
-    public function __construct()
-    {
-        $this->app = app();
-        $this->config = $this->app['config'];
-    }
-
-    public function parseData($request = null)
-    {
-        if (!$request) {
-            $request = request();
-        }
+    public function parseData(
+        ?Request $request = null,
+    ): array {
+        $request ??= request();
 
         return [
             'pageUrl' => $request->url(),
-            'refererUrl' => $request->header('referer'),
+            'refererUrl' => $request->header(
+                key: 'referer',
+            ),
             'sessionId' => $request->session()->getId(),
             'userAgent' => $request->userAgent(),
-            'client_ip' => get_ip(),
+            'clientIp' => get_ip(),
             'isSecure' => $request->isSecure(),
             'userId' => user()?->id,
         ];
     }
 
-    public function getData()
+    public function getData(): array
     {
         $res = $this->parseData();
 
         $this->bind(
-            $res['sessionId'],
-            $res['userAgent'],
-            $res['client_ip'],
-            $res['isSecure'],
-            $res['userId'],
+            sessionId: $res['sessionId'],
+            userAgent: $res['userAgent'],
+            clientIp: $res['clientIp'],
+            isSecure: $res['isSecure'],
+            userId: $res['userId'],
         );
 
         return [
-            'client_ip' => $this->client_ip,
+            'clientIp' => $this->clientIp,
             'session_id' => $this->sessionId,
             'agent' => $this->getCurrentAgentArray(),
             'device' => $this->getCurrentDeviceArray(),
             'language' => $this->getLanguage(),
-            'referrer' => $this->getReferrerArray($res['pageUrl'], $res['refererUrl']),
-            'geo' => get_location($this->client_ip),
+            'referrer' => $this->getReferrerArray(
+                refererUrl: $res['pageUrl'],
+                pageUrl: $res['refererUrl'],
+            ),
+            'geo' => get_location(
+                ip: $this->clientIp,
+            ),
         ];
     }
 
-    public function hitEvent($eventName, $pageUrl, $refererUrl = '')
-    {
+    public function hitEvent(
+        string $eventName,
+        string $pageUrl,
+        string $refererUrl = '',
+    ): array {
         $res = $this->parseData();
 
         $this->bind(
-            $res['sessionId'],
-            $res['userAgent'],
-            $res['client_ip'],
-            $res['isSecure'],
-            $res['userId'],
+            sessionId: $res['sessionId'],
+            userAgent: $res['userAgent'],
+            clientIp: $res['clientIp'],
+            isSecure: $res['isSecure'],
+            userId: $res['userId'],
         );
 
-        if (!$this->userAgentOriginal || !$this->isTrackable($pageUrl) || !$this->config->get('tracker.log_events')) {
-            return;
+        if (!$this->userAgentOriginal || !$this->isTrackable($pageUrl) || !config('tracker.log_events')) {
+            return [];
         }
 
         $agent = $this->hitAgent();
         $device = $this->hitDevice();
         $language = $this->hitLanguage();
-        $referer = $this->hitReferer($refererUrl, $pageUrl);
+        $referer = $this->hitReferer(
+            refererUrl: $refererUrl,
+            pageUrl: $pageUrl,
+        );
         $geoip = $this->hitGeo();
 
         $session = $this->hitSession(
-            optional($agent)->id,
-            optional($device)->id,
-            optional($referer)->id,
-            optional($language)->id,
-            optional($geoip)->id,
+            agent_id: $agent?->id,
+            device_id: $device?->id,
+            referer_id: $referer?->id,
+            language_id: $language?->id,
+            geoip_id: $geoip?->id,
         );
 
-        $path = $this->hitPath($pageUrl);
-        $domain = $this->hitDomain($pageUrl);
+        $path = $this->hitPath(
+            pageUrl: $pageUrl,
+        );
 
-        $event = TrackerEvent::findOrCreateCached(['name' => $eventName], ['name']);
+        $domain = $this->hitDomain(
+            pageUrl: $pageUrl,
+        );
+
+        $event = TrackerEvent::findOrCreateCached(
+            attributes: [
+                'name' => $eventName,
+            ],
+            keys: [
+                'name',
+            ],
+        );
 
         $log = $this->hitEventLog(
-            optional($event)->id,
-            optional($session)->id,
-            optional($referer)->id,
-            optional($path)->id,
+            event_id: $event?->id,
+            session_id: $session?->id,
+            referer_id: $referer?->id,
+            path_id: $path?->id,
         );
 
         return [
@@ -156,35 +151,56 @@ class Tracker
         ];
     }
 
-    public function hitPageVisit($pageUrl, $refererUrl, $sessionId, $userAgent, $client_ip, $isSecure = true, $userId = null)
-    {
-        $this->bind($sessionId, $userAgent, $client_ip, $isSecure, $userId);
+    public function hitPageVisit(
+        string $pageUrl,
+        string $refererUrl,
+        string $sessionId,
+        string $userAgent,
+        string $clientIp,
+        bool $isSecure = true,
+        ?int $userId = null
+    ): array {
+        $this->bind(
+            sessionId: $sessionId,
+            userAgent: $userAgent,
+            clientIp: $clientIp,
+            isSecure: $isSecure,
+            userId: $userId
+        );
 
         if (!$this->userAgentOriginal || !$this->isTrackable($pageUrl)) {
-            return;
+            return [];
         }
 
         $agent = $this->hitAgent();
         $device = $this->hitDevice();
         $language = $this->hitLanguage();
-        $referer = $this->hitReferer($refererUrl, $pageUrl);
+        $referer = $this->hitReferer(
+            refererUrl: $refererUrl,
+            pageUrl: $pageUrl,
+        );
         $geoip = $this->hitGeo();
 
         $session = $this->hitSession(
-            optional($agent)->id,
-            optional($device)->id,
-            optional($referer)->id,
-            optional($language)->id,
-            optional($geoip)->id,
+            agent_id: $agent?->id,
+            device_id: $device?->id,
+            referer_id: $referer?->id,
+            language_id: $language?->id,
+            geoip_id: $geoip?->id,
         );
 
-        $path = $this->hitPath($pageUrl);
-        $domain = $this->hitDomain($pageUrl);
+        $path = $this->hitPath(
+            pageUrl: $pageUrl,
+        );
+
+        $domain = $this->hitDomain(
+            pageUrl: $pageUrl,
+        );
 
         $log = $this->hitLog(
-            optional($session)->id,
-            optional($referer)->id,
-            optional($path)->id,
+            session_id: $session?->id,
+            referer_id: $referer?->id,
+            path_id: $path?->id,
         );
 
         return [
@@ -201,34 +217,51 @@ class Tracker
         ];
     }
 
-    public function hitPath($pageUrl)
-    {
-        if (!$this->config->get('tracker.log_paths')) {
-            return;
+    public function hitPath(
+        string $pageUrl,
+    ): ?TrackerPath {
+        if (!config('tracker.log_paths')) {
+            return null;
         }
 
-        $parsed = parse_url((string) $pageUrl);
+        $parsed = parse_url(
+            url: (string) $pageUrl,
+        );
 
         if (!($parsed['path'] ?? '')) {
-            return;
+            return null;
         }
 
-        return TrackerPath::findOrCreateCached(['path' => $parsed['path']], ['path']);
+        return TrackerPath::findOrCreateCached(
+            attributes: [
+                'path' => $parsed['path'],
+            ],
+            keys: [
+                'path',
+            ],
+        );
     }
 
-    public function hitGeo()
+    public function hitGeo(): ?TrackerGeoip
     {
-        if (!$this->config->get('tracker.log_geoip')) {
-            return;
+        if (!config('tracker.log_geoip')) {
+            return null;
         }
 
         if ($session = session('tracker.country')) {
             $session['payload'] = json_encode($session, JSON_THROW_ON_ERROR);
 
-            return TrackerGeoip::findOrCreateCached($session, ['payload']);
+            return TrackerGeoip::findOrCreateCached(
+                attributes: $session,
+                keys: [
+                    'payload',
+                ],
+            );
         }
 
-        $detect = get_location($this->client_ip);
+        $detect = get_location(
+            ip: $this->clientIp,
+        );
 
         if ($detect) {
             $attributes = [
@@ -248,39 +281,50 @@ class Tracker
 
             $attributes['payload'] = md5(json_encode($attributes, JSON_THROW_ON_ERROR));
 
-            return TrackerGeoip::query()
-                ->findOrCreateCached($attributes, ['payload']);
+            return TrackerGeoip::findOrCreateCached(
+                attributes: $attributes,
+                keys: [
+                    'payload',
+                ],
+            );
         }
     }
 
     //
 
-    public function getReferrerArray($refererUrl, $pageUrl)
-    {
+    public function getReferrerArray(
+        string $refererUrl,
+        string $pageUrl,
+    ): ?RefererParser {
         if (!$refererUrl) {
-            return;
+            return null;
         }
 
-        $url = parse_url((string) $refererUrl);
+        $url = parse_url(
+            url: (string) $refererUrl,
+        );
 
         if (!isset($url['host'])) {
-            return;
+            return null;
         }
 
-        return new RefererParser($refererUrl, $pageUrl);
+        return new RefererParser(
+            refererUrl: $refererUrl,
+            pageUrl: $pageUrl,
+        );
     }
 
-    public function getCurrentAgentArray()
+    public function getCurrentAgentArray(): array
     {
         return [
             'name' => $name = $this->userAgentOriginal ?: 'Other',
-            'browser' => optional($this->userAgent->ua)->family ?? '',
+            'browser' => $this->userAgent->ua?->family ?? '',
             'browser_version' => $this->userAgent->getUAVersion(),
             'name_hash' => hash('sha256', (string) $name),
         ];
     }
 
-    public function getCurrentDeviceArray()
+    public function getCurrentDeviceArray(): array
     {
         return [
             'family' => $this->userAgent->device->family,
@@ -295,8 +339,12 @@ class Tracker
         ];
     }
 
-    public function getEventLogData($event_id, $session_id, $referer_id, $path_id)
-    {
+    public function getEventLogData(
+        int $event_id,
+        int $session_id,
+        int $referer_id,
+        int $path_id,
+    ): array {
         return [
             'event_id' => $event_id,
             'session_id' => $session_id,
@@ -306,8 +354,11 @@ class Tracker
         ];
     }
 
-    public function getLogData($session_id, $referer_id, $path_id)
-    {
+    public function getLogData(
+        int $session_id,
+        int $referer_id,
+        int $path_id,
+    ): array {
         return [
             'session_id' => $session_id,
             'referer_id' => $referer_id,
@@ -316,21 +367,24 @@ class Tracker
         ];
     }
 
-    public function isRobot()
+    public function isRobot(): bool
     {
         return $this->crawlerDetect->isRobot();
     }
 
-    public function getUserId()
+    public function getUserId(): ?int
     {
-        return $this->config->get('tracker.log_users') ? $this->userId : null;
+        return config('tracker.log_users')
+            ? $this->userId
+            : null;
     }
 
     //
 
-    public function isTrackable($pageUrl)
-    {
-        return $this->config->get('tracker.enabled', 0)
+    public function isTrackable(
+        string $pageUrl,
+    ): bool {
+        return config('tracker.enabled', 0)
             && $this->logIsEnabled()
             && $this->isTrackableEnvironment()
             && $this->notRobotOrTrackable()
@@ -338,42 +392,42 @@ class Tracker
             && $this->pathIsTrackable($pageUrl);
     }
 
-    public function logIsEnabled()
+    public function logIsEnabled(): bool
     {
-        return $this->config->get('tracker.log_enabled')
-            || $this->config->get('tracker.log_user_agents')
-            || $this->config->get('tracker.log_devices')
-            || $this->config->get('tracker.log_domains')
-            || $this->config->get('tracker.log_languages')
-            || $this->config->get('tracker.log_referers')
-            || $this->config->get('tracker.log_sessions')
-            || $this->config->get('tracker.log_events')
+        return config('tracker.log_enabled')
+            || config('tracker.log_user_agents')
+            || config('tracker.log_devices')
+            || config('tracker.log_domains')
+            || config('tracker.log_languages')
+            || config('tracker.log_referers')
+            || config('tracker.log_sessions')
+            || config('tracker.log_events')
             //
-            || $this->config->get('tracker.log_geoip')
-            || $this->config->get('tracker.log_users')
-            || $this->config->get('tracker.log_paths')
-            || $this->config->get('tracker.log_queries');
+            || config('tracker.log_geoip')
+            || config('tracker.log_users')
+            || config('tracker.log_paths')
+            || config('tracker.log_queries');
     }
 
-    public function isTrackableIp()
+    public function isTrackableIp(): bool
     {
         $trackable = !ipv4_in_range(
-            $this->client_ip,
-            $this->config->get('tracker.do_not_track_ips')
+            ip: $this->clientIp,
+            range: config('tracker.do_not_track_ips'),
         );
 
         if (!$trackable) {
-            // Debugbar::info($this->client_ip . ' is not trackable.');
+            // Debugbar::info($this->clientIp . ' is not trackable.');
         }
 
         return $trackable;
     }
 
-    public function isTrackableEnvironment()
+    public function isTrackableEnvironment(): bool
     {
         $trackable = !in_array(
-            $this->app->environment(),
-            $this->config->get('tracker.do_not_track_environments')
+            config('app.env'),
+            config('tracker.do_not_track_environments')
         );
 
         if (!$trackable) {
@@ -383,24 +437,38 @@ class Tracker
         return $trackable;
     }
 
-    public function pathIsTrackable($pageUrl)
-    {
-        $forbidden = $this->config->get('tracker.do_not_track_paths');
+    public function pathIsTrackable(
+        string $pageUrl,
+    ): bool {
+        $forbidden = config('tracker.do_not_track_paths');
 
-        $parsed = parse_url((string) $pageUrl);
+        $parsed = parse_url(
+            url: (string) $pageUrl,
+        );
 
-        return !$forbidden || empty($parsed['path'] ?? '') || !in_array_wildcard($parsed['path'], $forbidden);
+        return !$forbidden || empty($parsed['path'] ?? '') || !in_array_wildcard(
+            needle: $parsed['path'],
+            haystack: $forbidden,
+        );
     }
 
     //
 
-    public function makeCacheKey($attributes, $keys, $identifier)
-    {
-        $attributes = $this->extractAttributes($attributes);
+    public function makeCacheKey(
+        array $attributes,
+        array $keys,
+        string $identifier,
+    ): string {
+        $attributes = $this->extractAttributes(
+            attributes: $attributes,
+        );
 
         $cacheKey = "className={$identifier};";
 
-        $keys = $this->extractKeys($attributes, $keys);
+        $keys = $this->extractKeys(
+            attributes: $attributes,
+            keys: $keys,
+        );
 
         foreach ($keys as $key) {
             if (isset($attributes[$key])) {
@@ -411,9 +479,9 @@ class Tracker
         return sha1($cacheKey);
     }
 
-    private function notRobotOrTrackable()
+    private function notRobotOrTrackable(): bool
     {
-        $trackable = !$this->isRobot() || !$this->config->get('tracker.do_not_track_robots');
+        $trackable = !$this->isRobot() || !config('tracker.do_not_track_robots');
 
         if (!$trackable) {
             // Debugbar::info('tracking of robots is disabled.');
@@ -422,84 +490,134 @@ class Tracker
         return $trackable;
     }
 
-    private function bind($sessionId, $userAgent, $client_ip, $isSecure = true, $userId = null): void
-    {
+    private function bind(
+        int $sessionId,
+        string $userAgent,
+        string $clientIp,
+        bool $isSecure = true,
+        ?int $userId = null,
+    ): void {
         $this->sessionId = $sessionId;
         $this->userAgentOriginal = $userAgent;
         $this->isSecure = $isSecure;
         $this->userId = $userId;
 
         if ($this->userAgentOriginal) {
-            $this->client_ip = $client_ip;
+            $this->clientIp = $clientIp;
 
-            $this->userAgent = new UserAgentParser($this->userAgentOriginal);
-            $this->mobileDetect = new MobileDetect($this->userAgentOriginal);
-            $this->crawlerDetect = new CrawlerDetect($this->userAgentOriginal);
-            $this->langDetect = new LanguageDetect($this->userAgentOriginal);
+            $this->userAgent = new UserAgentParser(
+                userAgent: $this->userAgentOriginal,
+            );
+
+            $this->mobileDetect = new MobileDetect(
+                userAgent: $this->userAgentOriginal,
+            );
+
+            $this->crawlerDetect = new CrawlerDetect(
+                userAgent: $this->userAgentOriginal,
+            );
+
+            $this->langDetect = new LanguageDetect(
+                userAgent: $this->userAgentOriginal,
+            );
         }
     }
 
-    private function hitAgent()
+    private function hitAgent(): ?TrackerAgent
     {
-        if (!$this->config->get('tracker.log_user_agents')) {
-            return;
+        if (!config('tracker.log_user_agents')) {
+            return null;
         }
 
         $attributes = $this->getCurrentAgentArray();
 
-        return TrackerAgent::query()
-            ->findOrCreateCached($attributes, ['name']);
+        return TrackerAgent::findOrCreateCached(
+            attributes: $attributes,
+            keys: [
+                'name',
+            ],
+        );
     }
 
-    private function hitDevice()
+    private function hitDevice(): ?TrackerDevice
     {
-        if (!$this->config->get('tracker.log_devices')) {
-            return;
+        if (!config('tracker.log_devices')) {
+            return null;
         }
 
         $attributes = $this->getCurrentDeviceArray();
 
-        return TrackerDevice::query()
-            ->findOrCreateCached($attributes, [
-                'grade', 'family', 'model', 'brand', 'platform', 'platform_version',
-            ]);
+        return TrackerDevice::findOrCreateCached(
+            attributes: $attributes,
+            keys: [
+                'grade',
+                'family',
+                'model',
+                'brand',
+                'platform',
+                'platform_version',
+            ],
+        );
     }
 
-    private function hitDomain($pageUrl)
-    {
-        if (!$this->config->get('tracker.log_domains')) {
-            return;
+    private function hitDomain(
+        string $pageUrl,
+    ): ?TrackerDomain {
+        if (!config('tracker.log_domains')) {
+            return null;
         }
 
-        $parsed = parse_url((string) $pageUrl);
+        $parsed = parse_url(
+            url: (string) $pageUrl,
+        );
 
         if (!isset($parsed['host'])) {
-            return;
+            return null;
         }
 
-        return TrackerDomain::query()
-            ->findOrCreateCached(['name' => $parsed['host']], ['name']);
+        return TrackerDomain::findOrCreateCached(
+            attributes: [
+                'name' => $parsed['host'],
+            ],
+            keys: [
+                'name',
+            ]
+        );
     }
 
-    private function hitLanguage()
+    private function hitLanguage(): ?TrackerLanguage
     {
-        if (!$this->config->get('tracker.log_languages')) {
-            return;
+        if (!config('tracker.log_languages')) {
+            return null;
         }
 
         $attributes = $this->getLanguage();
 
-        return TrackerLanguage::query()
-            ->findOrCreateCached($attributes, ['preference', 'language_range']);
+        return TrackerLanguage::findOrCreateCached(
+            attributes: $attributes,
+            keys: [
+                'preference',
+                'language_range',
+            ]
+        );
     }
 
-    private function hitEventLog($event_id, $session_id, $referer_id, $path_id)
-    {
-        if (!$this->config->get('tracker.log_enabled')) {
-            return;
+    private function hitEventLog(
+        int $event_id,
+        int $session_id,
+        int $referer_id,
+        int $path_id,
+    ): ?TrackerEventLog {
+        if (!config('tracker.log_enabled')) {
+            return null;
         }
 
-        $attributes = $this->getEventLogData($event_id, $session_id, $referer_id, $path_id);
+        $attributes = $this->getEventLogData(
+            event_id: $event_id,
+            session_id: $session_id,
+            referer_id: $referer_id,
+            path_id: $path_id,
+        );
 
         return TrackerEventLog::query()
             ->create(
@@ -507,32 +625,46 @@ class Tracker
             );
     }
 
-    private function hitLog($session_id, $referer_id, $path_id)
-    {
-        if (!$this->config->get('tracker.log_enabled')) {
-            return;
+    private function hitLog(
+        int $session_id,
+        int $referer_id,
+        int $path_id,
+    ): ?TrackerLog {
+        if (!config('tracker.log_enabled')) {
+            return null;
         }
 
-        $attributes = $this->getLogData($session_id, $referer_id, $path_id);
+        $attributes = $this->getLogData(
+            session_id: $session_id,
+            referer_id: $referer_id,
+            path_id: $path_id,
+        );
 
         return TrackerLog::create(
             attributes: $attributes,
         );
     }
 
-    private function hitReferer($refererUrl, $pageUrl)
-    {
-        if (!$this->config->get('tracker.log_referers') || !$refererUrl) {
-            return;
+    private function hitReferer(
+        string $refererUrl,
+        string $pageUrl,
+    ): ?TrackerReferer {
+        if (!config('tracker.log_referers') || !$refererUrl) {
+            return null;
         }
 
-        $parsed = $this->getReferrerArray($refererUrl, $pageUrl);
+        $parsed = $this->getReferrerArray(
+            refererUrl: $refererUrl,
+            pageUrl: $pageUrl,
+        );
 
         if (!$parsed) {
-            return;
+            return null;
         }
 
-        $domain = $this->hitDomain($refererUrl);
+        $domain = $this->hitDomain(
+            pageUrl: $refererUrl,
+        );
 
         $attributes = [
             'url' => $refererUrl,
@@ -550,20 +682,33 @@ class Tracker
             $attributes['search_terms_hash'] = sha1((string) $parsed->getSearchTerm());
         }
 
-        $referer = TrackerReferer::query()
-            ->findOrCreateCached($attributes, ['url', 'search_terms_hash']);
+        $referer = TrackerReferer::findOrCreateCached(
+            attributes: $attributes,
+            keys: [
+                'url',
+                'search_terms_hash',
+            ]
+        );
 
         if ($parsed->isKnown()) {
-            $this->storeSearchTerms($referer, $parsed);
+            $this->storeSearchTerms(
+                referer: $referer,
+                parsed: $parsed,
+            );
         }
 
         return $referer;
     }
 
-    private function hitSession($agent_id, $device_id, $referer_id, $language_id, $geoip_id)
-    {
-        if (!$this->config->get('tracker.log_sessions')) {
-            return;
+    private function hitSession(
+        int $agent_id,
+        int $device_id,
+        int $referer_id,
+        int $language_id,
+        int $geoip_id,
+    ): ?TrackerSession {
+        if (!config('tracker.log_sessions')) {
+            return null;
         }
 
         $attributes = [
@@ -573,19 +718,23 @@ class Tracker
             'referer_id' => $referer_id,
             'language_id' => $language_id,
             'geoip_id' => $geoip_id,
-            'client_ip' => $this->client_ip,
+            'client_ip' => $this->clientIp,
             'is_active' => 1,
             'last_activity' => now(),
             'is_robot' => $this->crawlerDetect->isRobot(),
             'robot' => $this->crawlerDetect->getMatches(),
         ];
 
-        $session_id = Cookie::get(config('tracker.session_name'));
+        $session_id = Cookie::get(
+            key: config('tracker.session_name'),
+        );
+
         if ((int) $session_id) {
             $attributes['id'] = (int) $session_id;
         }
 
         $user_id = $this->getUserId();
+
         if ($user_id) {
             $attributes['user_id'] = $user_id;
         }
@@ -594,24 +743,49 @@ class Tracker
         //     $attributes['last_activity'] = now();
         // }
 
-        $session = TrackerSession::where('uuid', $attributes['uuid'])->first();
+        $session = TrackerSession::query()
+            ->where(
+                column: 'uuid',
+                operator: '=',
+                value: $attributes['uuid'],
+            )
+            ->first();
 
         if (!$session) {
-            $session = TrackerSession::where('client_ip', $attributes['client_ip'])
-                ->where('device_id', $attributes['device_id'])
-                ->where('agent_id', $attributes['agent_id'])
+            $session = TrackerSession::query()
+                ->where(
+                    column: 'client_ip',
+                    operator: '=',
+                    value: $attributes['client_ip'],
+                )
+                ->where(
+                    column: 'device_id',
+                    operator: '=',
+                    value: $attributes['device_id'],
+                )
+                ->where(
+                    column: 'agent_id',
+                    operator: '=',
+                    value: $attributes['agent_id'],
+                )
                 ->first();
         }
 
         if ($session) {
-            $session->fill($attributes)->save();
+            $session
+                ->fill(
+                    attributes: $attributes,
+                )
+                ->save();
         } else {
-            $session = new TrackerSession($attributes);
+            $session = new TrackerSession(
+                attributes: $attributes,
+            );
             $session->save();
         }
 
         // $session = TrackerSession::updateOrCreate([
-        //     'client_ip' => $attributes['client_ip'],
+        //     'clientIp' => $attributes['client_ip'],
         //     'device_id' => $attributes['device_id'],
         //     'agent_id' => $attributes['agent_id'],
         // ], $attributes);
@@ -621,28 +795,38 @@ class Tracker
         return $session;
     }
 
-    private function storeSearchTerms($referer, $parsed): void
-    {
-        foreach (explode(' ', (string) $parsed->getSearchTerm()) as $term) {
+    private function storeSearchTerms(
+        ?TrackerReferer $referer,
+        ?RefererParser $parsed,
+    ): void {
+        $terms = explode(' ', (string) $parsed->getSearchTerm());
+
+        foreach ($terms as $term) {
             $attributes = [
                 'referer_id' => $referer->id,
                 'search_term' => $term,
             ];
 
-            TrackerRefererSearchTerm::query()
-                ->findOrCreateCached($attributes, ['referer_id', 'search_term']);
+            TrackerRefererSearchTerm::findOrCreateCached(
+                attributes: $attributes,
+                keys: [
+                    'referer_id',
+                    'search_term',
+                ],
+            );
         }
     }
 
     //
 
-    private function getLanguage()
+    private function getLanguage(): array
     {
         return $this->langDetect->detectLanguage();
     }
 
-    private function extractAttributes($attributes)
-    {
+    private function extractAttributes(
+        array | string | int | float $attributes,
+    ): array | string | null {
         if (is_array($attributes) || is_string($attributes)) {
             return $attributes;
         }
@@ -654,10 +838,14 @@ class Tracker
         if ($attributes instanceof Model) {
             return $attributes->getAttributes();
         }
+
+        return null;
     }
 
-    private function extractKeys($attributes, $keys)
-    {
+    private function extractKeys(
+        array $attributes,
+        array $keys,
+    ): array {
         if (!$keys) {
             $keys = array_keys($attributes);
         }

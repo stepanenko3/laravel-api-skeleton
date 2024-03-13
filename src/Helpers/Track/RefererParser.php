@@ -3,104 +3,73 @@
 namespace Stepanenko3\LaravelApiSkeleton\Helpers\Track;
 
 use Snowplow\RefererParser\Parser;
+use Snowplow\RefererParser\Referer;
 
 class RefererParser
 {
-    /**
-     * Referer parser instance.
-     *
-     * @var Parser
-     */
-    private $parser;
+    private Parser $parser;
+    private Referer $referer;
 
-    /**
-     * Referer parser instance.
-     *
-     * @var \Snowplow\RefererParser\Referer
-     */
-    private $referer;
-
-    /**
-     * Create a referer parser instance.
-     *
-     * @param null|mixed $refererUrl
-     * @param null|mixed $pageUrl
-     *
-     * @return mixed
-     */
-    public function __construct($refererUrl = null, $pageUrl = null)
-    {
+    public function __construct(
+        ?string $refererUrl = null,
+        ?string $pageUrl = null,
+    ) {
         $this->parser = new Parser();
-        $this->referer = $this->parser->parse($refererUrl, $pageUrl);
+        $this->referer = $this->parser->parse(
+            refererUrl: $refererUrl,
+            pageUrl: $pageUrl,
+        );
     }
 
-    /**
-     * Parse a referer.
-     *
-     * @return RefererParser
-     */
-    public function parse(mixed $refererUrl, mixed $pageUrl)
-    {
-        $this->setReferer($this->parser->parse($refererUrl, $pageUrl));
+    public function parse(
+        mixed $refererUrl,
+        mixed $pageUrl,
+    ): self {
+        $this->setReferer(
+            referer: $this->parser->parse(
+                refererUrl: $refererUrl,
+                pageUrl: $pageUrl,
+            )
+        );
 
         return $this;
     }
 
-    /**
-     * Get the search medium.
-     *
-     * @return null|string
-     */
-    public function getMedium()
+    public function getMedium(): ?string
     {
         if ($this->isKnown()) {
             return $this->referer->getMedium();
         }
+
+        return null;
     }
 
-    /**
-     * Get the search source.
-     *
-     * @return null|string
-     */
-    public function getSource()
+    public function getSource(): ?string
     {
         if ($this->isKnown()) {
             return $this->referer->getSource();
         }
+
+        return null;
     }
 
-    /**
-     * Get the search term.
-     *
-     * @return null|string
-     */
-    public function getSearchTerm()
+    public function getSearchTerm(): ?string
     {
         if ($this->isKnown()) {
             return $this->referer->getSearchTerm();
         }
+
+        return null;
     }
 
-    /**
-     * Check if the referer is knwon.
-     *
-     * @return bool
-     */
-    public function isKnown()
+    public function isKnown(): bool
     {
         return $this->referer->isKnown();
     }
 
-    /**
-     * Set the referer.
-     *
-     * @param \Snowplow\RefererParser\Referer $referer
-     *
-     * @return RefererParser
-     */
-    public function setReferer($referer)
-    {
+    public function setReferer(
+        Referer $referer,
+    ): self {
         $this->referer = $referer;
 
         return $this;
