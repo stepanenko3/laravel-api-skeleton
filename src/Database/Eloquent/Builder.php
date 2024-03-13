@@ -17,7 +17,8 @@ class Builder extends BaseBuilder
     ): Pagination {
         $page = $page ?: Pagination::resolveCurrentPage($pageName);
 
-        $perPage = ($perPage instanceof Closure
+        $perPage = (
+            $perPage instanceof Closure
             ? $perPage($total)
             : $perPage
         ) ?: $this->model->getPerPage();
