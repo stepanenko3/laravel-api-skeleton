@@ -2,6 +2,7 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Helpers;
 
+use Exception;
 use GdImage;
 
 /**
@@ -78,7 +79,7 @@ class GifCreator
     public function create($frames = [], $durations = [], $loop = 0)
     {
         if (!is_array($frames) && !is_array($durations)) {
-            throw new \Exception($this->version . ': ' . $this->errors['ERR00']);
+            throw new Exception(message: $this->version . ': ' . $this->errors['ERR00']);
         }
 
         $this->loop = ($loop > -1) ? $loop : 0;
@@ -104,7 +105,7 @@ class GifCreator
                 $this->frameSources[] = ob_get_contents();
                 ob_end_clean();
             } else { // Fail
-                throw new \Exception($this->version . ': ' . $this->errors['ERR02']); // . ' (' . $mode . ')');
+                throw new Exception($this->version . ': ' . $this->errors['ERR02']); // . ' (' . $mode . ')');
             }
 
             if ($i == 0) {
@@ -112,14 +113,14 @@ class GifCreator
             }
 
             if (!str_starts_with((string) $this->frameSources[$i], 'GIF87a') && !str_starts_with((string) $this->frameSources[$i], 'GIF89a')) {
-                throw new \Exception($this->version . ': ' . $i . ' ' . $this->errors['ERR01']);
+                throw new Exception($this->version . ': ' . $i . ' ' . $this->errors['ERR01']);
             }
 
             for ($j = (13 + 3 * (2 << (ord($this->frameSources[$i][10]) & 0x07))), $k = true; $k; $j++) {
                 switch ($this->frameSources[$i][$j]) {
                     case '!':
                         if (substr((string) $this->frameSources[$i], $j + 3, 8) == 'NETSCAPE') {
-                            throw new \Exception($this->version . ': ' . $this->errors['ERR03'] . ' (' . ($i + 1) . ' source).');
+                            throw new Exception($this->version . ': ' . $this->errors['ERR03'] . ' (' . ($i + 1) . ' source).');
                         }
 
                         break;

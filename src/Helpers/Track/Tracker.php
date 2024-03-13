@@ -2,10 +2,20 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Helpers\Track;
 
-use Stepanenko3\LaravelApiSkeleton\Models\Track;
 use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerSession;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cookie;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerAgent;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerDevice;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerDomain;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerEvent;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerEventLog;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerGeoip;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerLanguage;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerLog;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerPath;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerReferer;
+use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerRefererSearchTerm;
 
 class Tracker
 {
@@ -123,7 +133,7 @@ class Tracker
         $path = $this->hitPath($pageUrl);
         $domain = $this->hitDomain($pageUrl);
 
-        $event = Track\TrackerEvent::findOrCreateCached(['name' => $eventName], ['name']);
+        $event = TrackerEvent::findOrCreateCached(['name' => $eventName], ['name']);
 
         $log = $this->hitEventLog(
             optional($event)->id,
@@ -203,7 +213,7 @@ class Tracker
             return;
         }
 
-        return Track\TrackerPath::findOrCreateCached(['path' => $parsed['path']], ['path']);
+        return TrackerPath::findOrCreateCached(['path' => $parsed['path']], ['path']);
     }
 
     public function hitGeo()
@@ -215,7 +225,7 @@ class Tracker
         if ($session = session('tracker.country')) {
             $session['payload'] = json_encode($session, JSON_THROW_ON_ERROR);
 
-            return Track\TrackerGeoip::findOrCreateCached($session, ['payload']);
+            return TrackerGeoip::findOrCreateCached($session, ['payload']);
         }
 
         $detect = get_location($this->client_ip);
@@ -238,7 +248,8 @@ class Tracker
 
             $attributes['payload'] = md5(json_encode($attributes, JSON_THROW_ON_ERROR));
 
-            return Track\TrackerGeoip::findOrCreateCached($attributes, ['payload']);
+            return TrackerGeoip::query()
+                ->findOrCreateCached($attributes, ['payload']);
         }
     }
 
@@ -436,7 +447,8 @@ class Tracker
 
         $attributes = $this->getCurrentAgentArray();
 
-        return Track\TrackerAgent::findOrCreateCached($attributes, ['name']);
+        return TrackerAgent::query()
+            ->findOrCreateCached($attributes, ['name']);
     }
 
     private function hitDevice()
@@ -447,9 +459,10 @@ class Tracker
 
         $attributes = $this->getCurrentDeviceArray();
 
-        return Track\TrackerDevice::findOrCreateCached($attributes, [
-            'grade', 'family', 'model', 'brand', 'platform', 'platform_version',
-        ]);
+        return TrackerDevice::query()
+            ->findOrCreateCached($attributes, [
+                'grade', 'family', 'model', 'brand', 'platform', 'platform_version',
+            ]);
     }
 
     private function hitDomain($pageUrl)
@@ -464,7 +477,8 @@ class Tracker
             return;
         }
 
-        return Track\TrackerDomain::findOrCreateCached(['name' => $parsed['host']], ['name']);
+        return TrackerDomain::query()
+            ->findOrCreateCached(['name' => $parsed['host']], ['name']);
     }
 
     private function hitLanguage()
@@ -475,7 +489,8 @@ class Tracker
 
         $attributes = $this->getLanguage();
 
-        return Track\TrackerLanguage::findOrCreateCached($attributes, ['preference', 'language_range']);
+        return TrackerLanguage::query()
+            ->findOrCreateCached($attributes, ['preference', 'language_range']);
     }
 
     private function hitEventLog($event_id, $session_id, $referer_id, $path_id)
@@ -486,7 +501,10 @@ class Tracker
 
         $attributes = $this->getEventLogData($event_id, $session_id, $referer_id, $path_id);
 
-        return Track\TrackerEventLog::create($attributes);
+        return TrackerEventLog::query()
+            ->create(
+                attributes: $attributes,
+            );
     }
 
     private function hitLog($session_id, $referer_id, $path_id)
@@ -497,7 +515,9 @@ class Tracker
 
         $attributes = $this->getLogData($session_id, $referer_id, $path_id);
 
-        return Track\TrackerLog::create($attributes);
+        return TrackerLog::create(
+            attributes: $attributes,
+        );
     }
 
     private function hitReferer($refererUrl, $pageUrl)
@@ -530,7 +550,8 @@ class Tracker
             $attributes['search_terms_hash'] = sha1((string) $parsed->getSearchTerm());
         }
 
-        $referer = Track\TrackerReferer::findOrCreateCached($attributes, ['url', 'search_terms_hash']);
+        $referer = TrackerReferer::query()
+            ->findOrCreateCached($attributes, ['url', 'search_terms_hash']);
 
         if ($parsed->isKnown()) {
             $this->storeSearchTerms($referer, $parsed);
@@ -608,7 +629,8 @@ class Tracker
                 'search_term' => $term,
             ];
 
-            Track\TrackerRefererSearchTerm::findOrCreateCached($attributes, ['referer_id', 'search_term']);
+            TrackerRefererSearchTerm::query()
+                ->findOrCreateCached($attributes, ['referer_id', 'search_term']);
         }
     }
 
