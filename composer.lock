@@ -3560,16 +3560,16 @@
         },
         {
             "name": "srwiez/thumbhash",
-            "version": "v1.2.0",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SRWieZ/thumbhash.git",
-                "reference": "70a4c48e3fa055ce7010641634ab1ea1b8d7ce81"
+                "reference": "2d5c6237fb16b79e9bd5d0d2a1571f9d6d3f1f66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SRWieZ/thumbhash/zipball/70a4c48e3fa055ce7010641634ab1ea1b8d7ce81",
-                "reference": "70a4c48e3fa055ce7010641634ab1ea1b8d7ce81",
+                "url": "https://api.github.com/repos/SRWieZ/thumbhash/zipball/2d5c6237fb16b79e9bd5d0d2a1571f9d6d3f1f66",
+                "reference": "2d5c6237fb16b79e9bd5d0d2a1571f9d6d3f1f66",
                 "shasum": ""
             },
             "require": {
@@ -3602,9 +3602,9 @@
             "description": "A brief description of your package",
             "support": {
                 "issues": "https://github.com/SRWieZ/thumbhash/issues",
-                "source": "https://github.com/SRWieZ/thumbhash/tree/v1.2.0"
+                "source": "https://github.com/SRWieZ/thumbhash/tree/v1.2.1"
             },
-            "time": "2023-05-10T15:02:57+00:00"
+            "time": "2024-02-11T11:22:22+00:00"
         },
         {
             "name": "stepanenko3/laravel-helpers",
