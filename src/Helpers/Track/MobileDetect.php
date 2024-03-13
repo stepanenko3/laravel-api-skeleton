@@ -6,21 +6,19 @@ use Jenssegers\Agent\Agent;
 
 class MobileDetect extends Agent
 {
-    public function __construct($userAgent = null)
-    {
+    public function __construct(
+        ?string $userAgent = null
+    ) {
         parent::__construct();
 
         if ($userAgent) {
-            $this->setUserAgent($userAgent);
+            $this->setUserAgent(
+                $userAgent,
+            );
         }
     }
 
-    /**
-     * Detect kind, model and mobility.
-     *
-     * @return array
-     */
-    public function detectDevice()
+    public function detectDevice(): array
     {
         return [
             'kind' => $this->getDeviceKind(),
@@ -30,14 +28,7 @@ class MobileDetect extends Agent
         ];
     }
 
-    /**
-     * Get the kind of device.
-     *
-     * @internal param $mobile
-     *
-     * @return string
-     */
-    public function getDeviceKind()
+    public function getDeviceKind(): string
     {
         $kind = 'unavailable';
 
@@ -52,22 +43,12 @@ class MobileDetect extends Agent
         return $kind;
     }
 
-    /**
-     * Is this a phone?
-     *
-     * @return bool
-     */
-    // public function isPhone()
-    // {
-    //     return !$this->isTablet() && !$this->isComputer();
-    // }
+    public function isPhone(): bool
+    {
+        return !$this->isTablet() && !$this->isComputer();
+    }
 
-    /**
-     * Is this a computer?
-     *
-     * @return bool
-     */
-    public function isComputer()
+    public function isComputer(): bool
     {
         return !$this->isMobile();
     }
