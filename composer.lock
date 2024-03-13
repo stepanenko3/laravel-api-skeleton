@@ -574,16 +574,16 @@
         },
         {
             "name": "giggsey/libphonenumber-for-php",
-            "version": "8.13.29",
+            "version": "8.13.32",
             "source": {
                 "type": "git",
                 "url": "https://github.com/giggsey/libphonenumber-for-php.git",
-                "reference": "b8fa0daf0c27bb6fdb5940e0288f203be7e5cfd4"
+                "reference": "11aa286e82f2bb567815a89da1e63e2848b81e66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/b8fa0daf0c27bb6fdb5940e0288f203be7e5cfd4",
-                "reference": "b8fa0daf0c27bb6fdb5940e0288f203be7e5cfd4",
+                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/11aa286e82f2bb567815a89da1e63e2848b81e66",
+                "reference": "11aa286e82f2bb567815a89da1e63e2848b81e66",
                 "shasum": ""
             },
             "require": {
@@ -642,7 +642,7 @@
                 "issues": "https://github.com/giggsey/libphonenumber-for-php/issues",
                 "source": "https://github.com/giggsey/libphonenumber-for-php"
             },
-            "time": "2024-01-26T08:49:18+00:00"
+            "time": "2024-03-12T08:08:27+00:00"
         },
         {
             "name": "giggsey/locale",
@@ -2557,30 +2557,30 @@
         },
         {
             "name": "propaganistas/laravel-phone",
-            "version": "5.1.1",
+            "version": "5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Phone.git",
-                "reference": "d8c0e5fbde9820e026595616a7a36074233a09c6"
+                "reference": "2dc9935da1bac59531729a20b3f1ac8a36f0e03b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Phone/zipball/d8c0e5fbde9820e026595616a7a36074233a09c6",
-                "reference": "d8c0e5fbde9820e026595616a7a36074233a09c6",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Phone/zipball/2dc9935da1bac59531729a20b3f1ac8a36f0e03b",
+                "reference": "2dc9935da1bac59531729a20b3f1ac8a36f0e03b",
                 "shasum": ""
             },
             "require": {
                 "giggsey/libphonenumber-for-php": "^7.0|^8.0",
-                "illuminate/contracts": "^9.0|^10.0",
-                "illuminate/support": "^9.0|^10.0",
-                "illuminate/validation": "^9.0|^10.0",
-                "php": "^8.0"
+                "illuminate/contracts": "^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0",
+                "illuminate/validation": "^10.0|^11.0",
+                "php": "^8.1"
             },
             "require-dev": {
-                "laravel/pint": "^1.4",
-                "nunomaduro/larastan": "^2.4",
+                "larastan/larastan": "^2.9",
+                "laravel/pint": "^1.14",
                 "orchestra/testbench": "*",
-                "phpunit/phpunit": "^9.5.10"
+                "phpunit/phpunit": "^10.5"
             },
             "type": "library",
             "extra": {
@@ -2617,7 +2617,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Propaganistas/Laravel-Phone/issues",
-                "source": "https://github.com/Propaganistas/Laravel-Phone/tree/5.1.1"
+                "source": "https://github.com/Propaganistas/Laravel-Phone/tree/5.2.0"
             },
             "funding": [
                 {
@@ -2625,7 +2625,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-01-15T09:23:46+00:00"
+            "time": "2024-03-12T07:19:37+00:00"
         },
         {
             "name": "psr/clock",
