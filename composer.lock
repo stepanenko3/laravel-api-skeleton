@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "492db8ce76d8f0c5d4b0da7add5719f6",
+    "content-hash": "cdcae75f9a5d8cbdc17db0ed8d89e0f3",
     "packages": [
         {
             "name": "brick/math",
@@ -3652,20 +3652,25 @@
         },
         {
             "name": "stepanenko3/laravel-pagination",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stepanenko3/laravel-pagination.git",
-                "reference": "619ae022412a637fbbc4e75bca70fc651bfb55ba"
+                "reference": "048d2c3d164e205d80bfb584825357abdffc6dc0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stepanenko3/laravel-pagination/zipball/619ae022412a637fbbc4e75bca70fc651bfb55ba",
-                "reference": "619ae022412a637fbbc4e75bca70fc651bfb55ba",
+                "url": "https://api.github.com/repos/stepanenko3/laravel-pagination/zipball/048d2c3d164e205d80bfb584825357abdffc6dc0",
+                "reference": "048d2c3d164e205d80bfb584825357abdffc6dc0",
                 "shasum": ""
             },
             "require": {
+                "laravel/framework": "^10.0|^11.0",
                 "php": "^8.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^1.10",
+                "tightenco/duster": "^2.7"
             },
             "type": "library",
             "autoload": {
@@ -3695,9 +3700,9 @@
             ],
             "support": {
                 "issues": "https://github.com/stepanenko3/laravel-pagination/issues",
-                "source": "https://github.com/stepanenko3/laravel-pagination/tree/v1.0.2"
+                "source": "https://github.com/stepanenko3/laravel-pagination/tree/v1.0.3"
             },
-            "time": "2023-06-08T07:04:44+00:00"
+            "time": "2024-03-14T11:53:05+00:00"
         },
         {
             "name": "symfony/console",
