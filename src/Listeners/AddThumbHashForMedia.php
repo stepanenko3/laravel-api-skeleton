@@ -10,8 +10,9 @@ use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAddedEvent;
 
 class AddThumbHashForMedia
 {
-    public function handle(MediaHasBeenAddedEvent $event): void
-    {
+    public function handle(
+        MediaHasBeenAddedEvent $event,
+    ): void {
         $content = Storage::disk(config('media-library.disk_name'))->get(get_media_path($event->media));
 
         $manager = new ImageManager(new Driver());
