@@ -30,9 +30,9 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
-    protected array $dontReport = [];
+    protected $dontReport = [];
 
-    protected array $dontFlash = [
+    protected $dontFlash = [
         'password',
         'password_confirmation',
     ];
