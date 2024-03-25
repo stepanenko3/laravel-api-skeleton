@@ -7,7 +7,7 @@ use Stepanenko3\LaravelApiSkeleton\Traits\Draftable\Draftable;
 use Stepanenko3\LaravelApiSkeleton\Traits\HasTranslations;
 use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Model;
 
-class SeoPage extends Model
+final class SeoPage extends Model
 {
     use Draftable;
     use HasTranslations;

@@ -20,7 +20,7 @@ class ExtendedCollection extends Collection
             ->pluck($groupKey)
             ->unique('id')
             ->map(function ($group) use ($valuesByGroup, $groupKey, $groupByKey, $valuesKey) {
-                $group[$valuesKey] = (new static($valuesByGroup[$group[$groupByKey]]))
+                $group[$valuesKey] = (new self($valuesByGroup[$group[$groupByKey]]))
                     ->map(function ($value) use ($groupKey) {
                         unset($value[$groupKey]);
 
@@ -33,7 +33,7 @@ class ExtendedCollection extends Collection
 
     public function dot()
     {
-        return new static(
+        return new self(
             Arr::dot(
                 $this->toArray()
             )

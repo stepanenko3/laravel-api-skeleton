@@ -4,7 +4,6 @@ namespace Stepanenko3\LaravelApiSkeleton\Traits\Draftable;
 
 use Stepanenko3\LaravelApiSkeleton\Scopes\DraftableScope;
 
-/** @phpstan-consistent-constructor */
 trait Draftable
 {
     public static function bootDraftable(): void

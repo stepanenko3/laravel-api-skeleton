@@ -12,14 +12,14 @@ class NestedCollection extends Collection
         $find = $this->where('id', $id)->first();
 
         if (!$find) {
-            return new static();
+            return new self();
         }
 
         $items = $this
             ->where('id', '!=', $find->id)
             ->where(fn ($item) => $find->_rgt > $item->_lft && $find->_rgt < $item->_rgt);
 
-        return new static($items);
+        return new self($items);
     }
 
     public function siblingsOf($id)
@@ -27,13 +27,13 @@ class NestedCollection extends Collection
         $find = $this->where('id', $id)->first();
 
         if (!$find) {
-            return new static();
+            return new self();
         }
 
         $items = $this
             ->where('parent_id', '=', $find->parent_id);
 
-        return new static($items);
+        return new self($items);
     }
 
     public function descendantsOf($id)
@@ -41,19 +41,19 @@ class NestedCollection extends Collection
         $find = $this->where('id', $id)->first();
 
         if (!$find) {
-            return new static();
+            return new self();
         }
 
         $items = $this
             ->whereBetween('_lft', [$find->_lft, $find->_rgt]);
 
-        return new static($items);
+        return new self($items);
     }
 
     public function toTree($root = false)
     {
         if ($this->isEmpty()) {
-            return new static();
+            return new self();
         }
 
         $this->linkNodes();
@@ -69,7 +69,7 @@ class NestedCollection extends Collection
             }
         }
 
-        return new static($items);
+        return new self($items);
     }
 
     public function linkNodes()
