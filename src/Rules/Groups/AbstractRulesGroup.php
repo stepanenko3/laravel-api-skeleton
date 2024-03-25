@@ -4,6 +4,7 @@ namespace Stepanenko3\LaravelApiSkeleton\Rules\Groups;
 
 use Stepanenko3\LaravelApiSkeleton\Traits\Makeable;
 
+/** @phpstan-consistent-constructor */
 abstract class AbstractRulesGroup
 {
     use Makeable;

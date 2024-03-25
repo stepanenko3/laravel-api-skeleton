@@ -4,6 +4,7 @@ namespace Stepanenko3\LaravelApiSkeleton\Helpers;
 
 use Illuminate\Support\Collection;
 
+/** @phpstan-consistent-constructor */
 class NestedCollection extends Collection
 {
     public function ancestorsOf($id)

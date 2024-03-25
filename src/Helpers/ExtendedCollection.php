@@ -4,11 +4,17 @@ namespace Stepanenko3\LaravelApiSkeleton\Helpers;
 
 use Illuminate\Support\{Arr, Collection};
 
+/** @phpstan-consistent-constructor */
 class ExtendedCollection extends Collection
 {
-    public function groupInto(string $groupKey, string $groupByKey, string $valuesKey)
-    {
-        $valuesByGroup = $this->groupBy(implode('.', [$groupKey, $groupByKey]));
+    public function groupInto(
+        string $groupKey,
+        string $groupByKey,
+        string $valuesKey,
+    ) {
+        $valuesByGroup = $this->groupBy(
+            implode('.', [$groupKey, $groupByKey])
+        );
 
         return $this
             ->pluck($groupKey)
@@ -27,24 +33,34 @@ class ExtendedCollection extends Collection
 
     public function dot()
     {
-        return new static(Arr::dot($this->toArray()));
+        return new static(
+            Arr::dot(
+                $this->toArray()
+            )
+        );
     }
 
-    public function whereHas($key, $operator = null, $value = null)
-    {
+    public function whereHas(
+        $key,
+        $operator = null,
+        $value = null,
+    ) {
         return $this
-            ->filter($this->operatorForWhere(...func_get_args()))
+            ->filter(
+                $this->operatorForWhere(
+                    ...func_get_args(),
+                ),
+            )
             ->isNotEmpty();
     }
 
-    public function isEmpty(?string $key = null): bool
-    {
+    public function isEmpty(
+        ?string $key = null,
+    ): bool {
         if ($key) {
-            return empty(
-                $this->get(
-                    key: $key,
-                )
-            );
+            return empty($this->get(
+                key: $key,
+            ));
         }
 
         return empty($this->items);

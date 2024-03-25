@@ -4,7 +4,6 @@ namespace Stepanenko3\LaravelApiSkeleton\Services;
 
 use Exception;
 use Illuminate\Support\Facades\{Http, Log};
-use Twilio\Rest\Client;
 
 class SMS
 {
@@ -44,21 +43,21 @@ class SMS
         return false;
     }
 
-    protected function twilio(string $phone, string $message): bool
-    {
-        try {
-            $client = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
+    // protected function twilio(string $phone, string $message): bool
+    // {
+    //     try {
+    //         $client = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
 
-            $client->messages->create($phone, [
-                'from' => env('TWILIO_NUMBER'),
-                'body' => $message,
-            ]);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
+    //         $client->messages->create($phone, [
+    //             'from' => env('TWILIO_NUMBER'),
+    //             'body' => $message,
+    //         ]);
+    //     } catch (Exception $e) {
+    //         Log::error($e->getMessage());
 
-            return false;
-        }
+    //         return false;
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 }

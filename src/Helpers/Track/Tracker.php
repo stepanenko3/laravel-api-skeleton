@@ -288,6 +288,8 @@ class Tracker
                 ],
             );
         }
+
+        return null;
     }
 
     //

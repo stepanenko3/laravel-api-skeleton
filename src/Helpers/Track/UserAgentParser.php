@@ -23,7 +23,8 @@ class UserAgentParser
             $userAgent = request()->userAgent();
         }
 
-        $this->parser = Parser::create()->parse($userAgent);
+        $this->parser = Parser::create()
+            ->parse($userAgent);
 
         $this->ua = $this->parser->ua;
         $this->os = $this->parser->os;

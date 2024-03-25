@@ -18,6 +18,7 @@ use Stepanenko3\LaravelApiSkeleton\Contracts\ValidatedDtoCastContract;
 use Stepanenko3\LaravelApiSkeleton\Contracts\ValidatedDtoContract;
 use Stepanenko3\LaravelApiSkeleton\Traits\WorkWithUses;
 
+/** @phpstan-consistent-constructor */
 abstract class ValidatedDTO implements ValidatedDtoContract
 {
     use WorkWithUses;
