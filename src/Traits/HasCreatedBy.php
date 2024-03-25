@@ -14,16 +14,21 @@ trait HasCreatedBy
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, self::createdByField());
+        return $this->belongsTo(
+            config('auth.providers.users.model'),
+            self::createdByField(),
+        );
     }
 
     protected static function bootHasCreatedBy(): void
     {
-        static::creating(function (Model $model): void {
-            if (auth()->check()) {
-                $model->{self::createdByField()} = auth()
-                    ->id();
-            }
-        });
+        static::creating(
+            function (Model $model): void {
+                if (auth()->check()) {
+                    $model->{self::createdByField()} = auth()
+                        ->id();
+                }
+            },
+        );
     }
 }

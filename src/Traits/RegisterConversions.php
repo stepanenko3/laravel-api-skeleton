@@ -11,9 +11,9 @@ trait RegisterConversions
 {
     use InteractsWithMedia;
 
-    protected $conversions;
+    protected array $conversions;
 
-    protected $conversionsExtensions = [];
+    protected array $conversionsExtensions = [];
 
     public function media(): MorphMany
     {

@@ -16,6 +16,7 @@ class FiltersRules extends AbstractRulesGroup
         public Schema $schema,
         public string $prefix = '',
     ) {
+        //
     }
 
     public function isMaxDepth(

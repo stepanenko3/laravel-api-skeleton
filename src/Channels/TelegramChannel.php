@@ -7,28 +7,37 @@ use Stepanenko3\LaravelApiSkeleton\Services\TelegramBot;
 
 class TelegramChannel
 {
-    /**
-     * Send the given notification.
-     */
-    public function send(mixed $notifiable, Notification $notification): void
-    {
+    public function send(
+        mixed $notifiable,
+        Notification $notification,
+    ): void {
         $key = 'telegram';
 
-        $to = $notifiable->routeNotificationFor($key, $notification);
+        $to = $notifiable->routeNotificationFor(
+            $key,
+            $notification,
+        );
+
         if (!$to) {
             return;
         }
 
-        $data = $notification->{'to' . ucfirst($key)}($notifiable);
+        $data = $notification->{'to' . ucfirst($key)}(
+            $notifiable,
+        );
 
         $bot = (new TelegramBot())
             ->via($key)
             ->to($to);
 
         if (count($data['buttons'] ?? []) > 0) {
-            $bot->buttons($data['buttons']);
+            $bot->buttons(
+                $data['buttons'],
+            );
         }
 
-        $bot->send($data['text']);
+        $bot->send(
+            message: $data['text'],
+        );
     }
 }

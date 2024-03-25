@@ -4,7 +4,6 @@ namespace Stepanenko3\LaravelApiSkeleton\Helpers;
 
 use Illuminate\Support\{Arr, Collection};
 
-/** @phpstan-consistent-constructor */
 class ExtendedCollection extends Collection
 {
     public function groupInto(

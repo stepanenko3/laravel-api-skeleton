@@ -4,6 +4,7 @@ namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
 use Exception;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Query\Builder;
 
 trait GeoLocation
 {
@@ -14,7 +15,7 @@ trait GeoLocation
         });
     }
 
-    public function getDistance()
+    public function getDistance(): string
     {
         $distance = null;
         $suffix = null;
@@ -41,7 +42,10 @@ trait GeoLocation
                 }
 
                 try {
-                    return unpack('x/x/x/x/corder/Ltype/dlat/dlng', (string) $value);
+                    return unpack(
+                        format: 'x/x/x/x/corder/Ltype/dlat/dlng',
+                        string: (string) $value,
+                    );
                 } catch (Exception $e) {
                     return;
                 }
@@ -49,25 +53,55 @@ trait GeoLocation
         );
     }
 
-    public function scopeWhereDistance($query, $lat, $lng, $radius)
-    {
-        return $query->whereRaw($this->distanceCalculate() . ' < ?', [$lat, $lng, $lat, $radius]);
-    }
-
-    public function scopeWithDistance($query, $lat, $lng)
-    {
-        return $query->selectRaw($this->distanceCalculate() . ' as distance', [$lat, $lng, $lat]);
-    }
-
-    public function scopeOrderByDistance($query, $lat, $lng, $direction = 'ASC')
-    {
-        return $query->orderByRaw(
-            $this->distanceCalculate() . ' ' . $direction,
-            [$lat, $lng, $lat],
+    public function scopeWhereDistance(
+        Builder $query,
+        int | float $lat,
+        int | float $lng,
+        int | float $radius,
+    ): Builder {
+        return $query->whereRaw(
+            sql: $this->distanceCalculate() . ' < ?',
+            bindings: [
+                $lat,
+                $lng,
+                $lat,
+                $radius,
+            ]
         );
     }
 
-    public function distanceCalculate()
+    public function scopeWithDistance(
+        Builder $query,
+        int | float $lat,
+        int | float $lng,
+    ): Builder {
+        return $query->selectRaw(
+            expression: $this->distanceCalculate() . ' as distance',
+            bindings: [
+                $lat,
+                $lng,
+                $lat,
+            ]
+        );
+    }
+
+    public function scopeOrderByDistance(
+        Builder $query,
+        int | float $lat,
+        int | float $lng,
+        string $direction = 'ASC',
+    ) {
+        return $query->orderByRaw(
+            sql: $this->distanceCalculate() . ' ' . $direction,
+            bindings: [
+                $lat,
+                $lng,
+                $lat,
+            ],
+        );
+    }
+
+    public function distanceCalculate(): string
     {
         return '(6371 * acos(cos(radians(?)) * cos(radians(ST_X(`coordinates`))) * cos(radians(ST_Y(`coordinates`)) - radians(?)) + sin(radians(?)) * sin(radians(ST_X(`coordinates`)))))';
     }

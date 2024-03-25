@@ -18,23 +18,27 @@ abstract class JsonResource extends BaseJsonResource
 
     private static $relationshipResourceGuesser;
 
-    public static function guessRelationshipResourceUsing(?callable $callback): void
-    {
+    public static function guessRelationshipResourceUsing(
+        ?callable $callback,
+    ): void {
         self::$relationshipResourceGuesser = $callback;
     }
 
-    public function toAttributes(Request $request): array
-    {
+    public function toAttributes(
+        Request $request,
+    ): array {
         return [];
     }
 
-    public function toRelationships(Request $request): array
-    {
+    public function toRelationships(
+        Request $request,
+    ): array {
         return [];
     }
 
-    public function toMeta(Request $request): array
-    {
+    public function toMeta(
+        Request $request,
+    ): array {
         return [];
     }
 
@@ -86,13 +90,16 @@ abstract class JsonResource extends BaseJsonResource
         );
     }
 
-    public function mapAttributes(array $attributes): array
-    {
+    public function mapAttributes(
+        array $attributes,
+    ): array {
         return $attributes;
     }
 
-    private static function guessRelationshipResource(string $relationship, self $resource)
-    {
+    private static function guessRelationshipResource(
+        string $relationship,
+        self $resource,
+    ) {
         return (self::$relationshipResourceGuesser ?? function (string $relationship, self $resource): string {
             $relationship = Str::of($relationship);
 
@@ -109,8 +116,9 @@ abstract class JsonResource extends BaseJsonResource
         })($relationship, $resource);
     }
 
-    private function resolveAttributes(Request $request): array
-    {
+    private function resolveAttributes(
+        Request $request,
+    ): array {
         return Collection::make($this->attributes)
             ->mapWithKeys(function (string $attribute, int | string $key): array {
                 $resolvedKey = is_string($key) ? $key : $attribute;
@@ -127,8 +135,9 @@ abstract class JsonResource extends BaseJsonResource
             ->toArray();
     }
 
-    private function resolveRelationships(Request $request): array
-    {
+    private function resolveRelationships(
+        Request $request,
+    ): array {
         return Collection::make($this->relationships)
             ->mapWithKeys(fn (string $value, int | string $key) => !is_int($key) ? [
                 $key => $value,

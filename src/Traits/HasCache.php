@@ -17,13 +17,17 @@ trait HasCache
 
     protected static function bootHasCache(): void
     {
-        static::updated(function (Model $model): void {
-            $model->flushCache();
-        });
+        static::updated(
+            function (Model $model): void {
+                $model->flushCache();
+            },
+        );
 
-        static::created(function (Model $model): void {
-            $model->flushCache();
-        });
+        static::created(
+            function (Model $model): void {
+                $model->flushCache();
+            },
+        );
     }
 
     protected function cacheKey(): string

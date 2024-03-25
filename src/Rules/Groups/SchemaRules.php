@@ -16,6 +16,7 @@ class SchemaRules extends AbstractRulesGroup
         public string $prefix = '',
         public int $level = 0,
     ) {
+        //
     }
 
     public function isRootSearchRules(

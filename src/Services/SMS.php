@@ -9,13 +9,19 @@ class SMS
 {
     private string $via = 'smsclub';
 
-    public function send(string $phone, string $message): self
-    {
-        return ($this->{$this->via})($phone, $message);
+    public function send(
+        string $phone,
+        string $message,
+    ): self {
+        return ($this->{$this->via})(
+            $phone,
+            $message,
+        );
     }
 
-    public function via(string $via): self
-    {
+    public function via(
+        string $via,
+    ): self {
         if (!in_array($via, ['smsclub, twilio'])) {
             throw new Exception('undefined provider ' . $via);
         }
@@ -25,9 +31,13 @@ class SMS
         return $this;
     }
 
-    protected function smsclub(string $phone, string $message): bool
-    {
-        $res = Http::withToken(env('SMSCLUB_TOKEN'))
+    protected function smsclub(
+        string $phone,
+        string $message,
+    ): bool {
+        $res = Http::withToken(
+            token: env('SMSCLUB_TOKEN'),
+        )
             ->post('https://im.smsclub.mobi/sms/send', [
                 'src_addr' => 'Shop Zakaz',
                 'phone' => [$phone],

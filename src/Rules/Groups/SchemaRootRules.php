@@ -12,6 +12,7 @@ class SchemaRootRules extends AbstractRulesGroup
         public Request $request,
         public Schema $schema,
     ) {
+        //
     }
 
     public function toArray(): array

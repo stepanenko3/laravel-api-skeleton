@@ -13,6 +13,7 @@ class ScopesRules extends AbstractRulesGroup
         public Schema $schema,
         public string $prefix = '',
     ) {
+        //
     }
 
     public function toArray(): array

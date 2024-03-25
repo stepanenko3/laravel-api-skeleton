@@ -6,4 +6,5 @@ use Stepanenko3\LaravelApiSkeleton\Contracts\ActionContract;
 
 abstract class Action implements ActionContract
 {
+    //
 }

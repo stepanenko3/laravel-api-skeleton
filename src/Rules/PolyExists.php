@@ -12,6 +12,7 @@ class PolyExists implements ValidationRule
         protected string $typeField,
         protected array $data = [],
     ) {
+        //
     }
 
     public function validate(

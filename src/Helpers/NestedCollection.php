@@ -4,54 +4,95 @@ namespace Stepanenko3\LaravelApiSkeleton\Helpers;
 
 use Illuminate\Support\Collection;
 
-/** @phpstan-consistent-constructor */
 class NestedCollection extends Collection
 {
-    public function ancestorsOf($id)
-    {
-        $find = $this->where('id', $id)->first();
+    public function ancestorsOf(
+        int | string $id,
+    ): self {
+        $find = $this
+            ->where(
+                key: 'id',
+                operator: '=',
+                value: $id,
+            )
+            ->first();
 
         if (!$find) {
             return new self();
         }
 
         $items = $this
-            ->where('id', '!=', $find->id)
-            ->where(fn ($item) => $find->_rgt > $item->_lft && $find->_rgt < $item->_rgt);
+            ->where(
+                key: 'id',
+                operator: '!=',
+                value: $find->id,
+            )
+            ->where(
+                fn ($item) => $find->_rgt > $item->_lft && $find->_rgt < $item->_rgt,
+            );
 
-        return new self($items);
+        return new self(
+            items: $items,
+        );
     }
 
-    public function siblingsOf($id)
-    {
-        $find = $this->where('id', $id)->first();
+    public function siblingsOf(
+        int | string $id,
+    ): self {
+        $find = $this
+            ->where(
+                key: 'id',
+                operator: '=',
+                value: $id,
+            )
+            ->first();
 
         if (!$find) {
             return new self();
         }
 
-        $items = $this
-            ->where('parent_id', '=', $find->parent_id);
+        $items = $this->where(
+            key: 'parent_id',
+            operator: '=',
+            value: $find->parent_id,
+        );
 
-        return new self($items);
+        return new self(
+            items: $items,
+        );
     }
 
-    public function descendantsOf($id)
-    {
-        $find = $this->where('id', $id)->first();
+    public function descendantsOf(
+        int | string $id,
+    ): self {
+        $find = $this
+            ->where(
+                key: 'id',
+                operator: '=',
+                value: $id,
+            )
+            ->first();
 
         if (!$find) {
             return new self();
         }
 
-        $items = $this
-            ->whereBetween('_lft', [$find->_lft, $find->_rgt]);
+        $items = $this->whereBetween(
+            key: '_lft',
+            values: [
+                $find->_lft,
+                $find->_rgt,
+            ]
+        );
 
-        return new self($items);
+        return new self(
+            items: $items,
+        );
     }
 
-    public function toTree($root = false)
-    {
+    public function toTree(
+        bool | int $root = false,
+    ): self {
         if ($this->isEmpty()) {
             return new self();
         }
@@ -60,25 +101,31 @@ class NestedCollection extends Collection
 
         $items = [];
 
-        $root = $this->getRootNodeId($root);
+        $root = $this->getRootNodeId(
+            root: $root,
+        );
 
         /** @var Model|NodeTrait $node */
         foreach ($this->items as $node) {
-            if ($node->parent_id == $root) {
+            if ($node->parent_id === $root) {
                 $items[] = $node;
             }
         }
 
-        return new self($items);
+        return new self(
+            items: $items,
+        );
     }
 
-    public function linkNodes()
+    public function linkNodes(): self
     {
         if ($this->isEmpty()) {
             return $this;
         }
 
-        $groupedNodes = $this->groupBy('parent_id');
+        $groupedNodes = $this->groupBy(
+            groupBy: 'parent_id',
+        );
 
         /** @var Model|NodeTrait $node */
         foreach ($this->items as $node) {
@@ -86,21 +133,27 @@ class NestedCollection extends Collection
                 $node->parent = null;
             }
 
-            $children = $groupedNodes->get($node->id, []);
+            $children = $groupedNodes->get(
+                key: $node->id,
+                default: [],
+            );
 
             /** @var Model|NodeTrait $child */
             foreach ($children as $child) {
                 $child->parent = $node;
             }
 
-            $node->children = Collection::make($children);
+            $node->children = Collection::make(
+                items: $children,
+            );
         }
 
         return $this;
     }
 
-    protected function getRootNodeId($root = false)
-    {
+    protected function getRootNodeId(
+        bool | int $root = false,
+    ): bool | int {
         if ($root !== false) {
             return $root;
         }

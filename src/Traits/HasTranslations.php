@@ -19,7 +19,12 @@ trait HasTranslations
 
             $attribute = $this->getAttributes()[$key] ?? '';
 
-            $json = json_decode((string) ($attribute ?: '{}'), true, 512, JSON_THROW_ON_ERROR) ?: [];
+            $json = json_decode(
+                json: (string) ($attribute ?: '{}'),
+                associative: true,
+                depth: 512,
+                flags: JSON_THROW_ON_ERROR,
+            ) ?: [];
 
             $data = $attribute && (!is_array($json) || count($json) <= 0)
                 ? [$fallbackLocale => $attribute]

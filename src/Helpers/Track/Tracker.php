@@ -158,7 +158,7 @@ class Tracker
         string $userAgent,
         string $clientIp,
         bool $isSecure = true,
-        ?int $userId = null
+        ?int $userId = null,
     ): array {
         $this->bind(
             sessionId: $sessionId,
