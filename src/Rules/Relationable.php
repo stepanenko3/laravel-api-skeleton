@@ -11,6 +11,7 @@ use Stepanenko3\LaravelApiSkeleton\Http\Schemas\Schema;
 use Stepanenko3\LaravelApiSkeleton\Rules\Groups\SchemaRules;
 use Stepanenko3\LaravelApiSkeleton\Traits\Makeable;
 
+/** @phpstan-consistent-constructor */
 class Relationable implements DataAwareRule, ValidationRule
 {
     use Makeable;

@@ -7,10 +7,16 @@ use Illuminate\Support\Traits\Conditionable;
 use Stepanenko3\LaravelApiSkeleton\Contracts\DtoContract;
 use Stepanenko3\LaravelApiSkeleton\Traits\Makeable;
 
+/** @phpstan-consistent-constructor */
 abstract class DTO implements DtoContract
 {
     use Conditionable;
     use Makeable;
+
+    public function __construct()
+    {
+        //
+    }
 
     public static function fromRequest(
         Request $request,
