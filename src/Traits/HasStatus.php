@@ -2,7 +2,9 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
-use Illuminate\Database\Query\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
+use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
 
 trait HasStatus
 {
@@ -12,7 +14,7 @@ trait HasStatus
     }
 
     public function scopeActive(
-        Builder $query,
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
     ): Builder {
         return $query->where(
             column: self::statusField(),
@@ -22,7 +24,7 @@ trait HasStatus
     }
 
     public function scopeDisabled(
-        Builder $query,
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
     ): Builder {
         return $query->where(
             column: self::statusField(),

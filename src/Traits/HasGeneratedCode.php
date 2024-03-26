@@ -3,13 +3,15 @@
 namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
+use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 trait HasGeneratedCode
 {
     public function scopeFindByCode(
-        Builder $query,
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
         string $code
     ): Model {
         return $query

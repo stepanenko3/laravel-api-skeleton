@@ -4,7 +4,9 @@ namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
 use Exception;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
+use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
 
 trait GeoLocation
 {
@@ -54,7 +56,7 @@ trait GeoLocation
     }
 
     public function scopeWhereDistance(
-        Builder $query,
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
         int | float $lat,
         int | float $lng,
         int | float $radius,
@@ -71,7 +73,7 @@ trait GeoLocation
     }
 
     public function scopeWithDistance(
-        Builder $query,
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
         int | float $lat,
         int | float $lng,
     ): Builder {
@@ -86,7 +88,7 @@ trait GeoLocation
     }
 
     public function scopeOrderByDistance(
-        Builder $query,
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
         int | float $lat,
         int | float $lng,
         string $direction = 'ASC',

@@ -2,15 +2,16 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
-use Illuminate\Database\Query\Builder as DatabaseBuilder;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
+use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Stepanenko3\LaravelApiSkeleton\Models\Search\SearchSynonym;
 
 trait Searchable
 {
     public function scopeSearch(
-        DatabaseBuilder | EloquentBuilder $query,
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
         string $search,
         array $synonyms = [],
     ): void {
