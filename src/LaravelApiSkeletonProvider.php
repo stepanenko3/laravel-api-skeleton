@@ -3,8 +3,8 @@
 namespace Stepanenko3\LaravelApiSkeleton;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
@@ -17,12 +17,12 @@ use Stepanenko3\LaravelApiSkeleton\Commands\ContainerModelMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\Commands\ContainerResourceMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\DTO\DTO;
 use Stepanenko3\LaravelApiSkeleton\Http\Schemas\Schema as SchemasSchema;
-use Stepanenko3\LaravelApiSkeleton\Http\Schemas\SchemaQueryBuilder;
 
 class LaravelApiSkeletonProvider extends PackageServiceProvider
 {
-    public function configurePackage(Package $package): void
-    {
+    public function configurePackage(
+        Package $package,
+    ): void {
         /*
          * This class is a Package Service Provider
          *
@@ -30,7 +30,7 @@ class LaravelApiSkeletonProvider extends PackageServiceProvider
          */
         $package
             ->name('laravel-api-skeleton')
-            ->hasConfigFile()
+            ->hasConfigFile(['api-skeleton', 'headers'])
             ->hasCommands([
                 ContainerModelMakeCommand::class,
                 ContainerResourceMakeCommand::class,
@@ -43,7 +43,7 @@ class LaravelApiSkeletonProvider extends PackageServiceProvider
                     ->startWith(function (InstallCommand $command): void {
                         $command->info('Hello, and welcome to my great new package!');
                     })
-                    ->publishConfigFile()
+                    ->publishConfigFile(['api-skeleton', 'headers'])
                     ->copyAndRegisterServiceProviderInApp()
                     ->askToStarRepoOnGitHub('stepanenko3/laravel-api-skeleton')
                     ->endWith(function (InstallCommand $command): void {
@@ -52,9 +52,6 @@ class LaravelApiSkeletonProvider extends PackageServiceProvider
             });
     }
 
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         parent::register();
@@ -62,7 +59,6 @@ class LaravelApiSkeletonProvider extends PackageServiceProvider
         foreach ([
             DTO::class,
             SchemasSchema::class,
-            SchemaQueryBuilder::class,
         ] as $abstract) {
             $this->app->beforeResolving($abstract, function ($class, $parameters, $app): void {
                 if ($app->has($class)) {
@@ -77,9 +73,6 @@ class LaravelApiSkeletonProvider extends PackageServiceProvider
         }
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         parent::boot();
@@ -90,21 +83,22 @@ class LaravelApiSkeletonProvider extends PackageServiceProvider
         setlocale(LC_TIME, config('app.locale'));
 
         $this->preventLazyLoading();
+        $this->bootMacros();
+    }
 
-        Builder::macro('orderBy', function ($field, $order = 'asc', $locale = null) {
-            if (
-                in_array(HasTranslations::class, class_uses($this->model))
-                && $this->model->isTranslatableAttribute($field)
-            ) {
-                $locale ??= app()->getLocale();
-                $field .= '->' . $locale;
-                $this->query->orderBy($field, $order);
-            } else {
-                $this->query->orderBy($field, $order);
-            }
-
-            return $this;
-        });
+    private function bootMacros(): void
+    {
+        Collection::make(glob(__DIR__ . '/Macros/*.php'))
+            ->mapWithKeys(
+                fn (string $path) => [
+                    $path => pathinfo($path, PATHINFO_FILENAME),
+                ],
+            )
+            ->each(
+                function ($macro, $path): void {
+                    require_once $path;
+                },
+            );
     }
 
     private function preventLazyLoading(): void

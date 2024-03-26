@@ -10,6 +10,7 @@ class KeysIn implements ValidationRule
     public function __construct(
         protected array $values,
     ) {
+        //
     }
 
     public function validate(

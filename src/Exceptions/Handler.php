@@ -26,25 +26,21 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
-    /**
-     * A list of the exception types that are not reported.
-     *
-     * @var array
-     */
     protected $dontReport = [];
 
-    /**
-     * A list of the inputs that are never flashed for validation exceptions.
-     *
-     * @var array
-     */
-    protected $dontFlash = ['password', 'password_confirmation'];
+    protected $dontFlash = [
+        'password',
+        'password_confirmation',
+    ];
 
-    public function render($request, $e): Responsable
-    {
+    public function render(
+        $request,
+        Throwable $e,
+    ): Responsable {
         $this->log(
             exception: $e,
         );
@@ -103,9 +99,12 @@ class Handler extends ExceptionHandler
         // return parent::render($request, $e);
     }
 
-    protected function log($exception): void
-    {
-        $logger = $this->container->make(LoggerInterface::class);
+    protected function log(
+        Throwable $exception,
+    ): void {
+        $logger = $this->container->make(
+            abstract: LoggerInterface::class,
+        );
 
         $logger->error(
             $exception->getMessage(),
@@ -118,16 +117,18 @@ class Handler extends ExceptionHandler
         );
     }
 
-    protected function responseForTokenMismatchException(TokenMismatchException $e): Responsable
-    {
+    protected function responseForTokenMismatchException(
+        TokenMismatchException $e,
+    ): Responsable {
         return new TokenMismatchResponse(
             message: $e->getMessage(),
             exception: $e,
         );
     }
 
-    protected function responseForNotAcceptableHttpException(NotAcceptableHttpException $e): Responsable
-    {
+    protected function responseForNotAcceptableHttpException(
+        NotAcceptableHttpException $e,
+    ): Responsable {
         return new ErrorResponse(
             message: 'Not Accessible: ' . $e->getMessage(),
             exception: $e,
@@ -135,8 +136,9 @@ class Handler extends ExceptionHandler
         );
     }
 
-    protected function responseForBadRequestHttpException(BadRequestHttpException $e): Responsable
-    {
+    protected function responseForBadRequestHttpException(
+        BadRequestHttpException $e,
+    ): Responsable {
         return new BadRequestResponse(
             message: $e->getMessage(),
             exception: $e,
@@ -146,16 +148,18 @@ class Handler extends ExceptionHandler
         );
     }
 
-    protected function responseForAuthenticationException(AuthenticationException $e): Responsable
-    {
+    protected function responseForAuthenticationException(
+        AuthenticationException $e,
+    ): Responsable {
         return new UnAuthenticatedResponse(
             message: $e->getMessage(),
             exception: $e,
         );
     }
 
-    protected function responseForUnprocessableEntityHttpException(UnprocessableEntityHttpException $e): Responsable
-    {
+    protected function responseForUnprocessableEntityHttpException(
+        UnprocessableEntityHttpException $e,
+    ): Responsable {
         return new UnprocessableErrorResponse(
             message: $e->getMessage(),
             exception: $e,
@@ -165,23 +169,26 @@ class Handler extends ExceptionHandler
         );
     }
 
-    protected function responseForNotFoundHttpException(NotFoundHttpException $e): Responsable
-    {
+    protected function responseForNotFoundHttpException(
+        NotFoundHttpException $e,
+    ): Responsable {
         return new NotFoundResponse(
             message: $e->getMessage(),
             exception: $e,
         );
     }
 
-    protected function responseForAuthorizationException(AuthorizationException $e): Responsable
-    {
+    protected function responseForAuthorizationException(
+        AuthorizationException $e,
+    ): Responsable {
         return new UnAuthorizedResponse(
             exception: $e,
         );
     }
 
-    protected function responseForQueryException(QueryException $e): Responsable
-    {
+    protected function responseForQueryException(
+        QueryException $e,
+    ): Responsable {
         if (app()->isProduction()) {
             return new ErrorResponse();
         }
@@ -195,8 +202,9 @@ class Handler extends ExceptionHandler
         );
     }
 
-    protected function responseForModelNotFoundException(ModelNotFoundException $e): Responsable
-    {
+    protected function responseForModelNotFoundException(
+        ModelNotFoundException $e,
+    ): Responsable {
         $id = [] !== $e->getIds() ? ' ' . implode(', ', $e->getIds()) : '.';
 
         $model = class_basename($e->getModel());
@@ -210,8 +218,9 @@ class Handler extends ExceptionHandler
         );
     }
 
-    protected function responseForValidationException(ValidationException $e): Responsable
-    {
+    protected function responseForValidationException(
+        ValidationException $e,
+    ): Responsable {
         return new UnprocessableErrorResponse(
             message: $e->getMessage(),
             data: $e->errors(),
@@ -219,8 +228,9 @@ class Handler extends ExceptionHandler
         );
     }
 
-    protected function responseForThrottleRequestsException(ThrottleRequestsException $e): Responsable
-    {
+    protected function responseForThrottleRequestsException(
+        ThrottleRequestsException $e,
+    ): Responsable {
         return new TooManyAttemptsResponse(
             exception: $e,
         );

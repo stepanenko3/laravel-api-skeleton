@@ -8,15 +8,20 @@ use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerGeoipCache;
 if (!function_exists('get_media_path')) {
     function get_media_path(
         Media $media,
-        mixed $conversion = '',
-    ) {
+        string $conversion = '',
+    ): string {
         $pathGenerator = app(config('media-library.path_generator'));
 
-        $baseFileName = pathinfo((string) $media->file_name, PATHINFO_FILENAME);
+        $baseFileName = pathinfo(
+            (string) $media->file_name,
+            PATHINFO_FILENAME,
+        );
 
         if ($conversion) {
             $model = new $media->model_type();
-            $fileExtension = $model->getConversionExtension($conversion);
+            $fileExtension = $model->getConversionExtension(
+                $conversion,
+            );
 
             $fileName = substr(base_convert(md5($baseFileName), 16, 32), 0, 12) . '-' . $conversion;
 
@@ -34,20 +39,12 @@ if (!function_exists('get_media_path')) {
 }
 
 if (!function_exists('get_media_url')) {
-    /**
-     * get_media_url.
-     *
-     * @param bool $version
-     * @param bool $absolute
-     *
-     * @return string
-     */
     function get_media_url(
         Media $media,
-        mixed $conversion = '',
-        $version = false,
-        $absolute = true,
-    ) {
+        string $conversion = '',
+        bool $version = false,
+        bool $absolute = true,
+    ): string {
         $url = get_media_path($media, $conversion);
 
         if ($version) {
@@ -65,11 +62,9 @@ if (!function_exists('get_media_url')) {
 }
 
 if (!function_exists('process_text_editor')) {
-    /**
-     * process_text_editor.
-     */
-    function process_text_editor(string | array $field): array | string
-    {
+    function process_text_editor(
+        string | array $field,
+    ): array | string {
         if (is_array($field)) {
             foreach ($field as $lang => $body) {
                 $field[$lang] = str_ireplace([
@@ -89,13 +84,6 @@ if (!function_exists('process_text_editor')) {
 }
 
 if (!function_exists('make_body')) {
-    /**
-     * make_body.
-     *
-     * @param string $tinyfadeKey
-     *
-     * @return string
-     */
     function make_body(
         string $body,
         mixed $tinyfade = null,
@@ -106,7 +94,7 @@ if (!function_exists('make_body')) {
         bool $replaceHeaders = false,
         bool $removeSpaces = true,
         bool $removeEmptyTags = true
-    ) {
+    ): string {
         $body = str_ireplace('tablesaw', 'table', $body);
 
         if ($removeEmptyTags) {
@@ -153,8 +141,9 @@ if (!function_exists('make_body')) {
 }
 
 if (!function_exists('make_layouts')) {
-    function make_layouts($layouts)
-    {
+    function make_layouts(
+        array $layouts,
+    ): ExtendedCollection {
         $locale = config('app.locale');
 
         return ecollect($layouts)
@@ -184,12 +173,18 @@ if (!function_exists('make_layouts')) {
 }
 
 if (!function_exists('geocode')) {
-    function geocode($address, $lat = 0, $lng = 0)
-    {
+    function geocode(
+        string $address,
+        int | float $lat = 0,
+        int | float $lng = 0,
+    ) {
         $geo = null;
         $geo_type = '';
 
-        $latlng = implode(',', [$lat, $lng]);
+        $latlng = implode(
+            separator: ',',
+            array: [$lat, $lng],
+        );
 
         if ($address) {
             $geo_type = 'address';
@@ -207,7 +202,9 @@ if (!function_exists('geocode')) {
             $googleParam = $geo_type == 'address' ? 'address=' . urlencode((string) $address) : 'latlng=' . $latlng;
             $googleLink = 'https://maps.googleapis.com/maps/api/geocode/json?' . $googleParam . '&sensor=false&key=' . env('GEOCODE_KEY') . '&language=' . $lang;
 
-            $res = Http::get($googleLink);
+            $res = Http::get(
+                url: $googleLink,
+            );
 
             if ($res->ok()) {
                 $geo_res = $res['results'][0];
@@ -235,13 +232,9 @@ if (!function_exists('geocode')) {
 }
 
 if (!function_exists('get_location')) {
-    /**
-     * get_location.
-     *
-     * @return array
-     */
-    function get_location(mixed $ip = null)
-    {
+    function get_location(
+        ?string $ip = null,
+    ): ?array {
         if (!$ip) {
             $ip = get_ip();
         }
@@ -257,18 +250,33 @@ if (!function_exists('get_location')) {
             return $cache->payload;
         }
 
-        if (in_array_wildcard($ip, ['127.0.0.1', '::1', '192.168.*'])) {
-            return;
+        if (in_array_wildcard(
+            needle: $ip,
+            haystack: [
+                '127.0.0.1',
+                '::1',
+                '192.168.*',
+            ],
+        )) {
+            return null;
         }
 
-        $res = Http::accept('application/json')
-            ->get('http://ipinfo.io/' . $ip, [
-                'language' => 'ru',
-            ])
+        $res = Http::accept(
+            contentType: 'application/json',
+        )
+            ->get(
+                url: 'http://ipinfo.io/' . $ip,
+                query: [
+                    'language' => 'ru',
+                ],
+            )
             ->json();
 
         if ($res['loc'] ?? null) {
-            $loc = explode(',', (string) $res['loc']);
+            $loc = explode(
+                separator: ',',
+                string: (string) $res['loc'],
+            );
 
             $data = [
                 'continent_code' => '',
@@ -294,14 +302,19 @@ if (!function_exists('get_location')) {
 }
 
 if (!function_exists('ecollect')) {
-    function ecollect($items = []): ExtendedCollection
-    {
-        return new ExtendedCollection($items);
+    function ecollect(
+        mixed $items = [],
+    ): ExtendedCollection {
+        return new ExtendedCollection(
+            $items,
+        );
     }
 }
 if (!function_exists('array_values_dot')) {
-    function array_values_dot(array $fields, string $prepend = '')
-    {
+    function array_values_dot(
+        array $fields,
+        string $prepend = '',
+    ) {
         $result = [];
 
         foreach ($fields as $key => $field) {
@@ -311,8 +324,8 @@ if (!function_exists('array_values_dot')) {
                 $result = array_merge(
                     $result,
                     array_values_dot(
-                        $field,
-                        $prepend . $prefix,
+                        fields: $field,
+                        prepend: $prepend . $prefix,
                     ),
                 );
             } else {

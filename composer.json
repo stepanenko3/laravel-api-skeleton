@@ -23,15 +23,19 @@
         "php": "^8.1",
         "intervention/image": "^3.4",
         "jaybizzle/crawler-detect": "^1.2",
+        "jenssegers/agent": "^2.6",
         "laravel/framework": "^10.0|^11.0",
         "propaganistas/laravel-phone": "^5.0",
+        "snowplow/referer-parser": "^0.2.0",
         "spatie/laravel-medialibrary": "^11.2.0",
         "spatie/laravel-package-tools": "^1.14.1",
+        "spatie/laravel-permission": "^6.4",
         "spatie/laravel-translatable": "^6.4",
         "spatie/opening-hours": "^3.0.0",
         "srwiez/thumbhash": "^1.1",
         "stepanenko3/laravel-helpers": "^1.2",
-        "stepanenko3/laravel-pagination": "^1.0"
+        "stepanenko3/laravel-pagination": "^1.0",
+        "ua-parser/uap-php": "^3.9"
     },
     "require-dev": {
         "phpstan/phpstan": "^1.10",

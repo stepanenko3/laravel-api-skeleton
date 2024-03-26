@@ -7,17 +7,10 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class RequiredArrayValues implements ValidationRule
 {
-    /**
-     * The accepted values.
-     */
-    protected array $values;
-
-    /**
-     * Create a new in rule instance.
-     */
-    public function __construct(array $values)
-    {
-        $this->values = $values;
+    public function __construct(
+        protected array $values,
+    ) {
+        //
     }
 
     public function validate(

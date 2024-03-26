@@ -6,25 +6,21 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class ExtendedMailMessage extends MailMessage
 {
-    /**
-     * @var string
-     */
-    public $extendedData = [];
+    public array $extendedData = [];
 
-    public function unsubscribe($url)
-    {
+    public function unsubscribe(
+        string $url,
+    ): self {
         $this->extendedData['unsubscribeUrl'] = $url;
 
         return $this;
     }
 
-    /**
-     * Get the data array for the mail message.
-     *
-     * @return array
-     */
-    public function data()
+    public function data(): array
     {
-        return array_merge(parent::data(), $this->extendedData);
+        return array_merge(
+            parent::data(),
+            $this->extendedData,
+        );
     }
 }

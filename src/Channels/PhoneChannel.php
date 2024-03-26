@@ -8,22 +8,30 @@ use Illuminate\Support\Facades\Log;
 
 class PhoneChannel
 {
-    /**
-     * Send the given notification.
-     */
-    public function send(mixed $notifiable, Notification $notification)
-    {
+    public function send(
+        mixed $notifiable,
+        Notification $notification,
+    ) {
         $key = 'phone';
 
-        $to = $notifiable->routeNotificationFor($key, $notification);
+        $to = $notifiable->routeNotificationFor(
+            $key,
+            $notification
+        );
+
         if (!$to) {
             return;
         }
 
-        $message = $notification->{'to' . ucfirst($key)}($notifiable);
+        $message = $notification->{'to' . ucfirst($key)}(
+            $notifiable,
+        );
 
         $status = (new SMS())
-            ->send($to, $message);
+            ->send(
+                $to,
+                $message,
+            );
 
         if ($status) {
             return true;

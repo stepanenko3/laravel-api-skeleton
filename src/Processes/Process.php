@@ -4,9 +4,15 @@ namespace Stepanenko3\LaravelApiSkeleton\Processes;
 
 use Illuminate\Support\Facades\Pipeline;
 
+/** @phpstan-consistent-constructor */
 abstract class Process
 {
     public array $tasks;
+
+    public function __construct()
+    {
+        //
+    }
 
     public static function run(
         object $payload,

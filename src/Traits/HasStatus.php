@@ -2,7 +2,7 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder;
 
 trait HasStatus
 {
@@ -11,14 +11,24 @@ trait HasStatus
         return 'status';
     }
 
-    public function scopeActive(Builder $query): Builder
-    {
-        return $query->where(self::statusField(), 1);
+    public function scopeActive(
+        Builder $query,
+    ): Builder {
+        return $query->where(
+            column: self::statusField(),
+            operator: '=',
+            value: 1,
+        );
     }
 
-    public function scopeDisabled(Builder $query): Builder
-    {
-        return $query->where(self::statusField(), 0);
+    public function scopeDisabled(
+        Builder $query,
+    ): Builder {
+        return $query->where(
+            column: self::statusField(),
+            operator: '=',
+            value: 0,
+        );
     }
 
     public function toggleActivation(): void

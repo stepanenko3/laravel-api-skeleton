@@ -10,11 +10,9 @@ class OneOf implements ValidationRule
     public function __construct(
         private array $oneOf,
     ) {
+        //
     }
 
-    /**
-     * Run the validation rule.
-     */
     public function validate(
         string $attribute,
         mixed $value,

@@ -6,8 +6,9 @@ use Jenssegers\Agent\Agent;
 
 class LanguageDetect extends Agent
 {
-    public function __construct($userAgent = null)
-    {
+    public function __construct(
+        ?string $userAgent = null,
+    ) {
         parent::__construct();
 
         if ($userAgent) {
@@ -15,12 +16,7 @@ class LanguageDetect extends Agent
         }
     }
 
-    /**
-     * Detect preference and language-range.
-     *
-     * @return array
-     */
-    public function detectLanguage()
+    public function detectLanguage(): array
     {
         return [
             'preference' => $this->getLanguagePreference(),
@@ -28,24 +24,16 @@ class LanguageDetect extends Agent
         ];
     }
 
-    /**
-     * Get language prefernece.
-     *
-     * @return string
-     */
-    public function getLanguagePreference()
+    public function getLanguagePreference(): string
     {
         $languages = $this->languages();
 
-        return count($languages) ? $languages[0] : 'en';
+        return count($languages)
+            ? $languages[0]
+            : 'en';
     }
 
-    /**
-     * Get languages ranges.
-     *
-     * @return string
-     */
-    public function getLanguageRange()
+    public function getLanguageRange(): string
     {
         return implode(',', $this->languages());
     }

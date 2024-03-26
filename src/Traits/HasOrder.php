@@ -2,12 +2,13 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder;
 
 trait HasOrder
 {
-    public static function updateSort(array $sort): void
-    {
+    public static function updateSort(
+        array $sort,
+    ): void {
         $field = self::orderField();
 
         foreach ($sort as $order => $modelId) {
@@ -24,8 +25,14 @@ trait HasOrder
 
     protected static function bootHasOrder(): void
     {
-        static::addGlobalScope('order', function (Builder $builder): void {
-            $builder->orderBy(self::orderField(), 'asc');
-        });
+        static::addGlobalScope(
+            'order',
+            function (Builder $builder): void {
+                $builder->orderBy(
+                    column: self::orderField(),
+                    direction: 'asc',
+                );
+            }
+        );
     }
 }

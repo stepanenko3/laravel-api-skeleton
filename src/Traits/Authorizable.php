@@ -21,7 +21,7 @@ trait Authorizable
      */
     public function authorizeTo(
         string $ability,
-        Model $model
+        Model $model,
     ): void {
         if ($this->isAuthorizingEnabled()) {
             $gatePasses = Gate::authorize(

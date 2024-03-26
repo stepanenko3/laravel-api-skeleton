@@ -43,8 +43,10 @@ class MobileDetect extends Agent
         return $kind;
     }
 
-    public function isPhone(): bool
-    {
+    public function isPhone(
+        $userAgent = null,
+        $httpHeaders = null,
+    ): bool {
         return !$this->isTablet() && !$this->isComputer();
     }
 

@@ -2,20 +2,30 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
 
 trait Sluggable
 {
-    public function scopeFindBySlug(Builder $query, string $slug): Model
-    {
-        return $query->where($this->getSlugFieldName(), $slug)->firstOrFail();
+    public function scopeFindBySlug(
+        Builder $query,
+        string $slug,
+    ): Model {
+        return $query
+            ->where(
+                column: $this->getSlugFieldName(),
+                operator: '=',
+                value: $slug,
+            )
+            ->firstOrFail();
     }
 
     public function generateSlug(): void
     {
-        $this->{$this->getSlugFieldName()} = Str::slug($this->{$this->getSlugSourceName()});
+        $this->{$this->getSlugFieldName()} = Str::slug(
+            title: $this->{$this->getSlugSourceName()},
+        );
     }
 
     protected static function bootSluggable(): void

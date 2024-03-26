@@ -2,16 +2,22 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
 
 trait HasGeneratedCode
 {
-    public function scopeFindByCode(Builder $query, string $code): Model
-    {
+    public function scopeFindByCode(
+        Builder $query,
+        string $code
+    ): Model {
         return $query
-            ->where($this->codeField(), $code)
+            ->where(
+                column: $this->codeField(),
+                operator: '=',
+                value: $code,
+            )
             ->firstOrFail();
     }
 
@@ -24,7 +30,14 @@ trait HasGeneratedCode
     {
         $code = Str::random(10);
 
-        if ($this->where($this->codeField(), $code)->exists()) {
+        if ($this
+            ->where(
+                column: $this->codeField(),
+                operator: '=',
+                value: $code,
+            )
+            ->exists()
+        ) {
             return $this->generateCode();
         }
 
@@ -33,9 +46,11 @@ trait HasGeneratedCode
 
     protected static function bootHasGeneratedCode(): void
     {
-        static::creating(function (Model $model): void {
-            $model->refreshCode();
-        });
+        static::creating(
+            function (Model $model): void {
+                $model->refreshCode();
+            },
+        );
     }
 
     protected function codeField(): string

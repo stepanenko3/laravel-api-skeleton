@@ -9,6 +9,9 @@ class InvalidJsonException extends Exception
 {
     public function __construct()
     {
-        parent::__construct('The JSON string provided is not valid', Response::HTTP_UNPROCESSABLE_ENTITY);
+        parent::__construct(
+            message: 'The JSON string provided is not valid',
+            code: Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
     }
 }

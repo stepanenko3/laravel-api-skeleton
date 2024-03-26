@@ -4,19 +4,24 @@ namespace Stepanenko3\LaravelApiSkeleton\Services;
 
 use Exception;
 use Illuminate\Support\Facades\{Http, Log};
-use Twilio\Rest\Client;
 
 class SMS
 {
     private string $via = 'smsclub';
 
-    public function send(string $phone, string $message): self
-    {
-        return ($this->{$this->via})($phone, $message);
+    public function send(
+        string $phone,
+        string $message,
+    ): self {
+        return ($this->{$this->via})(
+            $phone,
+            $message,
+        );
     }
 
-    public function via(string $via): self
-    {
+    public function via(
+        string $via,
+    ): self {
         if (!in_array($via, ['smsclub, twilio'])) {
             throw new Exception('undefined provider ' . $via);
         }
@@ -26,9 +31,13 @@ class SMS
         return $this;
     }
 
-    protected function smsclub(string $phone, string $message): bool
-    {
-        $res = Http::withToken(env('SMSCLUB_TOKEN'))
+    protected function smsclub(
+        string $phone,
+        string $message,
+    ): bool {
+        $res = Http::withToken(
+            token: env('SMSCLUB_TOKEN'),
+        )
             ->post('https://im.smsclub.mobi/sms/send', [
                 'src_addr' => 'Shop Zakaz',
                 'phone' => [$phone],
@@ -44,21 +53,21 @@ class SMS
         return false;
     }
 
-    protected function twilio(string $phone, string $message): bool
-    {
-        try {
-            $client = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
+    // protected function twilio(string $phone, string $message): bool
+    // {
+    //     try {
+    //         $client = new Client(env('TWILIO_SID'), env('TWILIO_TOKEN'));
 
-            $client->messages->create($phone, [
-                'from' => env('TWILIO_NUMBER'),
-                'body' => $message,
-            ]);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
+    //         $client->messages->create($phone, [
+    //             'from' => env('TWILIO_NUMBER'),
+    //             'body' => $message,
+    //         ]);
+    //     } catch (Exception $e) {
+    //         Log::error($e->getMessage());
 
-            return false;
-        }
+    //         return false;
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 }

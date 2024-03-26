@@ -10,10 +10,11 @@ class SchemaDTO extends DTO
         public array $with_count,
         public array $scopes,
     ) {
+        //
     }
 
     public function with(
-        array $relations = []
+        array $relations = [],
     ): self {
         $this->with = array_merge(
             $this->with,
@@ -24,7 +25,7 @@ class SchemaDTO extends DTO
     }
 
     public function withCount(
-        array $relations = []
+        array $relations = [],
     ): self {
         $this->with_count = array_merge(
             $this->with_count,

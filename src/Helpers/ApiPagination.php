@@ -15,8 +15,14 @@ class ApiPagination
     public function toArray(): array
     {
         return collect($this->pagination->toArray())
-            ->except(keys: ['data'])
-            ->keyBy(fn ($value, $key) => Str::snake($key))
+            ->except(
+                keys: [
+                    'data',
+                ],
+            )
+            ->keyBy(
+                fn ($value, $key) => Str::snake($key),
+            )
             ->only(
                 keys: [
                     'current_page',

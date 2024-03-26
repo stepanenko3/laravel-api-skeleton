@@ -3,20 +3,20 @@
 namespace Stepanenko3\LaravelApiSkeleton\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
 class APIversion
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return mixed
-     */
-    public function handle($request, Closure $next, mixed $guard)
-    {
-        Config::set('laravel-api-skeleton.api_version', (int) $guard);
+    public function handle(
+        Request $request,
+        Closure $next,
+        mixed $guard
+    ): mixed {
+        Config::set(
+            key: 'laravel-api-skeleton.api_version',
+            value: (int) $guard,
+        );
 
         return $next($request);
     }

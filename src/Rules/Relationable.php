@@ -11,6 +11,7 @@ use Stepanenko3\LaravelApiSkeleton\Http\Schemas\Schema;
 use Stepanenko3\LaravelApiSkeleton\Rules\Groups\SchemaRules;
 use Stepanenko3\LaravelApiSkeleton\Traits\Makeable;
 
+/** @phpstan-consistent-constructor */
 class Relationable implements DataAwareRule, ValidationRule
 {
     use Makeable;
@@ -22,6 +23,7 @@ class Relationable implements DataAwareRule, ValidationRule
         public Schema $schema,
         public int $level = 0,
     ) {
+        //
     }
 
     public function validate(
@@ -30,8 +32,11 @@ class Relationable implements DataAwareRule, ValidationRule
         Closure $fail
     ): void {
         $validator = Validator::make(
-            $this->data,
-            $this->buildValidationRules($attribute, $value)
+            data: $this->data,
+            rules: $this->buildValidationRules(
+                attribute: $attribute,
+                value: $value,
+            )
         );
 
         $validator->validate();

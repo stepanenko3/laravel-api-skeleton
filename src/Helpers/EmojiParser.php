@@ -152,6 +152,8 @@ class EmojiParser
 
     private function uploadImages($data, $size = 160): void
     {
+        $manager = new ImageManager(new Driver());
+
         foreach ($data['emoji'] as $emoji) {
             $imgPath = $this->getImgPath($emoji['code'], $size);
 
@@ -183,7 +185,20 @@ class EmojiParser
             }
 
             foreach ([16, 32, 64, 128] as $subsize) {
-                Image::make('public/foo.jpg')->resize(320, 240)->insert('public/watermark.png');
+                $manager
+                    ->read(
+                        input: public_path('foo.jpg'),
+                    )
+                    ->resize(
+                        width: 320,
+                        height: 240,
+                    )
+                    ->place(
+                        element: public_path('watermark.jpg'),
+                    );
+                // ->save(
+                //     path: str_ireplace('/160/', '/' . $size . '/', storage_path('/app/public/' . $file)),
+                // );
             }
         }
 

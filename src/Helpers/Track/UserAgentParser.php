@@ -3,16 +3,20 @@
 namespace Stepanenko3\LaravelApiSkeleton\Helpers\Track;
 
 use UAParser\Parser;
+use UAParser\Result\Client;
+use UAParser\Result\Device;
+use UAParser\Result\OperatingSystem;
+use UAParser\Result\UserAgent;
 
 class UserAgentParser
 {
-    public $parser;
+    public Client $parser;
 
-    public $ua;
+    public UserAgent $ua;
 
-    public $os;
+    public OperatingSystem $os;
 
-    public $device;
+    public Device $device;
 
     public string $originalUserAgent;
 
@@ -23,7 +27,10 @@ class UserAgentParser
             $userAgent = request()->userAgent();
         }
 
-        $this->parser = Parser::create()->parse($userAgent);
+        $this->parser = Parser::create()
+            ->parse(
+                userAgent: $userAgent,
+            );
 
         $this->ua = $this->parser->ua;
         $this->os = $this->parser->os;
