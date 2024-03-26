@@ -11,7 +11,7 @@ final class SetReferrerPolicy
     public function handle(
         Request $request,
         Closure $next,
-    ): Response {
+    ) {
         /**
          * @var Response $response
          */
