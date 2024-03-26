@@ -3,7 +3,9 @@
 namespace Stepanenko3\LaravelApiSkeleton\Models\Users;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
+use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
 use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Model;
 
 abstract class UserPhoneToken extends Model
@@ -23,9 +25,14 @@ abstract class UserPhoneToken extends Model
         );
     }
 
-    public function scopeCurrentUser(Builder $query): void
-    {
-        $query->where('user_id', user()->id);
+    public function scopeCurrentUser(
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
+    ): void {
+        $query->where(
+            column: 'user_id',
+            operator: '=',
+            value: user()->id,
+        );
     }
 
     public function generateCode(
@@ -51,7 +58,7 @@ abstract class UserPhoneToken extends Model
     }
 
     public function scopeValid(
-        Builder $query,
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
     ): void {
         $query
             ->notExpired()
@@ -63,7 +70,7 @@ abstract class UserPhoneToken extends Model
     }
 
     public function scopeNotValid(
-        Builder $query,
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
     ): void {
         $query
             ->expired()
@@ -88,7 +95,7 @@ abstract class UserPhoneToken extends Model
     }
 
     public function scopeExpired(
-        Builder $query,
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
     ): void {
         $query->where(
             column: 'created_at',
@@ -101,7 +108,7 @@ abstract class UserPhoneToken extends Model
     }
 
     public function scopeNotExpired(
-        Builder $query,
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
     ): void {
         $query->where(
             column: 'created_at',

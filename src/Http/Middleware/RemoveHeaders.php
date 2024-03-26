@@ -11,7 +11,7 @@ final class RemoveHeaders
     public function handle(
         Request $request,
         Closure $next,
-    ): Response {
+    ): mixed {
         /**
          * @var Response $response
          */

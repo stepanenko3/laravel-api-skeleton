@@ -2,7 +2,9 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
-use Illuminate\Database\Query\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
+use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
 
 trait HasOrder
 {
@@ -27,7 +29,7 @@ trait HasOrder
     {
         static::addGlobalScope(
             'order',
-            function (Builder $builder): void {
+            function (EloquentBuilderContract | QueryBuilderContract | Builder $builder): void {
                 $builder->orderBy(
                     column: self::orderField(),
                     direction: 'asc',
