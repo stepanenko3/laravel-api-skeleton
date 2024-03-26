@@ -11,7 +11,7 @@ final class StrictTransportSecurity
     public function handle(
         Request $request,
         Closure $next,
-    ) {
+    ): mixed {
         /**
          * @var Response $response
          */

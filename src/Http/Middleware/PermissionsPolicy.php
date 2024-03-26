@@ -11,7 +11,7 @@ final class PermissionsPolicy
     public function handle(
         Request $request,
         Closure $next,
-    ) {
+    ): mixed {
         /**
          * @var Response $response
          */

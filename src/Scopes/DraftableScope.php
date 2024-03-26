@@ -2,13 +2,12 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Scopes;
 
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Stepanenko3\LaravelApiSkeleton\Traits\Draftable\DraftStatus;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
 use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
 use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
+use Stepanenko3\LaravelApiSkeleton\Traits\Draftable\DraftStatus;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Scope;
 
 class DraftableScope implements Scope
 {
@@ -38,9 +37,6 @@ class DraftableScope implements Scope
         $this->extend(
             builder: $builder,
         );
-        $this->extend(
-            builder: $builder,
-        );
     }
 
     public function remove(
@@ -65,19 +61,7 @@ class DraftableScope implements Scope
                     query: $query,
                     key: $key,
                 );
-            if ($this->isDraftableConstraint(
-                where: $where,
-                column: $column,
-            )) {
-                $this->removeWhere(
-                    query: $query,
-                    key: $key,
-                );
 
-                $this->removeBinding(
-                    query: $query,
-                    key: $bindingKey,
-                );
                 $this->removeBinding(
                     query: $query,
                     key: $bindingKey,
@@ -97,9 +81,6 @@ class DraftableScope implements Scope
             $this->{"add{$extension}"}(
                 $builder,
             );
-            $this->{"add{$extension}"}(
-                $builder,
-            );
         }
     }
 
@@ -114,15 +95,6 @@ class DraftableScope implements Scope
                     model: $builder->getModel(),
                 );
 
-                return $builder->where(
-                    column: $this->getDraftStatusColumn(
-                        builder: $builder,
-                    ),
-                    operator: '=',
-                    value: DraftStatus::PUBLISHED,
-                );
-            }
-        );
                 return $builder->where(
                     column: $this->getDraftStatusColumn(
                         builder: $builder,
@@ -152,13 +124,6 @@ class DraftableScope implements Scope
                 );
             }
         );
-                return $builder->where(
-                    column: $this->getDraftStatusColumn($builder),
-                    operator: '=',
-                    value: DraftStatus::DRAFT,
-                );
-            }
-        );
     }
 
     private function addwithAnyDraftStatus(
@@ -172,9 +137,6 @@ class DraftableScope implements Scope
                     model: $builder->getModel(),
                 );
 
-                return $builder;
-            }
-        );
                 return $builder;
             }
         );
@@ -192,25 +154,13 @@ class DraftableScope implements Scope
                     builder: $builder,
                     model: $model,
                 );
-                $this->remove(
-                    builder: $builder,
-                    model: $model,
-                );
 
                 $builder->where(
                     column: $model->getQualifiedDraftStatusColumn(),
                     operator: '=',
                     value: DraftStatus::PUBLISHED,
                 );
-                $builder->where(
-                    column: $model->getQualifiedDraftStatusColumn(),
-                    operator: '=',
-                    value: DraftStatus::PUBLISHED,
-                );
 
-                return $builder;
-            }
-        );
                 return $builder;
             }
         );
@@ -228,25 +178,13 @@ class DraftableScope implements Scope
                     builder: $builder,
                     model: $model,
                 );
-                $this->remove(
-                    builder: $builder,
-                    model: $model,
-                );
 
                 $builder->where(
                     column: $model->getQualifiedDraftStatusColumn(),
                     operator: '=',
                     value: DraftStatus::DRAFT,
                 );
-                $builder->where(
-                    column: $model->getQualifiedDraftStatusColumn(),
-                    operator: '=',
-                    value: DraftStatus::DRAFT,
-                );
 
-                return $builder;
-            }
-        );
                 return $builder;
             }
         );
@@ -260,13 +198,6 @@ class DraftableScope implements Scope
             function (EloquentBuilderContract | QueryBuilderContract | Builder $builder, $id = null) {
                 $builder->withAnyDraftStatus();
 
-                return $this->updateDraftableStatus(
-                    builder: $builder,
-                    id: $id,
-                    status: DraftStatus::PUBLISHED,
-                );
-            }
-        );
                 return $this->updateDraftableStatus(
                     builder: $builder,
                     id: $id,
@@ -291,13 +222,6 @@ class DraftableScope implements Scope
                 );
             }
         );
-                return $this->updateDraftableStatus(
-                    builder: $builder,
-                    id: $id,
-                    status: DraftStatus::DRAFT,
-                );
-            }
-        );
     }
 
     private function getDraftStatusColumn(
@@ -307,14 +231,8 @@ class DraftableScope implements Scope
             return $builder
                 ->getModel()
                 ->getQualifiedDraftStatusColumn();
-            return $builder
-                ->getModel()
-                ->getQualifiedDraftStatusColumn();
         }
 
-        return $builder
-            ->getModel()
-            ->getDraftStatusColumn();
         return $builder
             ->getModel()
             ->getDraftStatusColumn();
@@ -340,15 +258,8 @@ class DraftableScope implements Scope
         $query->setBindings(
             bindings: $bindings,
         );
-        $query->setBindings(
-            bindings: $bindings,
-        );
     }
 
-    private function isDraftableConstraint(
-        array $where,
-        string $column,
-    ): bool {
     private function isDraftableConstraint(
         array $where,
         string $column,
@@ -370,22 +281,12 @@ class DraftableScope implements Scope
                 id: $id,
             );
 
-            $model = $builder->find(
-                id: $id,
-            );
-
             $model->{$model->getDraftStatusColumn()} = $status;
             $model->save();
 
             return $id;
-            return $id;
         }
 
-        return $builder->update(
-            values: [
-                $builder->getModel()->getDraftStatusColumn() => $status,
-            ],
-        );
         return $builder->update(
             values: [
                 $builder->getModel()->getDraftStatusColumn() => $status,

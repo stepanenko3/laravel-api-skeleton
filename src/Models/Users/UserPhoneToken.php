@@ -25,9 +25,14 @@ abstract class UserPhoneToken extends Model
         );
     }
 
-    public function scopeCurrentUser(EloquentBuilderContract | QueryBuilderContract | Builder $query): void
-    {
-        $query->where('user_id', user()->id);
+    public function scopeCurrentUser(
+        EloquentBuilderContract | QueryBuilderContract | Builder $query,
+    ): void {
+        $query->where(
+            column: 'user_id',
+            operator: '=',
+            value: user()->id,
+        );
     }
 
     public function generateCode(

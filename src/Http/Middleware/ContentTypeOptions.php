@@ -11,7 +11,7 @@ final class ContentTypeOptions
     public function handle(
         Request $request,
         Closure $next,
-    ) {
+    ): mixed {
         /**
          * @var Response $response
          */

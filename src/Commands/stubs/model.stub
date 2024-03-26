@@ -4,6 +4,9 @@ namespace {{ namespace }};
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Model;
+use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
+use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
+use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
 
 class {{ class }} extends Model
 {
@@ -18,12 +21,12 @@ class {{ class }} extends Model
     ];
 
     public function scopeApplyOrder(
-        Builder $builder,
+        EloquentBuilderContract | QueryBuilderContract | Builder $builder,
         string $orderBy,
     ): Builder {
         return $builder->when(
             $orderBy,
-            fn (Builder $query) => match ($orderBy) {
+            fn (EloquentBuilderContract | QueryBuilderContract | Builder $query) => match ($orderBy) {
                 'oldest' => $query->orderBy($this->qualifyColumn('id')),
                 default => $query->orderByDesc($this->qualifyColumn('id')),
             },
