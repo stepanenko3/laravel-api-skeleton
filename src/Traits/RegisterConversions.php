@@ -11,7 +11,7 @@ trait RegisterConversions
 {
     use InteractsWithMedia;
 
-    protected array $conversions;
+    protected ?array $conversions = null;
 
     protected array $conversionsExtensions = [];
 
