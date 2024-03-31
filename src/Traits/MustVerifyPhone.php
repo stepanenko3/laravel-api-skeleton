@@ -5,7 +5,6 @@ namespace Stepanenko3\LaravelApiSkeleton\Traits;
 use Exception;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\RateLimiter;
-use Stepanenko3\LaravelApiSkeleton\Models\Users\UserPhoneToken;
 
 trait MustVerifyPhone
 {
@@ -66,7 +65,7 @@ trait MustVerifyPhone
         return $this->phone;
     }
 
-    public function createPhoneToken(): UserPhoneToken
+    public function createPhoneToken(): mixed
     {
         return $this
             ->userPhoneTokens()
@@ -76,7 +75,7 @@ trait MustVerifyPhone
     public function userPhoneTokens(): HasMany
     {
         return $this->hasMany(
-            related: UserPhoneToken::class,
+            related: config('api-skeleton.user_phone_token_model'),
         );
     }
 }

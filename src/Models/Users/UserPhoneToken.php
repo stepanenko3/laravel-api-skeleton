@@ -10,13 +10,16 @@ use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Model;
 
 abstract class UserPhoneToken extends Model
 {
-    public const EXPIRATION_TIME = 20; // minutes
-
     protected $fillable = [
         'code', 'user_id', 'used',
     ];
 
     abstract public function sendCode(): void;
+
+    public function expirationTime(): int | float
+    {
+        return 20;
+    }
 
     public function user(): BelongsTo
     {
@@ -91,7 +94,7 @@ abstract class UserPhoneToken extends Model
         return $this->created_at
             ->diffInMinutes(
                 now()
-            ) > static::EXPIRATION_TIME;
+            ) > $this->expirationTime();
     }
 
     public function scopeExpired(
@@ -102,7 +105,7 @@ abstract class UserPhoneToken extends Model
             operator: '<',
             value: now()
                 ->subMinutes(
-                    static::EXPIRATION_TIME,
+                    $this->expirationTime(),
                 )
         );
     }
@@ -115,7 +118,7 @@ abstract class UserPhoneToken extends Model
             operator: '>=',
             value: now()
                 ->subMinutes(
-                    static::EXPIRATION_TIME,
+                    $this->expirationTime(),
                 )
         );
     }

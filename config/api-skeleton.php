@@ -14,4 +14,6 @@ return [
     |-------------------------------------------
     */
     'dto_require_casting' => true,
+
+    'user_phone_token_model' => Stepanenko3\LaravelApiSkeleton\Models\Users\UserPhoneToken::class,
 ];
