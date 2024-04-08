@@ -2,12 +2,12 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
-use Exception;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\RateLimiter;
+use Stepanenko3\LaravelApiSkeleton\Models\OTP;
 
 trait MustVerifyPhone
 {
+    use HasOTP;
+
     public function getPhone(): ?string
     {
         if ($this->hasVerifiedPhone()) {
@@ -26,56 +26,47 @@ trait MustVerifyPhone
     {
         return $this
             ->forceFill([
-                'phone_verified_at' => $this->freshTimestamp(),
+                'phone_verified_at' => now(),
             ])
             ->save();
     }
 
-    public function sendPhoneVerificationNotification(): bool
-    {
-        $token = $this->createPhoneToken();
+    abstract public function sendPhoneVerificationOtpCallback(
+        OTP $otp,
+    ): void;
 
-        try {
-            $key = 'user:' . $this->getPhoneForVerification() . ':phone_verification_notification';
+    public function sendPhoneVerificationOtp(
+        ?int $lifetimeSeconds = null,
+        ?int $codeLength = null,
+    ): void {
+        $this
+            ->createOTP(
+                target: $this->getPhoneForVerification(),
+                type: 'phone_verification',
+                lifetimeSeconds: $lifetimeSeconds,
+                codeLength: $codeLength,
+            )
+            ->send(fn (OTP $otp) => $this->sendPhoneVerificationOtpCallback(
+                otp: $otp,
+            ));
+    }
 
-            $token->sendCode();
-
-            RateLimiter::increment(
-                key: $key,
-                decaySeconds: 60,
-                amount: 1,
-            );
-
-            session([
-                'verify_phone_available_at' => RateLimiter::availableIn(
-                    key: $key,
-                ),
-            ]);
-
+    public function usePhoneVerificationOtp(
+        string | int $code,
+    ): bool {
+        if ($this->hasVerifiedPhone()) {
             return true;
-        } catch (Exception) {
-            $token->delete();
-
-            return false;
         }
+
+        return OTP::use(
+            code: $code,
+            type: 'phone_verification',
+            target: $this->getPhoneForVerification(),
+        );
     }
 
     public function getPhoneForVerification(): string
     {
         return $this->phone;
-    }
-
-    public function createPhoneToken(): mixed
-    {
-        return $this
-            ->userPhoneTokens()
-            ->create();
-    }
-
-    public function userPhoneTokens(): HasMany
-    {
-        return $this->hasMany(
-            related: config('api-skeleton.user_phone_token_model'),
-        );
     }
 }

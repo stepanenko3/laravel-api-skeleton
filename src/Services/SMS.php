@@ -39,7 +39,7 @@ class SMS
             token: env('SMSCLUB_TOKEN'),
         )
             ->post('https://im.smsclub.mobi/sms/send', [
-                'src_addr' => 'Shop Zakaz',
+                'src_addr' => 'Zamovlennia',
                 'phone' => [$phone],
                 'message' => $message,
             ]);

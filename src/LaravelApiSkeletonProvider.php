@@ -23,11 +23,6 @@ class LaravelApiSkeletonProvider extends PackageServiceProvider
     public function configurePackage(
         Package $package,
     ): void {
-        /*
-         * This class is a Package Service Provider
-         *
-         * More info: https://github.com/spatie/laravel-package-tools
-         */
         $package
             ->name('laravel-api-skeleton')
             ->hasConfigFile(['api-skeleton', 'headers'])
@@ -37,6 +32,9 @@ class LaravelApiSkeletonProvider extends PackageServiceProvider
                 ContainerActionMakeCommand::class,
                 ContainerDtoMakeCommand::class,
                 ContainerControllerMakeCommand::class,
+            ])
+            ->hasMigrations([
+                'create_otp_table',
             ])
             ->hasInstallCommand(function (InstallCommand $command): void {
                 $command
