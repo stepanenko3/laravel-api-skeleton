@@ -49,7 +49,7 @@ class OTP extends Model
         string $target,
         string $type,
     ): self {
-        $otp = OTP::query()
+        $otp = self::query()
             ->where(
                 column: 'code',
                 operator: '=',

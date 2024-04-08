@@ -28,7 +28,7 @@ trait HasOTP
                     codeLength: $codeLength,
                 ),
                 'used' => 0,
-                'for_type' => get_class($this),
+                'for_type' => static::class,
                 'for_id' => $this->getKey(),
                 'target' => $target,
                 'type' => $type,
