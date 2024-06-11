@@ -3,8 +3,8 @@
 namespace Stepanenko3\LaravelApiSkeleton\Listeners;
 
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Drivers\Imagick\Driver;
 use Thumbhash\Thumbhash;
+use Intervention\Image\Drivers\Imagick\Driver;
 use Intervention\Image\ImageManager;
 use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAddedEvent;
 
@@ -15,9 +15,7 @@ class AddThumbHashForMedia
     ): void {
         $content = Storage::disk(config('media-library.disk_name'))->get(get_media_path($event->media));
 
-        $manager = new ImageManager(new Driver());
-
-        $image = $manager
+        $image = (new ImageManager(new Driver()))
             ->read(
                 input: $content,
             )

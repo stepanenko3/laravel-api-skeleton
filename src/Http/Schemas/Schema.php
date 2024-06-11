@@ -8,10 +8,12 @@ use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
 use Stepanenko3\LaravelApiSkeleton\DTO\SchemaDTO;
 use Stepanenko3\LaravelApiSkeleton\Http\Requests\Request;
 use Stepanenko3\LaravelApiSkeleton\Traits\Authorizable;
+use Stepanenko3\LaravelApiSkeleton\Traits\Makeable;
 
 abstract class Schema
 {
     use Authorizable;
+    use Makeable;
 
     public function defaultFields(): array
     {

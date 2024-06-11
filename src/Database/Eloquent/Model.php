@@ -12,4 +12,17 @@ abstract class Model extends BaseModel
             query: $query,
         );
     }
+
+    public function setOnly(
+        array $attributes,
+    ): self {
+        $this->setRawAttributes(
+            attributes: $this->only(
+                attributes: $attributes,
+            ),
+            sync: true,
+        );
+
+        return $this;
+    }
 }

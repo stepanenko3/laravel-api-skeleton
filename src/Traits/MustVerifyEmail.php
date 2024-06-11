@@ -41,26 +41,6 @@ trait MustVerifyEmail
         );
     }
 
-    abstract public function sendEmailVerificationOtpCallback(
-        OTP $otp,
-    ): void;
-
-    public function sendEmailVerificationOtp(
-        ?int $lifetimeSeconds = null,
-        ?int $codeLength = null,
-    ): void {
-        $this
-            ->createOTP(
-                target: $this->getEmailForVerification(),
-                type: 'email_verification',
-                lifetimeSeconds: $lifetimeSeconds,
-                codeLength: $codeLength,
-            )
-            ->send(fn (OTP $otp) => $this->sendEmailVerificationOtpCallback(
-                otp: $otp,
-            ));
-    }
-
     public function useEmailVerificationOtp(
         string | int $code,
     ): bool {
@@ -70,7 +50,7 @@ trait MustVerifyEmail
 
         return OTP::use(
             code: $code,
-            type: 'email_verification',
+            type: 'email_verify',
             target: $this->getEmailForVerification(),
         );
     }

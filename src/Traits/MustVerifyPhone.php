@@ -31,26 +31,6 @@ trait MustVerifyPhone
             ->save();
     }
 
-    abstract public function sendPhoneVerificationOtpCallback(
-        OTP $otp,
-    ): void;
-
-    public function sendPhoneVerificationOtp(
-        ?int $lifetimeSeconds = null,
-        ?int $codeLength = null,
-    ): void {
-        $this
-            ->createOTP(
-                target: $this->getPhoneForVerification(),
-                type: 'phone_verification',
-                lifetimeSeconds: $lifetimeSeconds,
-                codeLength: $codeLength,
-            )
-            ->send(fn (OTP $otp) => $this->sendPhoneVerificationOtpCallback(
-                otp: $otp,
-            ));
-    }
-
     public function usePhoneVerificationOtp(
         string | int $code,
     ): bool {
@@ -60,7 +40,7 @@ trait MustVerifyPhone
 
         return OTP::use(
             code: $code,
-            type: 'phone_verification',
+            type: 'phone_verify',
             target: $this->getPhoneForVerification(),
         );
     }
