@@ -9,31 +9,20 @@ class NestedCollection extends Collection
     public function ancestorsOf(
         int | string $id,
     ): self {
-        $find = $this
-            ->where(
-                key: 'id',
-                operator: '=',
-                value: $id,
-            )
-            ->first();
+        // Use keyBy for faster lookups if not already indexed
+        $allItems = $this->keyBy('id');
+
+        $find = $allItems->get($id);
 
         if (!$find) {
             return new self();
         }
 
-        $items = $this
-            ->where(
-                key: 'id',
-                operator: '!=',
-                value: $find->id,
-            )
-            ->where(
-                fn ($item) => $find->_rgt > $item->_lft && $find->_rgt < $item->_rgt,
-            );
+        $items = $this->filter(function ($item) use ($find) {
+            return $find->_rgt > $item->_lft && $find->_rgt < $item->_rgt;
+        });
 
-        return new self(
-            items: $items,
-        );
+        return new self($items->values());
     }
 
     public function siblingsOf(
