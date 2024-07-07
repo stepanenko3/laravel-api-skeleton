@@ -2,39 +2,73 @@
 
 namespace Stepanenko3\LaravelApiSkeleton\Helpers\Track;
 
-use Jenssegers\Agent\Agent;
+use Illuminate\Http\Request;
+use WhichBrowser\Parser;
 
-class LanguageDetect extends Agent
+class LanguageDetect extends Parser
 {
-    public function __construct(
-        ?string $userAgent = null,
-    ) {
-        parent::__construct();
-
-        if ($userAgent) {
-            $this->setUserAgent($userAgent);
-        }
-    }
-
     public function detectLanguage(): array
     {
+        $languages = $this->getLanguages(
+            request: request(),
+        );
+
         return [
-            'preference' => $this->getLanguagePreference(),
-            'language_range' => $this->getLanguageRange(),
+            'preference' => $languages[0],
+            'language_range' => implode(
+                separator: ', ',
+                array: $languages,
+            ),
         ];
     }
 
-    public function getLanguagePreference(): string
-    {
-        $languages = $this->languages();
+    protected function getLanguages(
+        Request $request,
+    ): array {
+        $acceptLanguage = $request->header(
+            key: 'Accept-Language',
+        );
 
-        return count($languages)
-            ? $languages[0]
-            : 'en';
+        if ($acceptLanguage) {
+            $languages = $this->parseAcceptLanguage(
+                acceptLanguage: $acceptLanguage,
+            );
+        }
+
+        return $languages ?? ['en'];
     }
 
-    public function getLanguageRange(): string
-    {
-        return implode(',', $this->languages());
+    protected function parseAcceptLanguage(
+        string $acceptLanguage,
+    ): array {
+        $languages = [];
+
+        // Split the header by comma
+        $languageRanges = explode(',', $acceptLanguage);
+
+        foreach ($languageRanges as $languageRange) {
+            // Split each range by semicolon to separate the language code from the q-value
+            $parts = explode(';', $languageRange);
+
+            // The first part is the language code
+            $language = trim($parts[0]);
+
+            // Default q-value is 1
+            $qValue = 1.0;
+
+            // If there's a q-value specified, parse it
+            if (isset($parts[1]) && strpos($parts[1], 'q=') === 0) {
+                $qValue = (float) substr($parts[1], 2);
+            }
+
+            // Store the language and q-value
+            $languages[$language] = $qValue;
+        }
+
+        // Sort languages by q-value in descending order
+        arsort($languages);
+
+        // Return only the language codes
+        return array_keys($languages);
     }
 }

@@ -123,12 +123,29 @@ abstract class JsonResource extends BaseJsonResource
             ->mapWithKeys(function (string $attribute, int | string $key): array {
                 $resolvedKey = is_string($key) ? $key : $attribute;
 
+                $value = $this->whenNotNull(
+                    method_exists($this->resource, 'isTranslatableAttribute') && $this->resource->isTranslatableAttribute($resolvedKey)
+                        ? $this->resource->getOriginal($resolvedKey)
+                        : ($this->resource->{$resolvedKey} ?? $this->resource->getOriginal($resolvedKey)),
+                );
+
+                if (is_numeric($value)) {
+                    if (is_int($value)) {
+                        $value = (int) $value;
+                    } elseif (is_float($value) || is_double($value)) {
+                        $value = (float) $value;
+                    } else {
+                        // If it's numeric but not specifically int or float, check its type
+                        if (ctype_digit($value)) {
+                            $value = (int) $value;
+                        } else {
+                            $value = (float) $value;
+                        }
+                    }
+                }
+
                 return [
-                    $attribute => $this->whenNotNull(
-                        method_exists($this->resource, 'isTranslatableAttribute') && $this->resource->isTranslatableAttribute($resolvedKey)
-                            ? $this->resource->getOriginal($resolvedKey)
-                            : ($this->resource->{$resolvedKey} ?? $this->resource->getOriginal($resolvedKey)),
-                    ),
+                    $attribute => $value,
                 ];
             })
             ->merge($this->toAttributes($request))

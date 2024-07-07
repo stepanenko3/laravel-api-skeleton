@@ -13,7 +13,12 @@ class AddThumbHashForMedia
     public function handle(
         MediaHasBeenAddedEvent $event,
     ): void {
-        $content = Storage::disk(config('media-library.disk_name'))->get(get_media_path($event->media));
+        $content = Storage::disk(config('media-library.disk_name'))
+            ->get(
+                path: get_media_path(
+                    media: $event->media,
+                ),
+            );
 
         $image = (new ImageManager(new Driver()))
             ->read(
@@ -31,7 +36,10 @@ class AddThumbHashForMedia
 
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
-                $pixel = $image->pickColor($x, $y);
+                $pixel = $image->pickColor(
+                    x: $x,
+                    y: $y,
+                );
 
                 $pixels[] = $pixel[0];
                 $pixels[] = $pixel[1];
@@ -40,8 +48,15 @@ class AddThumbHashForMedia
             }
         }
 
-        $hash = Thumbhash::RGBAToHash($width, $height, $pixels);
-        $key = Thumbhash::convertHashToString($hash);
+        $hash = Thumbhash::RGBAToHash(
+            w: $width,
+            h: $height,
+            rgba: $pixels,
+        );
+
+        $key = Thumbhash::convertHashToString(
+            hash: $hash,
+        );
 
         $event->media
             ->setCustomProperty(
