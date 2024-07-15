@@ -41,6 +41,10 @@ class AddThumbHashForMedia
                     y: $y,
                 );
 
+                if (!is_array($pixel)) {
+                    $pixel = $pixel->toArray();
+                }
+
                 $pixels[] = $pixel[0];
                 $pixels[] = $pixel[1];
                 $pixels[] = $pixel[2];

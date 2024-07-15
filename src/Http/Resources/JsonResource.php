@@ -54,7 +54,12 @@ abstract class JsonResource extends BaseJsonResource
                 'id' => $this->whenNotNull($this->getKey()),
                 'type' => $this->getTable(),
                 'attributes' => $this->resolveAttributes($request),
-                'meta' => $this->toMeta($request),
+                'meta' => array_merge(
+                    $this->toMeta($request),
+                    method_exists($this->resource, 'getMetaAttributes')
+                        ? $this->resource->getMetaAttributes()
+                        : [],
+                ),
                 'relations' => $this->resolveRelationships($request),
             ];
 
