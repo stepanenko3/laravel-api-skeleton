@@ -18,9 +18,7 @@ class NestedCollection extends Collection
             return new self();
         }
 
-        $items = $this->filter(function ($item) use ($find) {
-            return $find->_rgt > $item->_lft && $find->_rgt < $item->_rgt;
-        });
+        $items = $this->filter(fn ($item) => $find->_rgt > $item->_lft && $find->_rgt < $item->_rgt);
 
         return new self($items->values());
     }

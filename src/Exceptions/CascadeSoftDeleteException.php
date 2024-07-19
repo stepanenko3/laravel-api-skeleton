@@ -15,7 +15,6 @@ class CascadeSoftDeleteException extends Exception
         );
     }
 
-
     public static function invalidRelationships(
         array $relationships,
     ): self {
@@ -26,7 +25,7 @@ class CascadeSoftDeleteException extends Exception
                     value: 'Relationship',
                     count: count($relationships),
                 ),
-                join(
+                implode(
                     separator: ', ',
                     array: $relationships,
                 )

@@ -137,7 +137,7 @@ abstract class JsonResource extends BaseJsonResource
                 if (is_numeric($value)) {
                     if (is_int($value)) {
                         $value = (int) $value;
-                    } elseif (is_float($value) || is_double($value)) {
+                    } elseif (is_float($value) || is_float($value)) {
                         $value = (float) $value;
                     } else {
                         // If it's numeric but not specifically int or float, check its type

@@ -20,6 +20,20 @@ abstract class DTO implements DtoContract
         //
     }
 
+    public function __set(
+        string $name,
+        mixed $value,
+    ): void {
+        $this->{$name} = $value;
+
+        $this->keys = array_unique(
+            array: array_merge(
+                $this->keys,
+                [$name],
+            ),
+        );
+    }
+
     public static function fromRequest(
         Request $request,
     ): static {
@@ -67,8 +81,10 @@ abstract class DTO implements DtoContract
         $vars = get_object_vars($this);
 
         return $intersection
-            ?  array_intersect_key(
-                $vars, array_flip($this->keys))
+            ? array_intersect_key(
+                $vars,
+                array_flip($this->keys)
+            )
             : $vars;
     }
 
@@ -92,19 +108,5 @@ abstract class DTO implements DtoContract
         }
 
         return $default;
-    }
-
-    public function __set(
-        string $name,
-        mixed $value,
-    ): void {
-        $this->{$name} = $value;
-
-        $this->keys = array_unique(
-            array: array_merge(
-                $this->keys,
-                [$name],
-            ),
-        );
     }
 }

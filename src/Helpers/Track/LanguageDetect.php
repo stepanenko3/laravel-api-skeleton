@@ -57,7 +57,7 @@ class LanguageDetect extends Parser
             $qValue = 1.0;
 
             // If there's a q-value specified, parse it
-            if (isset($parts[1]) && strpos($parts[1], 'q=') === 0) {
+            if (isset($parts[1]) && str_starts_with($parts[1], 'q=')) {
                 $qValue = (float) substr($parts[1], 2);
             }
 

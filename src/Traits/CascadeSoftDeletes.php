@@ -13,9 +13,9 @@ trait CascadeSoftDeletes
     // Remove the model with cascading deletes
     // $model->delete();
 
-    protected static function bootCascadeSoftDeletes()
+    protected static function bootCascadeSoftDeletes(): void
     {
-        static::deleting(function ($model) {
+        static::deleting(function ($model): void {
             $model->validateCascadingSoftDelete();
 
             $model->runCascadingDeletes();
@@ -25,15 +25,11 @@ trait CascadeSoftDeletes
     protected function validateCascadingSoftDelete(): void
     {
         if (!$this->implementsSoftDeletes()) {
-            throw CascadeSoftDeleteException::softDeleteNotImplemented(
-                class: get_called_class(),
-            );
+            throw CascadeSoftDeleteException::softDeleteNotImplemented(class: static::class);
         }
 
         if ($invalidCascadingRelationships = $this->hasInvalidCascadingRelationships()) {
-            throw CascadeSoftDeleteException::invalidRelationships(
-                relationships: $invalidCascadingRelationships,
-            );
+            throw CascadeSoftDeleteException::invalidRelationships(relationships: $invalidCascadingRelationships);
         }
     }
 
@@ -45,7 +41,6 @@ trait CascadeSoftDeletes
             );
         }
     }
-
 
     protected function cascadeSoftDeletes(
         $relationship,
@@ -66,11 +61,10 @@ trait CascadeSoftDeletes
     {
         return array_filter(
             array: $this->getCascadingDeletes(),
-            callback: fn ($relationship) =>  !method_exists($this, $relationship) ||
-                !$this->{$relationship}() instanceof Relation,
+            callback: fn ($relationship) =>  !method_exists($this, $relationship)
+                || !$this->{$relationship}() instanceof Relation,
         );
     }
-
 
     protected function getCascadingDeletes(): array
     {
@@ -78,7 +72,6 @@ trait CascadeSoftDeletes
             ? (array) $this->cascadeDeletes
             : [];
     }
-
 
     protected function getActiveCascadingDeletes(): array
     {
