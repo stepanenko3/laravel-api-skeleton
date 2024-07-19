@@ -13,6 +13,8 @@ abstract class DTO implements DtoContract
     use Conditionable;
     use Makeable;
 
+    public array $keys = [];
+
     public function __construct()
     {
         //
@@ -27,7 +29,7 @@ abstract class DTO implements DtoContract
             ),
         );
 
-        return new static(
+        $static = new static(
             ...array_filter(
                 array: $request->validated(),
                 callback: fn (string $key) => in_array(
@@ -37,19 +39,37 @@ abstract class DTO implements DtoContract
                 mode: ARRAY_FILTER_USE_KEY,
             ),
         );
+
+        $static->keys = array_keys(
+            array: $request->validated(),
+        );
+
+        return $static;
     }
 
     public static function fromArray(
         array $data,
     ): static {
-        return new static(
+        $static = new static(
             ...$data,
         );
+
+        $static->keys = array_keys(
+            array: $data,
+        );
+
+        return $static;
     }
 
-    public function toArray(): array
-    {
-        return get_object_vars($this);
+    public function toArray(
+        bool $intersection = false,
+    ): array {
+        $vars = get_object_vars($this);
+
+        return $intersection
+            ?  array_intersect_key(
+                $vars, array_flip($this->keys))
+            : $vars;
     }
 
     public function toBase(): self
@@ -72,5 +92,19 @@ abstract class DTO implements DtoContract
         }
 
         return $default;
+    }
+
+    public function __set(
+        string $name,
+        mixed $value,
+    ): void {
+        $this->{$name} = $value;
+
+        $this->keys = array_unique(
+            array: array_merge(
+                $this->keys,
+                [$name],
+            ),
+        );
     }
 }
