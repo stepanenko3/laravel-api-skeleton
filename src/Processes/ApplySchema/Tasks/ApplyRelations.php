@@ -73,6 +73,7 @@ class ApplyRelations extends Task
                                     with: $with['with'] ?? [],
                                     with_count: $with['with_count'] ?? [],
                                     scopes: $with['scopes'] ?? [],
+                                    order_by: $with['order_by'] ?? null,
                                 ),
                             ),
                         ),

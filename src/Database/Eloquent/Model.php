@@ -28,4 +28,29 @@ abstract class Model extends BaseModel
 
         return $this;
     }
+
+    public function setExcept(
+        array $attributes,
+    ): self {
+        $this->setRawAttributes(
+            attributes: $this->except(
+                keys: $attributes,
+            ),
+            sync: true,
+        );
+
+        return $this;
+    }
+
+    public function applyOrder(
+        string $column,
+        string $direction = 'asc',
+    ): self {
+        $this->orderBy(
+            column: $column,
+            direction: $direction,
+        );
+
+        return $this;
+    }
 }

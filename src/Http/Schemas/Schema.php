@@ -81,6 +81,16 @@ abstract class Schema
 
     abstract public function countRelations(): array;
 
+    public function defaultSort(): ?string
+    {
+        return null;
+    }
+
+    public function sorts(): array
+    {
+        return [];
+    }
+
     public function scopes(
         Request $request,
     ): array {

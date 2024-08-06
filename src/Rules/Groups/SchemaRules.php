@@ -51,6 +51,15 @@ class SchemaRules extends AbstractRulesGroup
                             values: $this->schema->countRelations(),
                         ),
                     ],
+                    'order_by' => [
+                        'nullable',
+                        'string',
+                        Rule::in(
+                            values: array_keys(
+                                $this->schema->sorts(),
+                            ),
+                        ),
+                    ],
                 ],
             ),
             ScopesRules::make(

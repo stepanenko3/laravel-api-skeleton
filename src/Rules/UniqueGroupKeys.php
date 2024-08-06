@@ -7,7 +7,6 @@ use Closure;
 
 class UniqueGroupKeys implements ValidationRule
 {
-
     public function __construct(
         protected array $groups,
     ) {

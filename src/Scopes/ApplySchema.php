@@ -33,6 +33,7 @@ class ApplySchema
                 with: $this->dto->with,
                 with_count: $this->dto->with_count,
                 scopes: $this->dto->scopes,
+                order_by: $this->dto->order_by,
             ),
         );
     }

@@ -9,6 +9,7 @@ class SchemaDTO extends DTO
         public array $with,
         public array $with_count,
         public array $scopes,
+        public ?string $order_by,
     ) {
         //
     }

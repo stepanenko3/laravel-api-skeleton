@@ -12,10 +12,13 @@ class ApplySchemaDTO extends SchemaDTO
     public function __construct(
         public EloquentBuilderContract | QueryBuilderContract | Builder $builder,
         public Schema $schema,
+        //
         public array $fields,
         public array $with,
         public array $with_count,
         public array $scopes,
+        public ?string $order_by,
+        //
         public bool $isAuthorizingEnabled = false,
     ) {}
 }

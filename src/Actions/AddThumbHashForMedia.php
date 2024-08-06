@@ -69,13 +69,13 @@ class AddThumbHashForMedia
             $media->setCustomProperty('thumbhash', $key)->save();
         } catch (NotReadableException $e) {
             // Handle the error
-            Log::error("Image could not be decoded: " . $e->getMessage(), [
+            Log::error('Image could not be decoded: ' . $e->getMessage(), [
                 'media_id' => $media->id,
             ]);
             // Optionally, you could set a default value or take some other action
         } catch (Exception $e) {
             // Handle other exceptions
-            Log::error("An error occurred: " . $e->getMessage());
+            Log::error('An error occurred: ' . $e->getMessage());
             // Optionally, you could set a default value or take some other action
         } finally {
             // Optionally, you could take some action after the try/catch block

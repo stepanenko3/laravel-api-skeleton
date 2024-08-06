@@ -6,6 +6,7 @@ use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\ApplyCountRelatio
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\ApplyFields;
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\ApplyRelations;
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\ApplyScopes;
+use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\ApplySorts;
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\Authorize;
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\MutateDTO;
 use Stepanenko3\LaravelApiSkeleton\Processes\ApplySchema\Tasks\PerformQuery;
@@ -20,6 +21,7 @@ class ApplySchemaProcess extends Process
         ApplyRelations::class,
         ApplyCountRelations::class,
         ApplyScopes::class,
+        ApplySorts::class,
         PerformQuery::class,
     ];
 }
