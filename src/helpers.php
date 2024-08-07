@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\{Http, Storage};
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Stepanenko3\LaravelApiSkeleton\Helpers\ExtendedCollection;
 use Stepanenko3\LaravelApiSkeleton\Models\Track\TrackerGeoipCache;
+use Stepanenko3\LaravelApiSkeleton\Services\Performance\PerformanceTracker;
 
 if (!function_exists('get_media_path')) {
     function get_media_path(
@@ -334,5 +335,13 @@ if (!function_exists('array_values_dot')) {
         }
 
         return $result;
+    }
+}
+
+if (! function_exists('performance')) {
+    /** Get the PerformanceTracker instance. */
+    function performance(): PerformanceTracker
+    {
+        return app(PerformanceTracker::class);
     }
 }

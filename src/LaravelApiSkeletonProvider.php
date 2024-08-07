@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Sentry\State\HubInterface;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -17,6 +18,9 @@ use Stepanenko3\LaravelApiSkeleton\Commands\ContainerModelMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\Commands\ContainerResourceMakeCommand;
 use Stepanenko3\LaravelApiSkeleton\DTO\DTO;
 use Stepanenko3\LaravelApiSkeleton\Http\Schemas\Schema as SchemasSchema;
+use Stepanenko3\LaravelApiSkeleton\Services\Performance\ClockworkTracker;
+use Stepanenko3\LaravelApiSkeleton\Services\Performance\PerformanceTracker;
+use Stepanenko3\LaravelApiSkeleton\Services\Performance\SentryTracker;
 
 class LaravelApiSkeletonProvider extends PackageServiceProvider
 {
@@ -53,6 +57,24 @@ class LaravelApiSkeletonProvider extends PackageServiceProvider
     public function register(): void
     {
         parent::register();
+
+        $this->app->singleton(
+            abstract: PerformanceTracker::class,
+            concrete: function ($app) {
+                $sentryTracker = new SentryTracker(
+                    $app->make(HubInterface::class),
+                );
+
+                $clockworkTracker = new ClockworkTracker();
+
+                return new PerformanceTracker(
+                    trackers: [
+                        $sentryTracker,
+                        $clockworkTracker,
+                    ],
+                );
+            },
+        );
 
         foreach ([
             DTO::class,
