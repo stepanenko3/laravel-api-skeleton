@@ -511,17 +511,17 @@ class Tracker
                 userAgent: $this->userAgentOriginal,
             );
 
-            $this->mobileDetect = new MobileDetect(
-                userAgent: $this->userAgentOriginal,
-            );
+            $this->mobileDetect = new MobileDetect([
+                'User-Agent' => $this->userAgentOriginal,
+            ]);
 
             $this->crawlerDetect = new CrawlerDetect(
                 userAgent: $this->userAgentOriginal,
             );
 
-            $this->langDetect = new LanguageDetect(
-                userAgent: $this->userAgentOriginal,
-            );
+            $this->langDetect = new MobileDetect([
+                'User-Agent' => $this->userAgentOriginal,
+            ]);
         }
     }
 
