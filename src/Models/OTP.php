@@ -8,6 +8,7 @@ use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Model;
 use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
 use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Stepanenko3\LaravelApiSkeleton\Database\Eloquent\Builder;
 use Stepanenko3\LaravelApiSkeleton\Exceptions\OTP\OtpVerifyCodeAlreadyUsed;
@@ -188,7 +189,7 @@ class OTP extends Model
         EloquentBuilderContract | QueryBuilderContract | Builder $query,
     ): void {
         $query->when(
-            value: auth()->check(),
+            value: Auth::check(),
             callback: fn (EloquentBuilderContract | QueryBuilderContract | Builder $builder) => $builder->whereMorphedTo(
                 relation: 'for',
                 model: user(),

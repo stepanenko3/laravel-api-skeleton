@@ -38,7 +38,9 @@ class ApplySorts extends Task
                     $direction($payload->builder);
                 } else {
                     $payload->builder->orderBy(
-                        $field,
+                        $payload->builder->qualifyColumn(
+                            column: $field,
+                        ),
                         $direction,
                     );
                 }

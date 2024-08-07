@@ -4,6 +4,7 @@ namespace Stepanenko3\LaravelApiSkeleton\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
 
 trait HasCreatedBy
 {
@@ -24,7 +25,7 @@ trait HasCreatedBy
     {
         static::creating(
             function (Model $model): void {
-                if (auth()->check()) {
+                if (Auth::check()) {
                     $model->{self::createdByField()} = auth()
                         ->id();
                 }

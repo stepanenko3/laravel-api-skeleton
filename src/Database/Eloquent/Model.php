@@ -41,16 +41,4 @@ abstract class Model extends BaseModel
 
         return $this;
     }
-
-    public function applyOrder(
-        string $column,
-        string $direction = 'asc',
-    ): self {
-        $this->orderBy(
-            column: $column,
-            direction: $direction,
-        );
-
-        return $this;
-    }
 }
