@@ -158,6 +158,7 @@ class ArchiveService
     ): array {
         $modelInstance = new $modelClass();
         $tableName = $modelInstance->getTable();
+
         return $this->getArchiveFiles($tableName, $date);
     }
 
@@ -181,7 +182,7 @@ class ArchiveService
         $allFiles = Storage::disk($this->disk)->allFiles($this->archivePath);
         $pattern = $this->archivePath . $tableName . ($date ? "_{$date}" : '');
 
-        return array_filter($allFiles, fn($file) => Str::startsWith($file, $pattern) && Str::endsWith($file, '.json'));
+        return array_filter($allFiles, fn ($file) => Str::startsWith($file, $pattern) && Str::endsWith($file, '.json'));
     }
 
     protected function writeJsonChunks(
@@ -295,7 +296,6 @@ class ArchiveService
 //         return $record['user_id'] === $userId;
 //     }
 // );
-
 
 // Restore archived BlogPost records from a specific date
 // $date = '2024-08-08';
