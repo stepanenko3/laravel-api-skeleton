@@ -28,7 +28,7 @@ class CacheInvalidator
         Model $model,
     ): array {
         return [
-            get_class($model),
+            $model::class,
             $model->getTable(),
         ];
     }
