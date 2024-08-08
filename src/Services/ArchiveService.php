@@ -14,18 +14,29 @@ use Generator;
 
 class ArchiveService
 {
-    protected string $archivePath = 'archives/';
-
     public function __construct(
         protected string $disk = 'local',
+        protected string $archivePath = 'archives/',
     ) {
-        //
+        $this->setArchivePath(
+            archivePath: $this->archivePath,
+        );
     }
 
     public function setDisk(
         string $disk,
     ): void {
         $this->disk = $disk;
+    }
+
+    public function setArchivePath(
+        string $archivePath,
+    ): void {
+        if (!Str::endsWith($archivePath, '/')) {
+            $archivePath .= '/';
+        }
+
+        $this->archivePath = $archivePath;
     }
 
     public function archive(
