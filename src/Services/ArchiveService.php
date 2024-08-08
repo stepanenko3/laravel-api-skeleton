@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Cerbero\JsonParser\JsonParser;
 use Closure;
 use Generator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 
 class ArchiveService
 {
@@ -35,20 +37,23 @@ class ArchiveService
         if (!Str::endsWith($archivePath, '/')) {
             $archivePath .= '/';
         }
-
         $this->archivePath = $archivePath;
     }
 
     public function archive(
         string $modelClass,
         Builder $query,
-        int $chunkSize = 100,
+        int $chunkSize = 1000,
         array $relations = [],
-        ?string $customFileName = null
-    ): void {
-        $modelInstance = new $modelClass();
-        $tableName = $modelInstance->getTable();
-        $fileName = $customFileName ?? $this->archivePath . $tableName . '_' . now()->format('Y-m-d') . '.json';
+    ): int {
+        [
+            $modelInstance,
+            $tableName,
+        ] = $this->prepareModel(
+            modelClass: $modelClass,
+        );
+
+        $total = 0;
         $archiveData = [];
 
         foreach ($this->chunkGenerator($query, $chunkSize) as $chunk) {
@@ -56,7 +61,7 @@ class ArchiveService
             $chunkIds = [];
 
             foreach ($chunk as $record) {
-                $data = $record->toArray();
+                $data = $record->getOriginal();
 
                 foreach ($relations as $relation) {
                     $data[$relation] = $record->relationLoaded($relation)
@@ -68,144 +73,380 @@ class ArchiveService
                 $chunkIds[] = $record->getKey();
             }
 
-            $archiveData = array_merge($archiveData, $chunkData);
+            $archiveData = array_merge(
+                $archiveData,
+                $chunkData,
+            );
 
-            if (in_array(SoftDeletes::class, class_uses($modelInstance))) {
-                $modelClass::query()
-                    ->withoutGlobalScopes()
-                    ->whereIn($modelInstance->getKeyName(), $chunkIds)
-                    ->forceDelete();
-            } else {
-                $modelClass::query()
-                    ->withoutGlobalScopes()
-                    ->whereIn($modelInstance->getKeyName(), $chunkIds)
-                    ->delete();
-            }
+            // Here you should avoid deleting records immediately
+            $total += $this->deleteRecords(
+                modelInstance: $modelInstance,
+                chunkIds: $chunkIds,
+            );
         }
 
         if (!empty($archiveData)) {
-            $this->writeJsonChunks($fileName, $archiveData);
+            $fileName = $this->archivePath . $tableName . '_' . now()->format('Y-m-d') . '.json';
+
+            $this->writeJsonChunks(
+                fileName: $fileName,
+                data: $archiveData,
+            );
         }
+
+        return $total;
     }
 
     public function restore(
         string $modelClass,
         array $relations = [],
         ?Closure $conditions = null,
-        ?string $date = null
+        ?string $startDate = null,
+        ?string $endDate = null
     ): void {
-        $modelInstance = new $modelClass();
-        $tableName = $modelInstance->getTable();
-        $files = $this->getArchiveFiles($tableName, $date);
+        $filesToDelete = [];
 
-        foreach ($files as $file) {
-            $remainingRecords = [];
+        $this->processArchiveFiles(
+            modelClass: $modelClass,
+            conditions: $conditions,
+            startDate: $startDate,
+            endDate: $endDate,
+            callback: function ($record, $file, $modelInstance, $tableName) use ($relations, &$filesToDelete): void {
+                $relationsData = $this->extractRelationsData(
+                    record: $record,
+                    relations: $relations,
+                );
 
-            foreach ($this->readJsonChunks($file, $conditions) as $record) {
-                if ($conditions === null || $conditions($record)) {
-                    $relationsData = $this->extractRelationsData($record, $relations);
-
-                    foreach ($record as $key => $value) {
-                        if (is_array($value)) {
-                            $record[$key] = json_encode($value);
-                        }
+                foreach ($record as $key => $value) {
+                    if (is_array($value)) {
+                        $record[$key] = json_encode($value);
                     }
-
-                    $id = DB::table($tableName)->insertGetId($record);
-
-                    $this->insertRelationsData($modelInstance, $relationsData, $id);
-                } else {
-                    $remainingRecords[] = $record;
                 }
-            }
 
-            if (!empty($remainingRecords)) {
-                $this->writeJsonChunks($file, $remainingRecords);
-            } else {
-                Storage::disk($this->disk)->delete($file);
+                // Update the `updated_at` field to `now()` if it exists
+                if (array_key_exists('updated_at', $record)) {
+                    $record['updated_at'] = now();
+                }
+
+                $id = DB::table($tableName)
+                    ->insertGetId($record);
+
+                $this->insertRelationsData(
+                    modelInstance: $modelInstance,
+                    relationsData: $relationsData,
+                    id: $id,
+                );
+
+                // Collect the file to delete later
+                $filesToDelete[$file][] = $record;
             }
+        );
+
+        $keyName = (new $modelClass())->getKeyName();
+
+        // Delete the files after restoration
+        foreach ($filesToDelete as $file => $records) {
+            $this->deleteFileRecords(
+                keyName: $keyName,
+                file: $file,
+                records: $records,
+            );
         }
     }
 
     public function getArchivedRecords(
         string $modelClass,
-        ?Closure $conditions = null
+        ?Closure $conditions = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
+        bool $instantiateModels = false,
+        array $relations = [],
     ): array {
-        $modelInstance = new $modelClass();
-        $tableName = $modelInstance->getTable();
-        $files = $this->getArchiveFiles($tableName);
         $results = [];
 
-        foreach ($files as $file) {
-            foreach ($this->readJsonChunks($file, $conditions) as $record) {
-                $results[] = $record;
-            }
-        }
+        $this->processArchiveFiles(
+            modelClass: $modelClass,
+            conditions: $conditions,
+            startDate: $startDate,
+            endDate: $endDate,
+            callback: function ($record) use (&$results, $modelClass, $instantiateModels, $relations): void {
+                if ($instantiateModels) {
+                    $results[] = $this->makeModelInstanceWithRelations(
+                        modelClass: $modelClass,
+                        record: $record,
+                        relations: $relations,
+                    );
+                } else {
+                    $results[] = $record;
+                }
+            },
+        );
 
         return $results;
     }
 
     public function countArchivedRecords(
         string $modelClass,
-        ?Closure $conditions = null
+        ?Closure $conditions = null,
+        ?string $startDate = null,
+        ?string $endDate = null,
     ): int {
-        $modelInstance = new $modelClass();
-        $tableName = $modelInstance->getTable();
-        $files = $this->getArchiveFiles($tableName);
         $count = 0;
 
-        foreach ($files as $file) {
-            foreach ($this->readJsonChunks($file, $conditions) as $record) {
+        $this->processArchiveFiles(
+            modelClass: $modelClass,
+            conditions: $conditions,
+            startDate: $startDate,
+            endDate: $endDate,
+            callback: function ($record) use (&$count): void {
                 $count++;
-            }
-        }
+            },
+        );
 
         return $count;
     }
 
     public function listArchiveFiles(
         string $modelClass,
-        ?string $date = null
+        ?string $startDate = null,
+        ?string $endDate = null,
     ): array {
-        $modelInstance = new $modelClass();
-        $tableName = $modelInstance->getTable();
+        [$modelInstance, $tableName] = $this->prepareModel(
+            modelClass: $modelClass,
+        );
 
-        return $this->getArchiveFiles($tableName, $date);
+        return $this->getArchiveFiles(
+            tableName: $tableName,
+            startDate: $startDate,
+            endDate: $endDate,
+        );
     }
 
     public function deleteArchiveFiles(
         string $modelClass,
-        ?string $date = null
+        ?string $startDate = null,
+        ?string $endDate = null
     ): void {
+        $this->processArchiveFiles(
+            modelClass: $modelClass,
+            conditions: null,
+            startDate: $startDate,
+            endDate: $endDate,
+            callback: function ($record, $file): void {
+                Storage::disk($this->disk)
+                    ->delete($file);
+            },
+        );
+    }
+
+    protected function deleteFileRecords(
+        string $keyName,
+        string $file,
+        array $records,
+    ): void {
+        $filePath = Storage::disk($this->disk)
+            ->path($file);
+
+        $fileContents = file_get_contents($filePath);
+        $archiveData = json_decode($fileContents, true);
+
+        $keys = array_column($records, $keyName);
+
+        // Remove the restored records from the archive data
+        $updatedData = array_filter(
+            $archiveData,
+            fn ($archiveRecord) => !in_array($archiveRecord[$keyName], $keys),
+        );
+
+        // If the updated data is empty, delete the file
+        if (empty($updatedData)) {
+            Storage::disk($this->disk)
+                ->delete($file);
+        } else {
+            // Otherwise, update the file with the remaining data
+            file_put_contents(
+                $filePath,
+                json_encode($updatedData),
+            );
+        }
+    }
+
+    protected function makeModelInstanceWithRelations(
+        string $modelClass,
+        array $record,
+        array $relations = [],
+    ): Model {
+        /** @var Model */
+        $modelInstance = new $modelClass();
+
+        $relationsData = $this->extractRelationsData(
+            record: $record,
+            relations: $relations,
+        );
+
+        $modelInstance->forceFill(
+            attributes: $record,
+        );
+
+        foreach ($relationsData as $relation => $data) {
+            $relationModelClass = get_class(
+                object: $modelInstance
+                    ->{$relation}()
+                    ->getRelated(),
+            );
+
+            $relatedModels = array_map(
+                array: $data,
+                callback: function ($relatedRecord) use ($relationModelClass) {
+                    return $this->makeModelInstance(
+                        modelClass: $relationModelClass,
+                        record: $relatedRecord,
+                    );
+                },
+            );
+
+            $modelInstance->setRelation(
+                relation: $relation,
+                value: collect($relatedModels),
+            );
+
+            $attributes = $modelInstance->attributesToArray();
+
+            Arr::forget(
+                array: $attributes,
+                keys: $relation,
+            );
+
+            $modelInstance->setRawAttributes(
+                attributes: $attributes,
+                sync: true,
+            );
+        }
+
+        return $modelInstance;
+    }
+
+    protected function makeModelInstance(
+        string $modelClass,
+        array $record
+    ): Model {
+        /** @var Model */
+        $modelInstance = new $modelClass();
+
+        $modelInstance->forceFill(
+            attributes: $record,
+        );
+
+        return $modelInstance;
+    }
+
+    protected function prepareModel(
+        string $modelClass,
+    ): array {
         $modelInstance = new $modelClass();
         $tableName = $modelInstance->getTable();
-        $files = $this->getArchiveFiles($tableName, $date);
 
-        foreach ($files as $file) {
-            Storage::disk($this->disk)->delete($file);
+        return [
+            $modelInstance,
+            $tableName,
+        ];
+    }
+
+    protected function deleteRecords(
+        Model $modelInstance,
+        array $chunkIds,
+    ): int {
+        $query = ($modelInstance::class)::query()
+            ->withoutGlobalScopes()
+            ->whereIn(
+                column: $modelInstance->getKeyName(),
+                values: $chunkIds,
+            );
+
+        $hasSoftDeletes = in_array(
+            SoftDeletes::class,
+            class_uses_recursive($modelInstance),
+        );
+
+        if ($hasSoftDeletes) {
+            return $query->forceDelete();
         }
+
+        return $query->delete();
     }
 
     protected function getArchiveFiles(
         string $tableName,
-        ?string $date = null
+        ?string $startDate = null,
+        ?string $endDate = null,
     ): array {
-        $allFiles = Storage::disk($this->disk)->allFiles($this->archivePath);
-        $pattern = $this->archivePath . $tableName . ($date ? "_{$date}" : '');
+        $allFiles = Storage::disk($this->disk)
+            ->allFiles($this->archivePath);
 
-        return array_filter($allFiles, fn ($file) => Str::startsWith($file, $pattern) && Str::endsWith($file, '.json'));
+        $pattern = $this->archivePath . $tableName;
+
+        return array_filter(
+            $allFiles,
+            function ($file) use ($pattern, $startDate, $endDate) {
+                if (!Str::startsWith($file, $pattern) || !Str::endsWith($file, '.json')) {
+                    return false;
+                }
+
+                if ($startDate || $endDate) {
+                    $datePart = str_replace([$pattern . '_', '.json'], '', $file);
+
+                    $fileDate = Carbon::createFromFormat('Y-m-d', $datePart);
+
+                    if ($startDate && $fileDate->lt($startDate)) {
+                        return false;
+                    }
+
+                    if ($endDate && $fileDate->gt($endDate)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        );
+    }
+
+    protected function processArchiveFiles(
+        string $modelClass,
+        ?Closure $conditions,
+        ?string $startDate,
+        ?string $endDate,
+        Closure $callback,
+    ): void {
+        [$modelInstance, $tableName] = $this->prepareModel(
+            modelClass: $modelClass,
+        );
+
+        $files = $this->getArchiveFiles(
+            tableName: $tableName,
+            startDate: $startDate,
+            endDate: $endDate,
+        );
+
+        foreach ($files as $file) {
+            foreach ($this->readJsonChunks($file, $conditions) as $record) {
+                $callback($record, $file, $modelInstance, $tableName);
+            }
+        }
     }
 
     protected function writeJsonChunks(
         string $fileName,
         array $data,
-        int $chunkSize = 1000
+        int $chunkSize = 1000,
     ): void {
         if (!Storage::disk($this->disk)->exists($this->archivePath)) {
             Storage::disk($this->disk)->makeDirectory($this->archivePath);
         }
 
-        $filePath = Storage::disk($this->disk)->path($fileName);
+        $filePath = Storage::disk($this->disk)
+            ->path($fileName);
+
         $handle = fopen($filePath, 'w');
         $chunks = array_chunk($data, $chunkSize);
 
@@ -218,12 +459,14 @@ class ArchiveService
 
     protected function readJsonChunks(
         string $file,
-        ?Closure $conditions = null
+        ?Closure $conditions = null,
     ): Generator {
-        $filePath = Storage::disk($this->disk)->path($file);
+        $filePath = Storage::disk($this->disk)
+            ->path($file);
 
         foreach (JsonParser::parse($filePath) as $record) {
             $record = (array) $record;
+
             if ($conditions === null || $conditions($record)) {
                 yield $record;
             }
@@ -232,11 +475,13 @@ class ArchiveService
 
     protected function chunkGenerator(
         Builder $query,
-        int $chunkSize
+        int $chunkSize,
     ): Generator {
         $offset = 0;
         do {
-            $chunk = $query->take($chunkSize)->get();
+            $chunk = $query
+                ->take($chunkSize)
+                ->get();
 
             if ($chunk->isEmpty()) {
                 break;
@@ -250,13 +495,14 @@ class ArchiveService
 
     protected function extractRelationsData(
         array &$record,
-        array $relations
+        array $relations,
     ): array {
         $relationsData = [];
 
         foreach ($relations as $relation) {
             if (isset($record[$relation])) {
                 $relationsData[$relation] = $record[$relation];
+
                 unset($record[$relation]);
             }
         }
@@ -267,16 +513,28 @@ class ArchiveService
     protected function insertRelationsData(
         Model $modelInstance,
         array $relationsData,
-        int $id
+        int $id,
     ): void {
         foreach ($relationsData as $relation => $data) {
             foreach ($data as &$relatedRecord) {
-                $relationKey = Str::snake(class_basename($modelInstance)) . '_id';
+                $relationKey = Str::camel(class_basename($modelInstance)) . '_id';
+
                 $relatedRecord[$relationKey] = $id;
+
+                foreach ($relatedRecord as $key => $value) {
+                    if (is_array($value)) {
+                        $relatedRecord[$key] = json_encode($value);
+                    }
+                }
             }
 
-            $relationTable = $modelInstance->{$relation}()->getRelated()->getTable();
-            DB::table($relationTable)->insert($data);
+            $relationTable = $modelInstance
+                ->{$relation}()
+                ->getRelated()
+                ->getTable();
+
+            DB::table($relationTable)
+                ->insert($data);
         }
     }
 }
@@ -314,7 +572,7 @@ class ArchiveService
 // $service->restore(
 //     modelClass: BlogPost::class,
 //     relations: ['comments', 'tags'],
-//     date: $date
+//     startDate: $date
 // );
 
 // Retrieve paginated archived BlogPost records
@@ -354,13 +612,13 @@ class ArchiveService
 // Получение списка архивных файлов
 // $archiveFiles = $service->listArchiveFiles(
 //     modelClass: BlogPost::class,
-//     date: '2024-08-08'
+//     startDate: '2024-08-08'
 // );
 
 // Удаление архивных файлов
 // $service->deleteArchiveFiles(
 //     modelClass: BlogPost::class,
-//     date: '2024-08-08'
+//     startDate: '2024-08-08'
 // );
 
 // Установка диска для хранения на Amazon S3
