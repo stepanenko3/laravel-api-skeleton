@@ -15,8 +15,6 @@ class AddThumbHashForMedia
     public function handle(
         Media $media,
     ): void {
-        // $media = Media::find(7480);
-
         // Get the file content
         $content = Storage::disk(config('media-library.disk_name'))
             ->get(
@@ -81,7 +79,5 @@ class AddThumbHashForMedia
             // Optionally, you could take some action after the try/catch block
             Log::info("ThumbHash for media {$media->id} has been added");
         }
-
-        // dd(1);
     }
 }
